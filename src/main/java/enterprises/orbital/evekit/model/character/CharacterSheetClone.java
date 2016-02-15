@@ -1,0 +1,107 @@
+package enterprises.orbital.evekit.model.character;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.persistence.Entity;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.NoResultException;
+import javax.persistence.Table;
+import javax.persistence.TypedQuery;
+
+import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
+import enterprises.orbital.evekit.account.AccountAccessMask;
+import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
+import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.CachedData;
+
+@Entity
+@Table(name = "evekit_data_character_sheet_clone")
+@NamedQueries({
+    @NamedQuery(
+        name = "CharacterSheetClone.get",
+        query = "SELECT c FROM CharacterSheetClone c where c.owner = :owner and c.lifeStart <= :point and c.lifeEnd > :point"),
+})
+// 2 hour cache time - API caches for 1 hour
+public class CharacterSheetClone extends CachedData {
+  protected static final Logger log           = Logger.getLogger(CharacterSheetClone.class.getName());
+  private static final byte[]   MASK          = AccountAccessMask.createMask(AccountAccessMask.ACCESS_CHARACTER_SHEET);
+  // Stores just the cloneJumpDate part of the character sheet since this may change
+  // frequently and we want to avoid having to evolve the entire character sheet.
+  private long                  cloneJumpDate = -1;
+
+  @SuppressWarnings("unused")
+  private CharacterSheetClone() {}
+
+  public CharacterSheetClone(long cloneJumpDate) {
+    this.cloneJumpDate = cloneJumpDate;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean equivalent(CachedData sup) {
+    if (!(sup instanceof CharacterSheetClone)) return false;
+    CharacterSheetClone other = (CharacterSheetClone) sup;
+    return cloneJumpDate == other.cloneJumpDate;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public byte[] getMask() {
+    return MASK;
+  }
+
+  public long getCloneJumpDate() {
+    return cloneJumpDate;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + (int) (cloneJumpDate ^ (cloneJumpDate >>> 32));
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (!super.equals(obj)) return false;
+    if (getClass() != obj.getClass()) return false;
+    CharacterSheetClone other = (CharacterSheetClone) obj;
+    if (cloneJumpDate != other.cloneJumpDate) return false;
+    return true;
+  }
+
+  @Override
+  public String toString() {
+    return "CharacterSheetClone [cloneJumpDate=" + cloneJumpDate + ", owner=" + owner + ", lifeStart=" + lifeStart + ", lifeEnd=" + lifeEnd + "]";
+  }
+
+  public static CharacterSheetClone get(final SynchronizedEveAccount owner, final long time) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<CharacterSheetClone>() {
+        @Override
+        public CharacterSheetClone run() throws Exception {
+          TypedQuery<CharacterSheetClone> getter = EveKitUserAccountProvider.getFactory().getEntityManager().createNamedQuery("CharacterSheetClone.get",
+                                                                                                                              CharacterSheetClone.class);
+          getter.setParameter("owner", owner);
+          getter.setParameter("point", time);
+          try {
+            return getter.getSingleResult();
+          } catch (NoResultException e) {
+            return null;
+          }
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return null;
+  }
+}
