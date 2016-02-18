@@ -234,22 +234,4 @@ public class Blueprint extends CachedData {
     return Collections.emptyList();
   }
 
-  public static List<Blueprint> getAllBlueprints(final SynchronizedEveAccount owner, final long time) {
-    try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<Blueprint>>() {
-        @Override
-        public List<Blueprint> run() throws Exception {
-          TypedQuery<Blueprint> getter = EveKitUserAccountProvider.getFactory().getEntityManager().createNamedQuery("Blueprint.listByItemID", Blueprint.class);
-          getter.setParameter("owner", owner);
-          getter.setParameter("item", -1L);
-          getter.setParameter("point", time);
-          return getter.getResultList();
-        }
-      });
-    } catch (Exception e) {
-      log.log(Level.SEVERE, "query error", e);
-    }
-    return Collections.emptyList();
-  }
-
 }

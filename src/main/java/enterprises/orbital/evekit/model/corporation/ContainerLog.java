@@ -49,8 +49,8 @@ public class ContainerLog extends CachedData {
   private long                itemID;
   private long                itemTypeID;
   private int                 locationID;
-  private int                 newConfiguration;
-  private int                 oldConfiguration;
+  private String              newConfiguration;
+  private String              oldConfiguration;
   private String              passwordType;
   private int                 quantity;
   private long                typeID;
@@ -58,8 +58,8 @@ public class ContainerLog extends CachedData {
   @SuppressWarnings("unused")
   private ContainerLog() {}
 
-  public ContainerLog(long logTime, String action, long actorID, String actorName, int flag, long itemID, long itemTypeID, int locationID, int newConfiguration,
-                      int oldConfiguration, String passwordType, int quantity, long typeID) {
+  public ContainerLog(long logTime, String action, long actorID, String actorName, int flag, long itemID, long itemTypeID, int locationID,
+                      String newConfiguration, String oldConfiguration, String passwordType, int quantity, long typeID) {
     super();
     this.logTime = logTime;
     this.action = action;
@@ -129,11 +129,11 @@ public class ContainerLog extends CachedData {
     return locationID;
   }
 
-  public int getNewConfiguration() {
+  public String getNewConfiguration() {
     return newConfiguration;
   }
 
-  public int getOldConfiguration() {
+  public String getOldConfiguration() {
     return oldConfiguration;
   }
 
@@ -161,8 +161,8 @@ public class ContainerLog extends CachedData {
     result = prime * result + (int) (itemTypeID ^ (itemTypeID >>> 32));
     result = prime * result + locationID;
     result = prime * result + (int) (logTime ^ (logTime >>> 32));
-    result = prime * result + newConfiguration;
-    result = prime * result + oldConfiguration;
+    result = prime * result + ((newConfiguration == null) ? 0 : newConfiguration.hashCode());
+    result = prime * result + ((oldConfiguration == null) ? 0 : oldConfiguration.hashCode());
     result = prime * result + ((passwordType == null) ? 0 : passwordType.hashCode());
     result = prime * result + quantity;
     result = prime * result + (int) (typeID ^ (typeID >>> 32));
@@ -187,8 +187,12 @@ public class ContainerLog extends CachedData {
     if (itemTypeID != other.itemTypeID) return false;
     if (locationID != other.locationID) return false;
     if (logTime != other.logTime) return false;
-    if (newConfiguration != other.newConfiguration) return false;
-    if (oldConfiguration != other.oldConfiguration) return false;
+    if (newConfiguration == null) {
+      if (other.newConfiguration != null) return false;
+    } else if (!newConfiguration.equals(other.newConfiguration)) return false;
+    if (oldConfiguration == null) {
+      if (other.oldConfiguration != null) return false;
+    } else if (!oldConfiguration.equals(other.oldConfiguration)) return false;
     if (passwordType == null) {
       if (other.passwordType != null) return false;
     } else if (!passwordType.equals(other.passwordType)) return false;

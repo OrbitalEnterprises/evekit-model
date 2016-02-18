@@ -12,7 +12,6 @@ import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AbstractModelTester;
 import enterprises.orbital.evekit.model.CachedData;
-import enterprises.orbital.evekit.model.common.Asset;
 
 public class AssetTest extends AbstractModelTester<Asset> {
 
@@ -147,61 +146,6 @@ public class AssetTest extends AbstractModelTester<Asset> {
   }
 
   @Test
-  public void testGetAllAssetsUnlimited() throws Exception {
-    // Should exclude:
-    // - assets for a different account
-    // - assets not live at the given time
-    Asset existing;
-    Map<Long, Asset> listCheck = new HashMap<Long, Asset>();
-
-    existing = new Asset(itemID, locationID, typeID, quantity, flag, singleton, rawQuantity, container);
-    existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
-    listCheck.put(itemID, existing);
-
-    existing = new Asset(itemID + 10, locationID, typeID, quantity, flag, singleton, rawQuantity, container);
-    existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
-    listCheck.put(itemID + 10, existing);
-
-    existing = new Asset(itemID + 20, locationID, typeID, quantity, flag, singleton, rawQuantity, container);
-    existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
-    listCheck.put(itemID + 20, existing);
-
-    existing = new Asset(itemID + 30, locationID, typeID, quantity, flag, singleton, rawQuantity, container);
-    existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
-    listCheck.put(itemID + 30, existing);
-
-    // Associated with different account
-    existing = new Asset(itemID, locationID, typeID, quantity, flag, singleton, rawQuantity, container);
-    existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
-
-    // Not live at the given time
-    existing = new Asset(itemID + 5, locationID, typeID, quantity, flag, singleton, rawQuantity, container);
-    existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
-
-    // EOL before the given time
-    existing = new Asset(itemID + 3, locationID, typeID, quantity, flag, singleton, rawQuantity, container);
-    existing.setup(testAccount, 7777L);
-    existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
-
-    // Verify all proper keys are returned
-    List<Asset> result = Asset.getAllAssets(testAccount, 8888L);
-    Assert.assertEquals(listCheck.size(), result.size());
-    for (Asset next : result) {
-      long itemID = next.getItemID();
-      Assert.assertTrue(listCheck.containsKey(itemID));
-      Assert.assertTrue(next.equivalent(listCheck.get(itemID)));
-    }
-
-  }
-
-  @Test
   public void testGetContainedAssets() throws Exception {
     // Should exclude:
     // - messages for a different account
@@ -278,70 +222,6 @@ public class AssetTest extends AbstractModelTester<Asset> {
     Assert.assertEquals(2, result.size());
     Assert.assertEquals(listCheck.get(itemID + 30), result.get(0));
     Assert.assertEquals(listCheck.get(itemID + 40), result.get(1));
-  }
-
-  @Test
-  public void testGetContainedAssetsUnlimited() throws Exception {
-    // Should exclude:
-    // - assets for a different account
-    // - assets not live at the given time
-    // - assets contained by a different container
-    Asset existing;
-    Map<Long, Asset> listCheck = new HashMap<Long, Asset>();
-
-    existing = new Asset(itemID, locationID, typeID, quantity, flag, singleton, rawQuantity, container);
-    existing.setup(testAccount, 7777L);
-    CachedData.updateData(existing);
-
-    existing = new Asset(itemID + 10, locationID, typeID, quantity, flag, singleton, rawQuantity, itemID);
-    existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
-    listCheck.put(itemID + 10, existing);
-
-    existing = new Asset(itemID + 20, locationID, typeID, quantity, flag, singleton, rawQuantity, itemID);
-    existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
-    listCheck.put(itemID + 20, existing);
-
-    existing = new Asset(itemID + 30, locationID, typeID, quantity, flag, singleton, rawQuantity, itemID);
-    existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
-    listCheck.put(itemID + 30, existing);
-
-    existing = new Asset(itemID + 40, locationID, typeID, quantity, flag, singleton, rawQuantity, itemID);
-    existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
-    listCheck.put(itemID + 40, existing);
-
-    // Contained by a different asset
-    existing = new Asset(itemID + 45, locationID, typeID, quantity, flag, singleton, rawQuantity, itemID + 10);
-    existing.setup(testAccount, 7777L);
-    CachedData.updateData(existing);
-
-    // Associated with different account
-    existing = new Asset(itemID + 10, locationID, typeID, quantity, flag, singleton, rawQuantity, itemID);
-    existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
-
-    // Not live at the given time
-    existing = new Asset(itemID + 5, locationID, typeID, quantity, flag, singleton, rawQuantity, itemID);
-    existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
-
-    // EOL before the given time
-    existing = new Asset(itemID + 3, locationID, typeID, quantity, flag, singleton, rawQuantity, itemID);
-    existing.setup(testAccount, 7777L);
-    existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
-
-    // Verify all contained assets are returned
-    List<Asset> result = Asset.getContainedAssetsUnlimited(testAccount, itemID, 8888L);
-    Assert.assertEquals(listCheck.size(), result.size());
-    for (Asset next : result) {
-      long itemID = next.getItemID();
-      Assert.assertTrue(listCheck.containsKey(itemID));
-      Assert.assertTrue(next.equivalent(listCheck.get(itemID)));
-    }
   }
 
 }

@@ -12,7 +12,6 @@ import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AbstractModelTester;
 import enterprises.orbital.evekit.model.CachedData;
-import enterprises.orbital.evekit.model.common.Blueprint;
 
 public class BlueprintTest extends AbstractModelTester<Blueprint> {
   final long                                 itemID             = TestBase.getRandomInt(100000000);
@@ -149,60 +148,6 @@ public class BlueprintTest extends AbstractModelTester<Blueprint> {
     Assert.assertEquals(2, result.size());
     Assert.assertEquals(listCheck.get(itemID + 20), result.get(0));
     Assert.assertEquals(listCheck.get(itemID + 30), result.get(1));
-  }
-
-  @Test
-  public void testGetAllBlueprintsUnlimited() throws Exception {
-    // Should exclude:
-    // - blueprints for a different account
-    // - blueprints not live at the given time
-    Blueprint existing;
-    Map<Long, Blueprint> listCheck = new HashMap<Long, Blueprint>();
-
-    existing = new Blueprint(itemID, locationID, typeID, typeName, flagID, quantity, timeEfficiency, materialEfficiency, runs);
-    existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
-    listCheck.put(itemID, existing);
-
-    existing = new Blueprint(itemID + 10, locationID, typeID, typeName, flagID, quantity, timeEfficiency, materialEfficiency, runs);
-    existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
-    listCheck.put(itemID + 10, existing);
-
-    existing = new Blueprint(itemID + 20, locationID, typeID, typeName, flagID, quantity, timeEfficiency, materialEfficiency, runs);
-    existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
-    listCheck.put(itemID + 20, existing);
-
-    existing = new Blueprint(itemID + 30, locationID, typeID, typeName, flagID, quantity, timeEfficiency, materialEfficiency, runs);
-    existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
-    listCheck.put(itemID + 30, existing);
-
-    // Associated with different account
-    existing = new Blueprint(itemID, locationID, typeID, typeName, flagID, quantity, timeEfficiency, materialEfficiency, runs);
-    existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
-
-    // Not live at the given time
-    existing = new Blueprint(itemID + 5, locationID, typeID, typeName, flagID, quantity, timeEfficiency, materialEfficiency, runs);
-    existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
-
-    // EOL before the given time
-    existing = new Blueprint(itemID + 3, locationID, typeID, typeName, flagID, quantity, timeEfficiency, materialEfficiency, runs);
-    existing.setup(testAccount, 7777L);
-    existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
-
-    // Verify all blueprints are returned
-    List<Blueprint> result = Blueprint.getAllBlueprints(testAccount, 8888L);
-    Assert.assertEquals(listCheck.size(), result.size());
-    for (Blueprint next : result) {
-      long itemID = next.getItemID();
-      Assert.assertTrue(listCheck.containsKey(itemID));
-      Assert.assertTrue(next.equivalent(listCheck.get(itemID)));
-    }
   }
 
 }

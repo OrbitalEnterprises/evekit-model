@@ -12,7 +12,6 @@ import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AbstractModelTester;
 import enterprises.orbital.evekit.model.CachedData;
-import enterprises.orbital.evekit.model.corporation.ContainerLog;
 
 public class ContainerLogTest extends AbstractModelTester<ContainerLog> {
 
@@ -24,8 +23,8 @@ public class ContainerLogTest extends AbstractModelTester<ContainerLog> {
   final long                                    itemID           = TestBase.getRandomInt(100000000);
   final long                                    itemTypeID       = TestBase.getRandomInt(100000000);
   final int                                     locationID       = TestBase.getRandomInt(100000000);
-  final int                                     newConfiguration = TestBase.getRandomInt(100000000);
-  final int                                     oldConfiguration = TestBase.getRandomInt(100000000);
+  final String                                  newConfiguration = "new test config";
+  final String                                  oldConfiguration = "old test config";
   final String                                  passwordType     = "test password type";
   final int                                     quantity         = TestBase.getRandomInt(100000000);
   final long                                    typeID           = TestBase.getRandomInt(100000000);

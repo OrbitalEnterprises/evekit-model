@@ -226,33 +226,6 @@ public class Asset extends CachedData {
   }
 
   /**
-   * Get all assets which were live at the given time.
-   * 
-   * @param owner
-   *          assets owner
-   * @param time
-   *          time at which assets must be live
-   * @return list of asset keys
-   */
-  public static List<Asset> getAllAssets(final SynchronizedEveAccount owner, final long time) {
-    try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<Asset>>() {
-        @Override
-        public List<Asset> run() throws Exception {
-          TypedQuery<Asset> getter = EveKitUserAccountProvider.getFactory().getEntityManager().createNamedQuery("Asset.listFromID", Asset.class);
-          getter.setParameter("owner", owner);
-          getter.setParameter("item", -1L);
-          getter.setParameter("point", time);
-          return getter.getResultList();
-        }
-      });
-    } catch (Exception e) {
-      log.log(Level.SEVERE, "query error", e);
-    }
-    return Collections.emptyList();
-  }
-
-  /**
    * Retrieve assets contained within the given asset.
    * 
    * @param owner
@@ -290,33 +263,4 @@ public class Asset extends CachedData {
     return Collections.emptyList();
   }
 
-  /**
-   * Return entire list of assets contained within the given asset.
-   * 
-   * @param owner
-   *          assets owner
-   * @param containerID
-   *          itemID of the asset which is the container of the assets we're interested in
-   * @param time
-   *          time at which assets must be live
-   * @return a list of assets contained by the given asset live at the given time
-   */
-  public static List<Asset> getContainedAssetsUnlimited(final SynchronizedEveAccount owner, final long containerID, final long time) {
-    try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<Asset>>() {
-        @Override
-        public List<Asset> run() throws Exception {
-          TypedQuery<Asset> getter = EveKitUserAccountProvider.getFactory().getEntityManager().createNamedQuery("Asset.getContained", Asset.class);
-          getter.setParameter("owner", owner);
-          getter.setParameter("container", containerID);
-          getter.setParameter("item", -1L);
-          getter.setParameter("point", time);
-          return getter.getResultList();
-        }
-      });
-    } catch (Exception e) {
-      log.log(Level.SEVERE, "query error", e);
-    }
-    return Collections.emptyList();
-  }
 }
