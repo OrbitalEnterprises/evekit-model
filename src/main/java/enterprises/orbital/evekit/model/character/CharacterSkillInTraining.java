@@ -34,13 +34,13 @@ public class CharacterSkillInTraining extends CachedData {
   private int                   trainingStartSP;
   private int                   trainingDestinationSP;
   private int                   trainingToLevel;
-  private long                  skillTypeID;
+  private int                   skillTypeID;
 
   @SuppressWarnings("unused")
   private CharacterSkillInTraining() {}
 
   public CharacterSkillInTraining(boolean skillInTraining, long currentTrainingQueueTime, long trainingStartTime, long trainingEndTime, int trainingStartSP,
-                                  int trainingDestinationSP, int trainingToLevel, long skillTypeID) {
+                                  int trainingDestinationSP, int trainingToLevel, int skillTypeID) {
     super();
     this.skillInTraining = skillInTraining;
     this.currentTrainingQueueTime = currentTrainingQueueTime;
@@ -110,7 +110,7 @@ public class CharacterSkillInTraining extends CachedData {
     int result = super.hashCode();
     result = prime * result + (int) (currentTrainingQueueTime ^ (currentTrainingQueueTime >>> 32));
     result = prime * result + (skillInTraining ? 1231 : 1237);
-    result = prime * result + (int) (skillTypeID ^ (skillTypeID >>> 32));
+    result = prime * result + (skillTypeID ^ (skillTypeID >>> 32));
     result = prime * result + trainingDestinationSP;
     result = prime * result + (int) (trainingEndTime ^ (trainingEndTime >>> 32));
     result = prime * result + trainingStartSP;

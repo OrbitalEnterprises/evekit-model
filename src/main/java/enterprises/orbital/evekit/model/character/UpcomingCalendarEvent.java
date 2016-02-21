@@ -5,8 +5,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Index;
+import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.NoResultException;
@@ -38,6 +40,8 @@ public class UpcomingCalendarEvent extends CachedData {
   private int                 duration;
   private long                eventDate = -1;
   private int                 eventID;
+  @Lob
+  @Column(name = "eventText", columnDefinition = "CLOB NOT NULL")
   private String              eventText;
   private String              eventTitle;
   private long                ownerID;

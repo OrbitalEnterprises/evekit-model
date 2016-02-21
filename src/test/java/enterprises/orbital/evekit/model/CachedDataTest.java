@@ -367,7 +367,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
       int sel = TestBase.getRandomInt(5);
       CachedData next = new CharacterSkillInTraining(
           TestBase.getRandomBoolean(), TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomInt(),
-          TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomLong());
+          TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt());
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }

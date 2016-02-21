@@ -6,7 +6,6 @@ import enterprises.orbital.evekit.TestBase;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AbstractModelTester;
-import enterprises.orbital.evekit.model.character.CharacterSkillInTraining;
 
 public class CharacterSkillInTrainingTest extends AbstractModelTester<CharacterSkillInTraining> {
   final boolean                                             skillInTraining          = true;
@@ -16,7 +15,7 @@ public class CharacterSkillInTrainingTest extends AbstractModelTester<CharacterS
   final int                                                 trainingStartSP          = TestBase.getRandomInt(100000000);
   final int                                                 trainingDestinationSP    = TestBase.getRandomInt(100000000);
   final int                                                 trainingToLevel          = TestBase.getRandomInt(100000000);
-  final long                                                skillTypeID              = TestBase.getRandomInt(100000000);
+  final int                                                 skillTypeID              = TestBase.getRandomInt(100000000);
 
   final ClassUnderTestConstructor<CharacterSkillInTraining> eol                      = new ClassUnderTestConstructor<CharacterSkillInTraining>() {
 

@@ -3,7 +3,9 @@ package enterprises.orbital.evekit.model.corporation;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.NoResultException;
@@ -33,6 +35,8 @@ public class CorporationSheet extends CachedData {
   private String              ceoName;
   private long                corporationID;
   private String              corporationName;
+  @Lob
+  @Column(name = "description", columnDefinition = "CLOB NOT NULL")
   private String              description;
   private int                 logoColor1;
   private int                 logoColor2;

@@ -318,10 +318,8 @@ public abstract class CachedData {
   }
 
   public static void cleanup(final SynchronizedEveAccount toRemove) {
-    // Removes all CachedData which refers to this SynchronizedEveAccount.
-    // Very dangerous operation. Use with care.
-    // We don't use a bulk delete here because we need cascading deletes on element collections
-    // and the only way to do this (easily) is to let the entity manager handle the removal.
+    // Removes all CachedData which refers to this SynchronizedEveAccount. Very dangerous operation. Use with care. We don't use a bulk delete here because we
+    // need cascading deletes on element collections and the only way to do this (easily) is to let the entity manager handle the removal.
     long removeCount = 0;
     try {
       long lastRemoved = 0;
