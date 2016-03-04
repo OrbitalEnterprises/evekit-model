@@ -37,6 +37,8 @@ import enterprises.orbital.evekit.model.character.CharacterSheetJump;
 import enterprises.orbital.evekit.model.character.CharacterSkill;
 import enterprises.orbital.evekit.model.character.CharacterSkillInTraining;
 import enterprises.orbital.evekit.model.character.CharacterTitle;
+import enterprises.orbital.evekit.model.character.ChatChannel;
+import enterprises.orbital.evekit.model.character.ChatChannelMember;
 import enterprises.orbital.evekit.model.character.Implant;
 import enterprises.orbital.evekit.model.character.JumpClone;
 import enterprises.orbital.evekit.model.character.JumpCloneImplant;
@@ -386,6 +388,36 @@ public class CachedDataTest extends AbstractAccountBasedTest {
       next = CachedData.updateData(next);
     }
     System.out.println("Created CharacterTitles");
+    count = TestBase.getRandomInt(50) + 50;
+    for (int i = 0; i < count; i++) {
+      int sel = TestBase.getRandomInt(5);
+      CachedData next = new ChatChannel(
+          TestBase.getUniqueRandomLong(), TestBase.getRandomLong(), TestBase.getRandomText(50), TestBase.getRandomText(50), TestBase.getRandomText(50),
+          TestBase.getRandomBoolean(), TestBase.getRandomText(50));
+      for (int j = 0; j < sel; j++) {
+        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
+      }
+      next.setup(testAccount, testTime);
+      next = CachedData.updateData(next);
+    }
+    System.out.println("Created ChatChannels");
+    count = TestBase.getRandomInt(50) + 50;
+    for (int i = 0; i < count; i++) {
+      String[] cats = new String[] {
+          "allowed", "blocked", "muted", "operators"
+      };
+      int sel = TestBase.getRandomInt(5);
+      int category = TestBase.getRandomInt(4);
+      CachedData next = new ChatChannelMember(
+          TestBase.getUniqueRandomLong(), cats[category], TestBase.getUniqueRandomLong(), TestBase.getRandomText(50), TestBase.getRandomLong(),
+          TestBase.getRandomText(50));
+      for (int j = 0; j < sel; j++) {
+        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
+      }
+      next.setup(testAccount, testTime);
+      next = CachedData.updateData(next);
+    }
+    System.out.println("Created ChatChannelMembers");
     count = TestBase.getRandomInt(1000) + 200;
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);

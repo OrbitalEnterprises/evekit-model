@@ -26,7 +26,7 @@
   </dependencies>
 
   <build>
-    <finalName>evekit-model-${project.version}</finalName>
+    <finalName>evekit-${project.artifactId}-${project.version}</finalName>
   </build>  
   
 </project>

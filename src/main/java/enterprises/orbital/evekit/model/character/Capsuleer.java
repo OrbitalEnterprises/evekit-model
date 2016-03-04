@@ -23,9 +23,12 @@ import enterprises.orbital.evekit.model.CachedData;
  * expiry.
  */
 @Entity
-@Table(name = "evekit_data_capsuleer")
+@Table(
+    name = "evekit_data_capsuleer")
 @NamedQueries({
-    @NamedQuery(name = "Capsuleer.get", query = "SELECT c FROM Capsuleer c where c.owner = :owner"),
+    @NamedQuery(
+        name = "Capsuleer.get",
+        query = "SELECT c FROM Capsuleer c where c.owner = :owner"),
 })
 public class Capsuleer extends CachedData {
   private static final Logger log                          = Logger.getLogger(Capsuleer.class.getName());
@@ -39,6 +42,7 @@ public class Capsuleer extends CachedData {
   private long                assetListExpiry              = -1;
   private long                calendarEventAttendeesExpiry = -1;
   private long                characterSheetExpiry         = -1;
+  private long                chatChannelsExpiry           = -1;
   private long                contactListExpiry            = -1;
   private long                contactNotificationsExpiry   = -1;
   private long                blueprintsExpiry             = -1;
@@ -70,7 +74,8 @@ public class Capsuleer extends CachedData {
     return characterName;
   }
 
-  public void setCharacterName(String characterName) {
+  public void setCharacterName(
+                               String characterName) {
     this.characterName = characterName;
   }
 
@@ -78,7 +83,8 @@ public class Capsuleer extends CachedData {
     return characterID;
   }
 
-  public void setCharacterID(long characterID) {
+  public void setCharacterID(
+                             long characterID) {
     this.characterID = characterID;
   }
 
@@ -86,7 +92,8 @@ public class Capsuleer extends CachedData {
     return accountStatusExpiry;
   }
 
-  public void setAccountStatusExpiry(long accountStatusExpiry) {
+  public void setAccountStatusExpiry(
+                                     long accountStatusExpiry) {
     this.accountStatusExpiry = accountStatusExpiry;
   }
 
@@ -94,7 +101,8 @@ public class Capsuleer extends CachedData {
     return accountBalanceExpiry;
   }
 
-  public void setAccountBalanceExpiry(long accountBalanceExpiry) {
+  public void setAccountBalanceExpiry(
+                                      long accountBalanceExpiry) {
     this.accountBalanceExpiry = accountBalanceExpiry;
   }
 
@@ -102,7 +110,8 @@ public class Capsuleer extends CachedData {
     return assetListExpiry;
   }
 
-  public void setAssetListExpiry(long assetListExpiry) {
+  public void setAssetListExpiry(
+                                 long assetListExpiry) {
     this.assetListExpiry = assetListExpiry;
   }
 
@@ -110,7 +119,8 @@ public class Capsuleer extends CachedData {
     return calendarEventAttendeesExpiry;
   }
 
-  public void setCalendarEventAttendeesExpiry(long calendarEventAttendeesExpiry) {
+  public void setCalendarEventAttendeesExpiry(
+                                              long calendarEventAttendeesExpiry) {
     this.calendarEventAttendeesExpiry = calendarEventAttendeesExpiry;
   }
 
@@ -118,15 +128,26 @@ public class Capsuleer extends CachedData {
     return characterSheetExpiry;
   }
 
-  public void setCharacterSheetExpiry(long characterSheetExpiry) {
+  public void setCharacterSheetExpiry(
+                                      long characterSheetExpiry) {
     this.characterSheetExpiry = characterSheetExpiry;
+  }
+
+  public long getChatChannelsExpiry() {
+    return chatChannelsExpiry;
+  }
+
+  public void setChatChannelsExpiry(
+                                    long chatChannelsExpiry) {
+    this.chatChannelsExpiry = chatChannelsExpiry;
   }
 
   public long getContactListExpiry() {
     return contactListExpiry;
   }
 
-  public void setContactListExpiry(long contactListExpiry) {
+  public void setContactListExpiry(
+                                   long contactListExpiry) {
     this.contactListExpiry = contactListExpiry;
   }
 
@@ -134,7 +155,8 @@ public class Capsuleer extends CachedData {
     return contactNotificationsExpiry;
   }
 
-  public void setContactNotificationsExpiry(long contactNotificationsExpiry) {
+  public void setContactNotificationsExpiry(
+                                            long contactNotificationsExpiry) {
     this.contactNotificationsExpiry = contactNotificationsExpiry;
   }
 
@@ -142,7 +164,8 @@ public class Capsuleer extends CachedData {
     return blueprintsExpiry;
   }
 
-  public void setBlueprintsExpiry(long blueprintExpiry) {
+  public void setBlueprintsExpiry(
+                                  long blueprintExpiry) {
     this.blueprintsExpiry = blueprintExpiry;
   }
 
@@ -150,7 +173,8 @@ public class Capsuleer extends CachedData {
     return bookmarksExpiry;
   }
 
-  public void setBookmarksExpiry(long bookmarksExpiry) {
+  public void setBookmarksExpiry(
+                                 long bookmarksExpiry) {
     this.bookmarksExpiry = bookmarksExpiry;
   }
 
@@ -158,7 +182,8 @@ public class Capsuleer extends CachedData {
     return contractsExpiry;
   }
 
-  public void setContractsExpiry(long contractExpiry) {
+  public void setContractsExpiry(
+                                 long contractExpiry) {
     this.contractsExpiry = contractExpiry;
   }
 
@@ -166,7 +191,8 @@ public class Capsuleer extends CachedData {
     return contractItemsExpiry;
   }
 
-  public void setContractItemsExpiry(long contractItemsExpiry) {
+  public void setContractItemsExpiry(
+                                     long contractItemsExpiry) {
     this.contractItemsExpiry = contractItemsExpiry;
   }
 
@@ -174,7 +200,8 @@ public class Capsuleer extends CachedData {
     return contractBidsExpiry;
   }
 
-  public void setContractBidsExpiry(long contractBidsExpiry) {
+  public void setContractBidsExpiry(
+                                    long contractBidsExpiry) {
     this.contractBidsExpiry = contractBidsExpiry;
   }
 
@@ -182,7 +209,8 @@ public class Capsuleer extends CachedData {
     return facWarStatsExpiry;
   }
 
-  public void setFacWarStatsExpiry(long facWarStatsExpiry) {
+  public void setFacWarStatsExpiry(
+                                   long facWarStatsExpiry) {
     this.facWarStatsExpiry = facWarStatsExpiry;
   }
 
@@ -190,7 +218,8 @@ public class Capsuleer extends CachedData {
     return industryJobsExpiry;
   }
 
-  public void setIndustryJobsExpiry(long industryJobsExpiry) {
+  public void setIndustryJobsExpiry(
+                                    long industryJobsExpiry) {
     this.industryJobsExpiry = industryJobsExpiry;
   }
 
@@ -198,7 +227,8 @@ public class Capsuleer extends CachedData {
     return industryJobsHistoryExpiry;
   }
 
-  public void setIndustryJobsHistoryExpiry(long industryJobsHistoryExpiry) {
+  public void setIndustryJobsHistoryExpiry(
+                                           long industryJobsHistoryExpiry) {
     this.industryJobsHistoryExpiry = industryJobsHistoryExpiry;
   }
 
@@ -206,7 +236,8 @@ public class Capsuleer extends CachedData {
     return killlogExpiry;
   }
 
-  public void setKilllogExpiry(long killlogExpiry) {
+  public void setKilllogExpiry(
+                               long killlogExpiry) {
     this.killlogExpiry = killlogExpiry;
   }
 
@@ -214,7 +245,8 @@ public class Capsuleer extends CachedData {
     return mailBodiesExpiry;
   }
 
-  public void setMailBodiesExpiry(long mailBodiesExpiry) {
+  public void setMailBodiesExpiry(
+                                  long mailBodiesExpiry) {
     this.mailBodiesExpiry = mailBodiesExpiry;
   }
 
@@ -222,7 +254,8 @@ public class Capsuleer extends CachedData {
     return mailingListsExpiry;
   }
 
-  public void setMailingListsExpiry(long mailingListsExpiry) {
+  public void setMailingListsExpiry(
+                                    long mailingListsExpiry) {
     this.mailingListsExpiry = mailingListsExpiry;
   }
 
@@ -230,7 +263,8 @@ public class Capsuleer extends CachedData {
     return mailMessagesExpiry;
   }
 
-  public void setMailMessagesExpiry(long mailMessagesExpiry) {
+  public void setMailMessagesExpiry(
+                                    long mailMessagesExpiry) {
     this.mailMessagesExpiry = mailMessagesExpiry;
   }
 
@@ -238,7 +272,8 @@ public class Capsuleer extends CachedData {
     return marketOrdersExpiry;
   }
 
-  public void setMarketOrdersExpiry(long marketOrdersExpiry) {
+  public void setMarketOrdersExpiry(
+                                    long marketOrdersExpiry) {
     this.marketOrdersExpiry = marketOrdersExpiry;
   }
 
@@ -246,7 +281,8 @@ public class Capsuleer extends CachedData {
     return medalsExpiry;
   }
 
-  public void setMedalsExpiry(long medalsExpiry) {
+  public void setMedalsExpiry(
+                              long medalsExpiry) {
     this.medalsExpiry = medalsExpiry;
   }
 
@@ -254,7 +290,8 @@ public class Capsuleer extends CachedData {
     return notificationsExpiry;
   }
 
-  public void setNotificationsExpiry(long notificationsExpiry) {
+  public void setNotificationsExpiry(
+                                     long notificationsExpiry) {
     this.notificationsExpiry = notificationsExpiry;
   }
 
@@ -262,7 +299,8 @@ public class Capsuleer extends CachedData {
     return notificationTextsExpiry;
   }
 
-  public void setNotificationTextsExpiry(long notificationTextsExpiry) {
+  public void setNotificationTextsExpiry(
+                                         long notificationTextsExpiry) {
     this.notificationTextsExpiry = notificationTextsExpiry;
   }
 
@@ -270,7 +308,8 @@ public class Capsuleer extends CachedData {
     return planetaryColoniesExpiry;
   }
 
-  public void setPlanetaryColoniesExpiry(long planetaryColoniesExpiry) {
+  public void setPlanetaryColoniesExpiry(
+                                         long planetaryColoniesExpiry) {
     this.planetaryColoniesExpiry = planetaryColoniesExpiry;
   }
 
@@ -278,7 +317,8 @@ public class Capsuleer extends CachedData {
     return researchExpiry;
   }
 
-  public void setResearchExpiry(long researchExpiry) {
+  public void setResearchExpiry(
+                                long researchExpiry) {
     this.researchExpiry = researchExpiry;
   }
 
@@ -286,7 +326,8 @@ public class Capsuleer extends CachedData {
     return skillInTrainingExpiry;
   }
 
-  public void setSkillInTrainingExpiry(long skillInTrainingExpiry) {
+  public void setSkillInTrainingExpiry(
+                                       long skillInTrainingExpiry) {
     this.skillInTrainingExpiry = skillInTrainingExpiry;
   }
 
@@ -294,7 +335,8 @@ public class Capsuleer extends CachedData {
     return skillQueueExpiry;
   }
 
-  public void setSkillQueueExpiry(long skillQueueExpiry) {
+  public void setSkillQueueExpiry(
+                                  long skillQueueExpiry) {
     this.skillQueueExpiry = skillQueueExpiry;
   }
 
@@ -302,7 +344,8 @@ public class Capsuleer extends CachedData {
     return standingsExpiry;
   }
 
-  public void setStandingsExpiry(long standingsExpiry) {
+  public void setStandingsExpiry(
+                                 long standingsExpiry) {
     this.standingsExpiry = standingsExpiry;
   }
 
@@ -310,7 +353,8 @@ public class Capsuleer extends CachedData {
     return upcomingCalendarEventsExpiry;
   }
 
-  public void setUpcomingCalendarEventsExpiry(long upcomingCalendarEventsExpiry) {
+  public void setUpcomingCalendarEventsExpiry(
+                                              long upcomingCalendarEventsExpiry) {
     this.upcomingCalendarEventsExpiry = upcomingCalendarEventsExpiry;
   }
 
@@ -318,7 +362,8 @@ public class Capsuleer extends CachedData {
     return walletJournalExpiry;
   }
 
-  public void setWalletJournalExpiry(long walletJournalExpiry) {
+  public void setWalletJournalExpiry(
+                                     long walletJournalExpiry) {
     this.walletJournalExpiry = walletJournalExpiry;
   }
 
@@ -326,7 +371,8 @@ public class Capsuleer extends CachedData {
     return walletTransactionsExpiry;
   }
 
-  public void setWalletTransactionsExpiry(long walletTransactionsExpiry) {
+  public void setWalletTransactionsExpiry(
+                                          long walletTransactionsExpiry) {
     this.walletTransactionsExpiry = walletTransactionsExpiry;
   }
 
@@ -343,6 +389,7 @@ public class Capsuleer extends CachedData {
     result = prime * result + (int) (characterID ^ (characterID >>> 32));
     result = prime * result + ((characterName == null) ? 0 : characterName.hashCode());
     result = prime * result + (int) (characterSheetExpiry ^ (characterSheetExpiry >>> 32));
+    result = prime * result + (int) (chatChannelsExpiry ^ (chatChannelsExpiry >>> 32));
     result = prime * result + (int) (contactListExpiry ^ (contactListExpiry >>> 32));
     result = prime * result + (int) (contactNotificationsExpiry ^ (contactNotificationsExpiry >>> 32));
     result = prime * result + (int) (contractBidsExpiry ^ (contractBidsExpiry >>> 32));
@@ -371,7 +418,8 @@ public class Capsuleer extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -387,6 +435,7 @@ public class Capsuleer extends CachedData {
       if (other.characterName != null) return false;
     } else if (!characterName.equals(other.characterName)) return false;
     if (characterSheetExpiry != other.characterSheetExpiry) return false;
+    if (chatChannelsExpiry != other.chatChannelsExpiry) return false;
     if (contactListExpiry != other.contactListExpiry) return false;
     if (contactNotificationsExpiry != other.contactNotificationsExpiry) return false;
     if (contractBidsExpiry != other.contractBidsExpiry) return false;
@@ -418,23 +467,24 @@ public class Capsuleer extends CachedData {
   public String toString() {
     return "Capsuleer [characterName=" + characterName + ", characterID=" + characterID + ", accountStatusExpiry=" + accountStatusExpiry
         + ", accountBalanceExpiry=" + accountBalanceExpiry + ", assetListExpiry=" + assetListExpiry + ", calendarEventAttendeesExpiry="
-        + calendarEventAttendeesExpiry + ", characterSheetExpiry=" + characterSheetExpiry + ", contactListExpiry=" + contactListExpiry
-        + ", contactNotificationsExpiry=" + contactNotificationsExpiry + ", blueprintsExpiry=" + blueprintsExpiry + ", bookmarksExpiry=" + bookmarksExpiry
-        + ", contractsExpiry=" + contractsExpiry + ", contractItemsExpiry=" + contractItemsExpiry + ", contractBidsExpiry=" + contractBidsExpiry
-        + ", facWarStatsExpiry=" + facWarStatsExpiry + ", industryJobsExpiry=" + industryJobsExpiry + ", industryJobsHistoryExpiry=" + industryJobsHistoryExpiry
-        + ", killlogExpiry=" + killlogExpiry + ", mailBodiesExpiry=" + mailBodiesExpiry + ", mailingListsExpiry=" + mailingListsExpiry + ", mailMessagesExpiry="
-        + mailMessagesExpiry + ", marketOrdersExpiry=" + marketOrdersExpiry + ", medalsExpiry=" + medalsExpiry + ", notificationsExpiry=" + notificationsExpiry
-        + ", notificationTextsExpiry=" + notificationTextsExpiry + ", planetaryColoniesExpiry=" + planetaryColoniesExpiry + ", researchExpiry=" + researchExpiry
-        + ", skillInTrainingExpiry=" + skillInTrainingExpiry + ", skillQueueExpiry=" + skillQueueExpiry + ", standingsExpiry=" + standingsExpiry
-        + ", upcomingCalendarEventsExpiry=" + upcomingCalendarEventsExpiry + ", walletJournalExpiry=" + walletJournalExpiry + ", walletTransactionsExpiry="
-        + walletTransactionsExpiry + ", owner=" + owner + ", lifeStart=" + lifeStart + ", lifeEnd=" + lifeEnd + "]";
+        + calendarEventAttendeesExpiry + ", characterSheetExpiry=" + characterSheetExpiry + ", chatChannelsExpiry=" + chatChannelsExpiry
+        + ", contactListExpiry=" + contactListExpiry + ", contactNotificationsExpiry=" + contactNotificationsExpiry + ", blueprintsExpiry=" + blueprintsExpiry
+        + ", bookmarksExpiry=" + bookmarksExpiry + ", contractsExpiry=" + contractsExpiry + ", contractItemsExpiry=" + contractItemsExpiry
+        + ", contractBidsExpiry=" + contractBidsExpiry + ", facWarStatsExpiry=" + facWarStatsExpiry + ", industryJobsExpiry=" + industryJobsExpiry
+        + ", industryJobsHistoryExpiry=" + industryJobsHistoryExpiry + ", killlogExpiry=" + killlogExpiry + ", mailBodiesExpiry=" + mailBodiesExpiry
+        + ", mailingListsExpiry=" + mailingListsExpiry + ", mailMessagesExpiry=" + mailMessagesExpiry + ", marketOrdersExpiry=" + marketOrdersExpiry
+        + ", medalsExpiry=" + medalsExpiry + ", notificationsExpiry=" + notificationsExpiry + ", notificationTextsExpiry=" + notificationTextsExpiry
+        + ", planetaryColoniesExpiry=" + planetaryColoniesExpiry + ", researchExpiry=" + researchExpiry + ", skillInTrainingExpiry=" + skillInTrainingExpiry
+        + ", skillQueueExpiry=" + skillQueueExpiry + ", standingsExpiry=" + standingsExpiry + ", upcomingCalendarEventsExpiry=" + upcomingCalendarEventsExpiry
+        + ", walletJournalExpiry=" + walletJournalExpiry + ", walletTransactionsExpiry=" + walletTransactionsExpiry + "]";
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     throw new UnsupportedOperationException();
   }
 
@@ -446,7 +496,8 @@ public class Capsuleer extends CachedData {
     return null;
   }
 
-  public static Capsuleer getCapsuleer(final SynchronizedEveAccount parent) {
+  public static Capsuleer getCapsuleer(
+                                       final SynchronizedEveAccount parent) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<Capsuleer>() {
         @Override
@@ -466,7 +517,8 @@ public class Capsuleer extends CachedData {
     return null;
   }
 
-  public static Capsuleer getOrCreateCapsuleer(final SynchronizedEveAccount owner) {
+  public static Capsuleer getOrCreateCapsuleer(
+                                               final SynchronizedEveAccount owner) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<Capsuleer>() {
         @Override
