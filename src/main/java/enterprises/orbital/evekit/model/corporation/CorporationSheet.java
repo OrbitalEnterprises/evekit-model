@@ -19,7 +19,8 @@ import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_corporation_sheet")
+@Table(
+    name = "evekit_data_corporation_sheet")
 @NamedQueries({
     @NamedQuery(
         name = "CorporationSheet.get",
@@ -36,7 +37,8 @@ public class CorporationSheet extends CachedData {
   private long                corporationID;
   private String              corporationName;
   @Lob
-  @Column(name = "description", columnDefinition = "CLOB NOT NULL")
+  @Column(
+      length = 102400)
   private String              description;
   private int                 logoColor1;
   private int                 logoColor2;
@@ -89,7 +91,8 @@ public class CorporationSheet extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof CorporationSheet)) return false;
     CorporationSheet other = (CorporationSheet) sup;
     return allianceID == other.allianceID && nullSafeObjectCompare(allianceName, other.allianceName) && ceoID == other.ceoID
@@ -229,7 +232,8 @@ public class CorporationSheet extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -282,7 +286,9 @@ public class CorporationSheet extends CachedData {
         + stationName + ", taxRate=" + taxRate + ", ticker=" + ticker + ", url=" + url + "]";
   }
 
-  public static CorporationSheet get(final SynchronizedEveAccount owner, final long time) {
+  public static CorporationSheet get(
+                                     final SynchronizedEveAccount owner,
+                                     final long time) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<CorporationSheet>() {
         @Override

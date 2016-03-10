@@ -22,8 +22,13 @@ import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_corporation_medal", indexes = {
-    @Index(name = "medalIDIndex", columnList = "medalID", unique = false),
+@Table(
+    name = "evekit_data_corporation_medal",
+    indexes = {
+        @Index(
+            name = "medalIDIndex",
+            columnList = "medalID",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -39,7 +44,8 @@ public class CorporationMedal extends CachedData {
   private static final byte[] MASK = AccountAccessMask.createMask(AccountAccessMask.ACCESS_CORPORATION_MEDALS);
   private int                 medalID;
   @Lob
-  @Column(name = "description", columnDefinition = "CLOB NOT NULL")
+  @Column(
+      length = 102400)
   private String              description;
   private String              title;
   private long                created;
@@ -61,7 +67,8 @@ public class CorporationMedal extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof CorporationMedal)) return false;
     CorporationMedal other = (CorporationMedal) sup;
     return medalID == other.medalID && nullSafeObjectCompare(description, other.description) && nullSafeObjectCompare(title, other.title)
@@ -109,7 +116,8 @@ public class CorporationMedal extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -132,7 +140,10 @@ public class CorporationMedal extends CachedData {
         + ", owner=" + owner + ", lifeStart=" + lifeStart + ", lifeEnd=" + lifeEnd + "]";
   }
 
-  public static CorporationMedal get(final SynchronizedEveAccount owner, final long time, final int medalID) {
+  public static CorporationMedal get(
+                                     final SynchronizedEveAccount owner,
+                                     final long time,
+                                     final int medalID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<CorporationMedal>() {
         @Override
@@ -155,7 +166,9 @@ public class CorporationMedal extends CachedData {
     return null;
   }
 
-  public static List<CorporationMedal> getAll(final SynchronizedEveAccount owner, final long time) {
+  public static List<CorporationMedal> getAll(
+                                              final SynchronizedEveAccount owner,
+                                              final long time) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<CorporationMedal>>() {
         @Override

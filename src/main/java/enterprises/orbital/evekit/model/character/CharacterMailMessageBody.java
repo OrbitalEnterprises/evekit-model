@@ -22,8 +22,17 @@ import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_character_mail_message_body", indexes = {
-    @Index(name = "messageIDIndex", columnList = "messageID", unique = false), @Index(name = "retrievedIndex", columnList = "retrieved", unique = false)
+@Table(
+    name = "evekit_data_character_mail_message_body",
+    indexes = {
+        @Index(
+            name = "messageIDIndex",
+            columnList = "messageID",
+            unique = false),
+        @Index(
+            name = "retrievedIndex",
+            columnList = "retrieved",
+            unique = false)
 })
 @NamedQueries({
     @NamedQuery(
@@ -42,7 +51,8 @@ public class CharacterMailMessageBody extends CachedData {
   private long                messageID;
   private boolean             retrieved;
   @Lob
-  @Column(name = "body", columnDefinition = "CLOB NOT NULL")
+  @Column(
+      length = 102400)
   private String              body;
 
   @SuppressWarnings("unused")
@@ -60,7 +70,8 @@ public class CharacterMailMessageBody extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof CharacterMailMessageBody)) return false;
     CharacterMailMessageBody other = (CharacterMailMessageBody) sup;
     return messageID == other.messageID && retrieved == other.retrieved && nullSafeObjectCompare(body, other.body);
@@ -97,7 +108,8 @@ public class CharacterMailMessageBody extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -116,7 +128,10 @@ public class CharacterMailMessageBody extends CachedData {
         + ", lifeEnd=" + lifeEnd + "]";
   }
 
-  public static CharacterMailMessageBody get(final SynchronizedEveAccount owner, final long time, final long messageID) {
+  public static CharacterMailMessageBody get(
+                                             final SynchronizedEveAccount owner,
+                                             final long time,
+                                             final long messageID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<CharacterMailMessageBody>() {
         @Override
@@ -139,7 +154,9 @@ public class CharacterMailMessageBody extends CachedData {
     return null;
   }
 
-  public static List<Long> getUnretrievedMessageIDs(final SynchronizedEveAccount owner, final long time) {
+  public static List<Long> getUnretrievedMessageIDs(
+                                                    final SynchronizedEveAccount owner,
+                                                    final long time) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<Long>>() {
         @Override

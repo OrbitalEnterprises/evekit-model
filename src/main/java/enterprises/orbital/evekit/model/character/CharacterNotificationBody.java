@@ -22,9 +22,17 @@ import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_character_notification_body", indexes = {
-    @Index(name = "notificationIDIndex", columnList = "notificationID", unique = false),
-    @Index(name = "retrievedIndex", columnList = "retrieved", unique = false)
+@Table(
+    name = "evekit_data_character_notification_body",
+    indexes = {
+        @Index(
+            name = "notificationIDIndex",
+            columnList = "notificationID",
+            unique = false),
+        @Index(
+            name = "retrievedIndex",
+            columnList = "retrieved",
+            unique = false)
 })
 @NamedQueries({
     @NamedQuery(
@@ -42,7 +50,8 @@ public class CharacterNotificationBody extends CachedData {
   private long                notificationID;
   private boolean             retrieved;
   @Lob
-  @Column(name = "text", columnDefinition = "CLOB NOT NULL")
+  @Column(
+      length = 102400)
   private String              text;
   private boolean             missing;
 
@@ -63,7 +72,8 @@ public class CharacterNotificationBody extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof CharacterNotificationBody)) return false;
     CharacterNotificationBody other = (CharacterNotificationBody) sup;
     return notificationID == other.notificationID && retrieved == other.retrieved && nullSafeObjectCompare(text, other.text) && missing == other.missing;
@@ -105,7 +115,8 @@ public class CharacterNotificationBody extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -125,7 +136,10 @@ public class CharacterNotificationBody extends CachedData {
         + owner + ", lifeStart=" + lifeStart + ", lifeEnd=" + lifeEnd + "]";
   }
 
-  public static CharacterNotificationBody get(final SynchronizedEveAccount owner, final long time, final long notificationID) {
+  public static CharacterNotificationBody get(
+                                              final SynchronizedEveAccount owner,
+                                              final long time,
+                                              final long notificationID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<CharacterNotificationBody>() {
         @Override
@@ -148,7 +162,9 @@ public class CharacterNotificationBody extends CachedData {
     return null;
   }
 
-  public static List<Long> getUnretrievedNotificationIDs(final SynchronizedEveAccount owner, final long time) {
+  public static List<Long> getUnretrievedNotificationIDs(
+                                                         final SynchronizedEveAccount owner,
+                                                         final long time) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<Long>>() {
         @Override

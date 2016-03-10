@@ -22,8 +22,13 @@ import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_upcoming_calendar_event", indexes = {
-    @Index(name = "eventIDIndex", columnList = "eventID", unique = false),
+@Table(
+    name = "evekit_data_upcoming_calendar_event",
+    indexes = {
+        @Index(
+            name = "eventIDIndex",
+            columnList = "eventID",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -41,7 +46,8 @@ public class UpcomingCalendarEvent extends CachedData {
   private long                eventDate = -1;
   private int                 eventID;
   @Lob
-  @Column(name = "eventText", columnDefinition = "CLOB NOT NULL")
+  @Column(
+      length = 102400)
   private String              eventText;
   private String              eventTitle;
   private long                ownerID;
@@ -70,7 +76,8 @@ public class UpcomingCalendarEvent extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof UpcomingCalendarEvent)) return false;
     UpcomingCalendarEvent other = (UpcomingCalendarEvent) sup;
     return duration == other.duration && eventDate == other.eventDate && eventID == other.eventID && nullSafeObjectCompare(eventText, other.eventText)
@@ -139,7 +146,8 @@ public class UpcomingCalendarEvent extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -171,7 +179,10 @@ public class UpcomingCalendarEvent extends CachedData {
         + ", lifeStart=" + lifeStart + ", lifeEnd=" + lifeEnd + "]";
   }
 
-  public static UpcomingCalendarEvent get(final SynchronizedEveAccount owner, final long time, final int eventID) {
+  public static UpcomingCalendarEvent get(
+                                          final SynchronizedEveAccount owner,
+                                          final long time,
+                                          final int eventID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<UpcomingCalendarEvent>() {
         @Override
@@ -194,7 +205,9 @@ public class UpcomingCalendarEvent extends CachedData {
     return null;
   }
 
-  public static List<UpcomingCalendarEvent> getAllUpcomingCalendarEvents(final SynchronizedEveAccount owner, final long time) {
+  public static List<UpcomingCalendarEvent> getAllUpcomingCalendarEvents(
+                                                                         final SynchronizedEveAccount owner,
+                                                                         final long time) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<UpcomingCalendarEvent>>() {
         @Override

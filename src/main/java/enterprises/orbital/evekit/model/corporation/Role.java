@@ -22,8 +22,13 @@ import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_role", indexes = {
-    @Index(name = "roleIDIndex", columnList = "roleID", unique = false),
+@Table(
+    name = "evekit_data_role",
+    indexes = {
+        @Index(
+            name = "roleIDIndex",
+            columnList = "roleID",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -39,7 +44,8 @@ public class Role extends CachedData {
   private static final byte[] MASK = AccountAccessMask.createMask(AccountAccessMask.ACCESS_CORPORATION_TITLES);
   private long                roleID;
   @Lob
-  @Column(name = "roleDescription", columnDefinition = "CLOB NOT NULL")
+  @Column(
+      length = 102400)
   private String              roleDescription;
   private String              roleName;
 
@@ -57,7 +63,8 @@ public class Role extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof Role)) return false;
     Role other = (Role) sup;
     return roleID == other.roleID && nullSafeObjectCompare(roleDescription, other.roleDescription) && nullSafeObjectCompare(roleName, other.roleName);
@@ -94,7 +101,8 @@ public class Role extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -115,7 +123,10 @@ public class Role extends CachedData {
         + ", lifeEnd=" + lifeEnd + "]";
   }
 
-  public static Role get(final SynchronizedEveAccount owner, final long time, final long roleID) {
+  public static Role get(
+                         final SynchronizedEveAccount owner,
+                         final long time,
+                         final long roleID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<Role>() {
         @Override
@@ -137,7 +148,9 @@ public class Role extends CachedData {
     return null;
   }
 
-  public static List<Role> getAll(final SynchronizedEveAccount owner, final long time) {
+  public static List<Role> getAll(
+                                  final SynchronizedEveAccount owner,
+                                  final long time) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<Role>>() {
         @Override
