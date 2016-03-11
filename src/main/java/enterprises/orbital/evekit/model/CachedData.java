@@ -34,10 +34,23 @@ import enterprises.orbital.evekit.account.SynchronizedEveAccount;
  * only value that should ever be changed is the lifeEnd field when an object is evolved to a new version.
  */
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
-@Table(name = "evekit_cached_data", indexes = {
-    @Index(name = "accountIndex", columnList = "aid", unique = false), @Index(name = "lifeStartIndex", columnList = "lifeStart", unique = false),
-    @Index(name = "lifeEndIndex", columnList = "lifeEnd", unique = false)
+@Inheritance(
+    strategy = InheritanceType.JOINED)
+@Table(
+    name = "evekit_cached_data",
+    indexes = {
+        @Index(
+            name = "accountIndex",
+            columnList = "aid",
+            unique = false),
+        @Index(
+            name = "lifeStartIndex",
+            columnList = "lifeStart",
+            unique = false),
+        @Index(
+            name = "lifeEndIndex",
+            columnList = "lifeEnd",
+            unique = false)
 })
 public abstract class CachedData {
   private static final Logger      log             = Logger.getLogger(CachedData.class.getName());
@@ -47,12 +60,19 @@ public abstract class CachedData {
   public static final int          META_DATA_LIMIT = 10;
   // Unique cached data element ID
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ek_seq")
-  @SequenceGenerator(name = "ek_seq", initialValue = 100000, allocationSize = 10)
+  @GeneratedValue(
+      strategy = GenerationType.SEQUENCE,
+      generator = "ek_seq")
+  @SequenceGenerator(
+      name = "ek_seq",
+      initialValue = 100000,
+      allocationSize = 10)
   private long                     cid;
   // Account which owns this data
   @ManyToOne
-  @JoinColumn(name = "aid", referencedColumnName = "aid")
+  @JoinColumn(
+      name = "aid",
+      referencedColumnName = "aid")
   protected SynchronizedEveAccount owner;
   // Version and access mask. These are constants after creation.
   // Version 1 - pre Wayback Machine types
@@ -81,10 +101,13 @@ public abstract class CachedData {
   protected long                   lifeStart;
   protected long                   lifeEnd;
   // Object meta data - this will be serialized into storage
-  @ElementCollection(fetch = FetchType.EAGER)
+  @ElementCollection(
+      fetch = FetchType.EAGER)
   private Map<String, String>      metaData        = null;
 
-  public static boolean nullSafeObjectCompare(Object a, Object b) {
+  public static boolean nullSafeObjectCompare(
+                                              Object a,
+                                              Object b) {
     return a == b || (a != null && a.equals(b));
   }
 
@@ -96,7 +119,9 @@ public abstract class CachedData {
    * @param start
    *          start time of the life line of this object
    */
-  public final void setup(SynchronizedEveAccount owner, long start) {
+  public final void setup(
+                          SynchronizedEveAccount owner,
+                          long start) {
     this.owner = owner;
     this.lifeStart = start;
     this.accessMask = getMask();
@@ -109,7 +134,8 @@ public abstract class CachedData {
    * @param target
    *          the target object to be modified
    */
-  public final void dup(CachedData target) {
+  public final void dup(
+                        CachedData target) {
     target.owner = this.owner;
     target.eveKitVersion = eveKitVersion;
     target.metaData = null;
@@ -133,7 +159,9 @@ public abstract class CachedData {
    * @param time
    *          the time which marks the start of the evolution
    */
-  public final void evolve(CachedData other, long time) {
+  public final void evolve(
+                           CachedData other,
+                           long time) {
     setLifeEnd(time);
     if (other != null) {
       dup(other);
@@ -158,7 +186,8 @@ public abstract class CachedData {
    *          the entity to compare against.
    * @return true if the entities are equivalent except possibly for their CachedData headers, false otherwise.
    */
-  public abstract boolean equivalent(CachedData other);
+  public abstract boolean equivalent(
+                                     CachedData other);
 
   // Meta-data functions
 
@@ -166,7 +195,8 @@ public abstract class CachedData {
     if (metaData == null) metaData = new HashMap<String, String>();
   }
 
-  public String getMetaData(String key) {
+  public String getMetaData(
+                            String key) {
     synchronized (this) {
       if (metaData == null) return null;
       return metaData.get(key);
@@ -180,7 +210,9 @@ public abstract class CachedData {
     }
   }
 
-  public void setMetaData(String key, String value) throws MetaDataLimitException, MetaDataCountException {
+  public void setMetaData(
+                          String key,
+                          String value) throws MetaDataLimitException, MetaDataCountException {
     if (key == null || key.length() == 0) throw new MetaDataLimitException("Key empty!");
     if (value == null) throw new MetaDataLimitException("Value null!");
     if (key.length() > 255) throw new MetaDataLimitException("Key too large!");
@@ -192,7 +224,8 @@ public abstract class CachedData {
     }
   }
 
-  public void deleteMetaData(String key) {
+  public void deleteMetaData(
+                             String key) {
     synchronized (this) {
       if (metaData != null) metaData.remove(key);
     }
@@ -204,7 +237,8 @@ public abstract class CachedData {
     }
   }
 
-  public boolean containsMetaData(String key) {
+  public boolean containsMetaData(
+                                  String key) {
     synchronized (this) {
       return hasMetaData() && metaData.containsKey(key);
     }
@@ -222,7 +256,8 @@ public abstract class CachedData {
     return eveKitVersion;
   }
 
-  public void setEveKitVersion(short eveKitVersion) {
+  public void setEveKitVersion(
+                               short eveKitVersion) {
     this.eveKitVersion = eveKitVersion;
   }
 
@@ -230,7 +265,8 @@ public abstract class CachedData {
     return accessMask;
   }
 
-  public void setAccessMask(byte[] access) {
+  public void setAccessMask(
+                            byte[] access) {
     this.accessMask = access;
   }
 
@@ -242,7 +278,8 @@ public abstract class CachedData {
     return lifeEnd;
   }
 
-  public void setLifeEnd(long lifeEnd) {
+  public void setLifeEnd(
+                         long lifeEnd) {
     this.lifeEnd = lifeEnd;
   }
 
@@ -260,7 +297,8 @@ public abstract class CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
@@ -282,7 +320,8 @@ public abstract class CachedData {
         + lifeStart + ", lifeEnd=" + lifeEnd + "]";
   }
 
-  public static CachedData get(final long cid) {
+  public static CachedData get(
+                               final long cid) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<CachedData>() {
         @Override
@@ -303,7 +342,8 @@ public abstract class CachedData {
     return null;
   }
 
-  public static <A extends CachedData> A updateData(final A data) {
+  public static <A extends CachedData> A updateData(
+                                                    final A data) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<A>() {
         @Override
@@ -317,7 +357,9 @@ public abstract class CachedData {
     return null;
   }
 
-  public static void cleanup(final SynchronizedEveAccount toRemove) {
+  public static void cleanup(
+                             final SynchronizedEveAccount toRemove,
+                             final String tableName) {
     // Removes all CachedData which refers to this SynchronizedEveAccount. Very dangerous operation. Use with care. We don't use a bulk delete here because we
     // need cascading deletes on element collections and the only way to do this (easily) is to let the entity manager handle the removal.
     long removeCount = 0;
@@ -329,7 +371,7 @@ public abstract class CachedData {
           public Long run() throws Exception {
             long removed = 0;
             TypedQuery<CachedData> query = EveKitUserAccountProvider.getFactory().getEntityManager()
-                .createQuery("SELECT c FROM CachedData c where c.owner = :owner", CachedData.class);
+                .createQuery("SELECT c FROM " + tableName + " c where c.owner = :owner", CachedData.class);
             query.setParameter("owner", toRemove);
             query.setMaxResults(1000);
             for (CachedData next : query.getResultList()) {
