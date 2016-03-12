@@ -14,9 +14,6 @@ import enterprises.orbital.evekit.account.AccountCreationException;
 import enterprises.orbital.evekit.account.EveKitUserAccount;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
-import enterprises.orbital.evekit.model.CachedData;
-import enterprises.orbital.evekit.model.MetaDataCountException;
-import enterprises.orbital.evekit.model.MetaDataLimitException;
 import enterprises.orbital.evekit.model.common.Kill;
 
 public class MetaDataTest {
@@ -50,7 +47,7 @@ public class MetaDataTest {
     targetData = CachedData.updateData(targetData);
 
     // Now pull tag out
-    CachedData copy = CachedData.get(targetData.getCid());
+    CachedData copy = CachedData.get(targetData.getCid(), "Kill");
     Assert.assertNotNull(copy);
     Assert.assertEquals("testvalue", copy.getMetaData("testkey"));
   }
@@ -78,44 +75,50 @@ public class MetaDataTest {
     targetData = CachedData.updateData(targetData);
 
     // Check against target fetched from DB
-    CachedData copy = CachedData.get(targetData.getCid());
+    CachedData copy = CachedData.get(targetData.getCid(), "Kill");
     Assert.assertNotNull(copy);
     Assert.assertEquals("testvalue", copy.getMetaData("testkey"));
   }
 
-  @Test(expected = MetaDataLimitException.class)
+  @Test(
+      expected = MetaDataLimitException.class)
   public void testAddTagKeyTooBig() throws MetaDataCountException, MetaDataLimitException {
     final CachedData targetData = makeTestTarget();
     String bigKey = String.format("%256d", 0);
     targetData.setMetaData(bigKey, "anothervalue");
   }
 
-  @Test(expected = MetaDataLimitException.class)
+  @Test(
+      expected = MetaDataLimitException.class)
   public void testAddTagKeyNull() throws MetaDataCountException, MetaDataLimitException {
     final CachedData targetData = makeTestTarget();
     targetData.setMetaData(null, "anothervalue");
   }
 
-  @Test(expected = MetaDataLimitException.class)
+  @Test(
+      expected = MetaDataLimitException.class)
   public void testAddTagKeyEmpty() throws MetaDataCountException, MetaDataLimitException {
     final CachedData targetData = makeTestTarget();
     targetData.setMetaData("", "anothervalue");
   }
 
-  @Test(expected = MetaDataLimitException.class)
+  @Test(
+      expected = MetaDataLimitException.class)
   public void testAddTagValueTooBig() throws MetaDataCountException, MetaDataLimitException {
     final CachedData targetData = makeTestTarget();
     String bigValue = String.format("%256d", 0);
     targetData.setMetaData("testkey", bigValue);
   }
 
-  @Test(expected = MetaDataLimitException.class)
+  @Test(
+      expected = MetaDataLimitException.class)
   public void testAddTagValueNull() throws MetaDataCountException, MetaDataLimitException {
     final CachedData targetData = makeTestTarget();
     targetData.setMetaData("testkey", null);
   }
 
-  @Test(expected = MetaDataCountException.class)
+  @Test(
+      expected = MetaDataCountException.class)
   public void testAddTagMetaDataLimit() throws MetaDataCountException, MetaDataLimitException {
     final CachedData targetData = makeTestTarget();
     for (int i = 0; i < CachedData.META_DATA_LIMIT; i++) {
@@ -151,7 +154,7 @@ public class MetaDataTest {
     targetData = CachedData.updateData(targetData);
     targetData.setMetaData("testkey", "newvalue");
     targetData = CachedData.updateData(targetData);
-    CachedData copy = CachedData.get(targetData.getCid());
+    CachedData copy = CachedData.get(targetData.getCid(), "Kill");
     Assert.assertNotNull(copy);
     Assert.assertEquals(targetData, copy);
   }

@@ -321,13 +321,14 @@ public abstract class CachedData {
   }
 
   public static CachedData get(
-                               final long cid) {
+                               final long cid,
+                               final String tableName) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<CachedData>() {
         @Override
         public CachedData run() throws Exception {
-          TypedQuery<CachedData> getter = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery("SELECT c FROM CachedData c WHERE c.cid = :cid",
-                                                                                                                CachedData.class);
+          TypedQuery<CachedData> getter = EveKitUserAccountProvider.getFactory().getEntityManager()
+              .createQuery("SELECT c FROM " + tableName + " c WHERE c.cid = :cid", CachedData.class);
           getter.setParameter("cid", cid);
           try {
             return getter.getSingleResult();
