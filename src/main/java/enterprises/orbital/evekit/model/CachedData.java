@@ -25,9 +25,13 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.TypedQuery;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * Common abstract class for all model objects. Every synchronized object extends this class. Synchronized objects are immutable with one minor exception. The
@@ -52,6 +56,11 @@ import enterprises.orbital.evekit.account.SynchronizedEveAccount;
             columnList = "lifeEnd",
             unique = false)
 })
+@JsonIgnoreProperties({
+    "owner", "accessMask", "metaData"
+})
+@ApiModel(
+    description = "Model data common properties")
 public abstract class CachedData {
   private static final Logger      log             = Logger.getLogger(CachedData.class.getName());
   // Limit on number of meta-data tags allowed on a single cached item.
@@ -67,6 +76,8 @@ public abstract class CachedData {
       name = "ek_seq",
       initialValue = 100000,
       allocationSize = 10)
+  @ApiModelProperty(
+      value = "Unique ID")
   private long                     cid;
   // Account which owns this data
   @ManyToOne
@@ -77,6 +88,8 @@ public abstract class CachedData {
   // Version and access mask. These are constants after creation.
   // Version 1 - pre Wayback Machine types
   // Version 2 - Introduction of wayback machine
+  @ApiModelProperty(
+      value = "EveKit release version")
   private short                    eveKitVersion   = 2;
   private byte[]                   accessMask;
   // About Object Lifelines:
@@ -98,7 +111,11 @@ public abstract class CachedData {
   //
   // Place in object lifeline:
   // [ key.lifeStart, lifeEnd]
+  @ApiModelProperty(
+      value = "Model lifeline start (milliseconds UTC)")
   protected long                   lifeStart;
+  @ApiModelProperty(
+      value = "Model lifeline end (milliseconds UTC), MAX_LONG for live data")
   protected long                   lifeEnd;
   // Object meta data - this will be serialized into storage
   @ElementCollection(
@@ -268,6 +285,11 @@ public abstract class CachedData {
   public void setAccessMask(
                             byte[] access) {
     this.accessMask = access;
+  }
+
+  public void setLifeStart(
+                           long lifeStart) {
+    this.lifeStart = lifeStart;
   }
 
   public long getLifeStart() {
