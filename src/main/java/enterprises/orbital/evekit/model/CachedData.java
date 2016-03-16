@@ -57,7 +57,7 @@ import io.swagger.annotations.ApiModelProperty;
             unique = false)
 })
 @JsonIgnoreProperties({
-    "owner", "accessMask", "metaData"
+    "owner", "accessMask", "metaData", "mask", "allMetaData"
 })
 @ApiModel(
     description = "Model data common properties")
