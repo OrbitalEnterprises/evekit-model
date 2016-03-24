@@ -19,11 +19,17 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_research_agent", indexes = {
-    @Index(name = "agentIDIndex", columnList = "agentID", unique = false),
+@Table(
+    name = "evekit_data_research_agent",
+    indexes = {
+        @Index(
+            name = "agentIDIndex",
+            columnList = "agentID",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -62,7 +68,8 @@ public class ResearchAgent extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof ResearchAgent)) return false;
     ResearchAgent other = (ResearchAgent) sup;
     return agentID == other.agentID && currentPoints == other.currentPoints && pointsPerDay == other.pointsPerDay && remainderPoints == other.remainderPoints
@@ -119,7 +126,8 @@ public class ResearchAgent extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -140,7 +148,10 @@ public class ResearchAgent extends CachedData {
         + "]";
   }
 
-  public static ResearchAgent get(final SynchronizedEveAccount owner, final long time, final int agentID) {
+  public static ResearchAgent get(
+                                  final SynchronizedEveAccount owner,
+                                  final long time,
+                                  final int agentID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<ResearchAgent>() {
         @Override
@@ -163,7 +174,11 @@ public class ResearchAgent extends CachedData {
     return null;
   }
 
-  public static List<ResearchAgent> getAllAgents(final SynchronizedEveAccount owner, final long time, int maxresults, final int contid) {
+  public static List<ResearchAgent> getAllAgents(
+                                                 final SynchronizedEveAccount owner,
+                                                 final long time,
+                                                 int maxresults,
+                                                 final int contid) {
     final int maxr = OrbitalProperties.getNonzeroLimited(maxresults, (int) PersistentProperty
         .getLongPropertyWithFallback(OrbitalProperties.getPropertyName(ResearchAgent.class, "maxresults"), DEFAULT_MAX_RESULTS));
     try {
@@ -177,6 +192,51 @@ public class ResearchAgent extends CachedData {
           getter.setParameter("point", time);
           getter.setMaxResults(maxr);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<ResearchAgent> accessQuery(
+                                                final SynchronizedEveAccount owner,
+                                                final long contid,
+                                                final int maxresults,
+                                                final AttributeSelector at,
+                                                final AttributeSelector agentID,
+                                                final AttributeSelector currentPoints,
+                                                final AttributeSelector pointsPerDay,
+                                                final AttributeSelector remainderPoints,
+                                                final AttributeSelector researchStartDate,
+                                                final AttributeSelector skillTypeID) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<ResearchAgent>>() {
+        @Override
+        public List<ResearchAgent> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM ResearchAgent c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeSelector.addIntSelector(qs, "c", "agentID", agentID);
+          AttributeSelector.addDoubleSelector(qs, "c", "currentPoints", currentPoints);
+          AttributeSelector.addDoubleSelector(qs, "c", "pointsPerDay", pointsPerDay);
+          AttributeSelector.addDoubleSelector(qs, "c", "remainderPoints", remainderPoints);
+          AttributeSelector.addLongSelector(qs, "c", "researchStartDate", researchStartDate);
+          AttributeSelector.addIntSelector(qs, "c", "skillTypeID", skillTypeID);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<ResearchAgent> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), ResearchAgent.class);
+          query.setParameter("owner", owner);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

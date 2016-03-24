@@ -19,11 +19,18 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_member_tracking", indexes = {
-    @Index(name = "characterIDIndex", columnList = "characterID", unique = false),
+@Table(
+    name = "evekit_data_member_tracking",
+    indexes = {
+        @Index(
+            name = "characterIDIndex",
+            columnList = "characterID",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -79,7 +86,8 @@ public class MemberTracking extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof MemberTracking)) return false;
     MemberTracking other = (MemberTracking) sup;
     return characterID == other.characterID && nullSafeObjectCompare(base, other.base) && baseID == other.baseID && grantableRoles == other.grantableRoles
@@ -175,7 +183,8 @@ public class MemberTracking extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -215,7 +224,10 @@ public class MemberTracking extends CachedData {
         + ", lifeStart=" + lifeStart + ", lifeEnd=" + lifeEnd + "]";
   }
 
-  public static MemberTracking get(final SynchronizedEveAccount owner, final long time, final long characterID) {
+  public static MemberTracking get(
+                                   final SynchronizedEveAccount owner,
+                                   final long time,
+                                   final long characterID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<MemberTracking>() {
         @Override
@@ -238,7 +250,11 @@ public class MemberTracking extends CachedData {
     return null;
   }
 
-  public static List<MemberTracking> getAll(final SynchronizedEveAccount owner, final long time, int maxresults, final long contid) {
+  public static List<MemberTracking> getAll(
+                                            final SynchronizedEveAccount owner,
+                                            final long time,
+                                            int maxresults,
+                                            final long contid) {
     final int maxr = OrbitalProperties.getNonzeroLimited(maxresults, (int) PersistentProperty
         .getLongPropertyWithFallback(OrbitalProperties.getPropertyName(MemberTracking.class, "maxresults"), DEFAULT_MAX_RESULTS));
     try {
@@ -252,6 +268,69 @@ public class MemberTracking extends CachedData {
           getter.setParameter("point", time);
           getter.setMaxResults(maxr);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<MemberTracking> accessQuery(
+                                                 final SynchronizedEveAccount owner,
+                                                 final long contid,
+                                                 final int maxresults,
+                                                 final AttributeSelector at,
+                                                 final AttributeSelector characterID,
+                                                 final AttributeSelector base,
+                                                 final AttributeSelector baseID,
+                                                 final AttributeSelector grantableRoles,
+                                                 final AttributeSelector location,
+                                                 final AttributeSelector locationID,
+                                                 final AttributeSelector logoffDateTime,
+                                                 final AttributeSelector logonDateTime,
+                                                 final AttributeSelector name,
+                                                 final AttributeSelector roles,
+                                                 final AttributeSelector shipType,
+                                                 final AttributeSelector shipTypeID,
+                                                 final AttributeSelector startDateTime,
+                                                 final AttributeSelector title) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<MemberTracking>>() {
+        @Override
+        public List<MemberTracking> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM MemberTracking c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addLongSelector(qs, "c", "characterID", characterID);
+          AttributeSelector.addStringSelector(qs, "c", "base", base, p);
+          AttributeSelector.addIntSelector(qs, "c", "baseID", baseID);
+          AttributeSelector.addLongSelector(qs, "c", "grantableRoles", grantableRoles);
+          AttributeSelector.addStringSelector(qs, "c", "location", location, p);
+          AttributeSelector.addIntSelector(qs, "c", "locationID", locationID);
+          AttributeSelector.addLongSelector(qs, "c", "logoffDateTime", logoffDateTime);
+          AttributeSelector.addLongSelector(qs, "c", "logonDateTime", logonDateTime);
+          AttributeSelector.addStringSelector(qs, "c", "name", name, p);
+          AttributeSelector.addLongSelector(qs, "c", "roles", roles);
+          AttributeSelector.addStringSelector(qs, "c", "shipType", shipType, p);
+          AttributeSelector.addIntSelector(qs, "c", "shipTypeID", shipTypeID);
+          AttributeSelector.addLongSelector(qs, "c", "startDateTime", startDateTime);
+          AttributeSelector.addStringSelector(qs, "c", "title", title, p);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<MemberTracking> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), MemberTracking.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

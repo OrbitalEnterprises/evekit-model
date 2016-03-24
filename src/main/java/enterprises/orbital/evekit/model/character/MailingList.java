@@ -17,11 +17,18 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_mailing_list", indexes = {
-    @Index(name = "listIDIndex", columnList = "listID", unique = false),
+@Table(
+    name = "evekit_data_mailing_list",
+    indexes = {
+        @Index(
+            name = "listIDIndex",
+            columnList = "listID",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -54,7 +61,8 @@ public class MailingList extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof MailingList)) return false;
     MailingList other = (MailingList) sup;
     return nullSafeObjectCompare(displayName, other.displayName) && listID == other.listID;
@@ -86,7 +94,8 @@ public class MailingList extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -103,7 +112,10 @@ public class MailingList extends CachedData {
     return "MailingList [displayName=" + displayName + ", listID=" + listID + ", owner=" + owner + ", lifeStart=" + lifeStart + ", lifeEnd=" + lifeEnd + "]";
   }
 
-  public static MailingList get(final SynchronizedEveAccount owner, final long time, final long listID) {
+  public static MailingList get(
+                                final SynchronizedEveAccount owner,
+                                final long time,
+                                final long listID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<MailingList>() {
         @Override
@@ -126,7 +138,9 @@ public class MailingList extends CachedData {
     return null;
   }
 
-  public static List<Long> getAllListIDs(final SynchronizedEveAccount owner, final long time) {
+  public static List<Long> getAllListIDs(
+                                         final SynchronizedEveAccount owner,
+                                         final long time) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<Long>>() {
         @Override
@@ -143,7 +157,9 @@ public class MailingList extends CachedData {
     return Collections.emptyList();
   }
 
-  public static List<MailingList> getAllLists(final SynchronizedEveAccount owner, final long time) {
+  public static List<MailingList> getAllLists(
+                                              final SynchronizedEveAccount owner,
+                                              final long time) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<MailingList>>() {
         @Override
@@ -152,6 +168,45 @@ public class MailingList extends CachedData {
           getter.setParameter("owner", owner);
           getter.setParameter("point", time);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<MailingList> accessQuery(
+                                              final SynchronizedEveAccount owner,
+                                              final long contid,
+                                              final int maxresults,
+                                              final AttributeSelector at,
+                                              final AttributeSelector displayName,
+                                              final AttributeSelector listID) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<MailingList>>() {
+        @Override
+        public List<MailingList> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM MailingList c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addStringSelector(qs, "c", "displayName", displayName, p);
+          AttributeSelector.addLongSelector(qs, "c", "listID", listID);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<MailingList> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), MailingList.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

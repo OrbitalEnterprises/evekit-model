@@ -19,6 +19,8 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
@@ -217,6 +219,60 @@ public class UpcomingCalendarEvent extends CachedData {
           getter.setParameter("owner", owner);
           getter.setParameter("point", time);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<UpcomingCalendarEvent> accessQuery(
+                                                        final SynchronizedEveAccount owner,
+                                                        final long contid,
+                                                        final int maxresults,
+                                                        final AttributeSelector at,
+                                                        final AttributeSelector duration,
+                                                        final AttributeSelector eventDate,
+                                                        final AttributeSelector eventID,
+                                                        final AttributeSelector eventText,
+                                                        final AttributeSelector eventTitle,
+                                                        final AttributeSelector ownerID,
+                                                        final AttributeSelector ownerName,
+                                                        final AttributeSelector response,
+                                                        final AttributeSelector important) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<UpcomingCalendarEvent>>() {
+        @Override
+        public List<UpcomingCalendarEvent> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM UpcomingCalendarEvent c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addIntSelector(qs, "c", "duration", duration);
+          AttributeSelector.addLongSelector(qs, "c", "eventDate", eventDate);
+          AttributeSelector.addIntSelector(qs, "c", "eventID", eventID);
+          AttributeSelector.addStringSelector(qs, "c", "eventText", eventText, p);
+          AttributeSelector.addStringSelector(qs, "c", "eventTitle", eventTitle, p);
+          AttributeSelector.addLongSelector(qs, "c", "ownerID", ownerID);
+          AttributeSelector.addStringSelector(qs, "c", "ownerName", ownerName, p);
+          AttributeSelector.addStringSelector(qs, "c", "response", response, p);
+          AttributeSelector.addBooleanSelector(qs, "c", "important", important);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<UpcomingCalendarEvent> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(),
+                                                                                                                          UpcomingCalendarEvent.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

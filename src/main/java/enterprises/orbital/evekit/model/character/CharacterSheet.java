@@ -1,5 +1,7 @@
 package enterprises.orbital.evekit.model.character;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,12 +16,17 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_character_sheet")
+@Table(
+    name = "evekit_data_character_sheet")
 @NamedQueries({
-    @NamedQuery(name = "CharacterSheet.get", query = "SELECT c FROM CharacterSheet c where c.owner = :owner and c.lifeStart <= :point and c.lifeEnd > :point"),
+    @NamedQuery(
+        name = "CharacterSheet.get",
+        query = "SELECT c FROM CharacterSheet c where c.owner = :owner and c.lifeStart <= :point and c.lifeEnd > :point"),
 })
 // 2 hour cache time - API caches for 1 hour
 public class CharacterSheet extends CachedData {
@@ -101,7 +108,8 @@ public class CharacterSheet extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof CharacterSheet)) return false;
     CharacterSheet other = (CharacterSheet) sup;
     return characterID == other.characterID && nullSafeObjectCompare(name, other.name) && corporationID == other.corporationID
@@ -250,7 +258,8 @@ public class CharacterSheet extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -308,7 +317,9 @@ public class CharacterSheet extends CachedData {
         + ", remoteStationDate=" + remoteStationDate + "]";
   }
 
-  public static CharacterSheet get(final SynchronizedEveAccount owner, final long time) {
+  public static CharacterSheet get(
+                                   final SynchronizedEveAccount owner,
+                                   final long time) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<CharacterSheet>() {
         @Override
@@ -329,4 +340,89 @@ public class CharacterSheet extends CachedData {
     }
     return null;
   }
+
+  public static List<CharacterSheet> accessQuery(
+                                                 final SynchronizedEveAccount owner,
+                                                 final long contid,
+                                                 final int maxresults,
+                                                 final AttributeSelector at,
+                                                 final AttributeSelector characterID,
+                                                 final AttributeSelector name,
+                                                 final AttributeSelector corporationID,
+                                                 final AttributeSelector corporationName,
+                                                 final AttributeSelector race,
+                                                 final AttributeSelector doB,
+                                                 final AttributeSelector bloodline,
+                                                 final AttributeSelector ancestry,
+                                                 final AttributeSelector gender,
+                                                 final AttributeSelector allianceName,
+                                                 final AttributeSelector allianceID,
+                                                 final AttributeSelector factionName,
+                                                 final AttributeSelector factionID,
+                                                 final AttributeSelector intelligence,
+                                                 final AttributeSelector memory,
+                                                 final AttributeSelector charisma,
+                                                 final AttributeSelector perception,
+                                                 final AttributeSelector willpower,
+                                                 final AttributeSelector homeStationID,
+                                                 final AttributeSelector lastRespecDate,
+                                                 final AttributeSelector lastTimedRespec,
+                                                 final AttributeSelector freeRespecs,
+                                                 final AttributeSelector freeSkillPoints,
+                                                 final AttributeSelector remoteStationDate) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<CharacterSheet>>() {
+        @Override
+        public List<CharacterSheet> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM CharacterSheet c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+
+          AttributeSelector.addLongSelector(qs, "c", "characterID", characterID);
+          AttributeSelector.addStringSelector(qs, "c", "name", name, p);
+          AttributeSelector.addLongSelector(qs, "c", "corporationID", corporationID);
+          AttributeSelector.addStringSelector(qs, "c", "corporationName", corporationName, p);
+          AttributeSelector.addStringSelector(qs, "c", "race", race, p);
+          AttributeSelector.addLongSelector(qs, "c", "doB", doB);
+          AttributeSelector.addStringSelector(qs, "c", "bloodline", bloodline, p);
+          AttributeSelector.addStringSelector(qs, "c", "ancestry", ancestry, p);
+          AttributeSelector.addStringSelector(qs, "c", "gender", gender, p);
+          AttributeSelector.addStringSelector(qs, "c", "allianceName", allianceName, p);
+          AttributeSelector.addLongSelector(qs, "c", "allianceID", allianceID);
+          AttributeSelector.addStringSelector(qs, "c", "factionName", factionName, p);
+          AttributeSelector.addLongSelector(qs, "c", "factionID", factionID);
+          AttributeSelector.addIntSelector(qs, "c", "intelligence", intelligence);
+          AttributeSelector.addIntSelector(qs, "c", "memory", memory);
+          AttributeSelector.addIntSelector(qs, "c", "charisma", charisma);
+          AttributeSelector.addIntSelector(qs, "c", "perception", perception);
+          AttributeSelector.addIntSelector(qs, "c", "willpower", willpower);
+          AttributeSelector.addLongSelector(qs, "c", "homeStationID", homeStationID);
+          AttributeSelector.addLongSelector(qs, "c", "lastRespecDate", lastRespecDate);
+          AttributeSelector.addLongSelector(qs, "c", "lastTimedRespec", lastTimedRespec);
+          AttributeSelector.addIntSelector(qs, "c", "freeRespecs", freeRespecs);
+          AttributeSelector.addIntSelector(qs, "c", "freeSkillPoints", freeSkillPoints);
+          AttributeSelector.addLongSelector(qs, "c", "remoteStationDate", remoteStationDate);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<CharacterSheet> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), CharacterSheet.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
 }

@@ -17,11 +17,22 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_planetary_route", indexes = {
-    @Index(name = "planetIDIndex", columnList = "planetID", unique = false), @Index(name = "routeIDIndex", columnList = "routeID", unique = false)
+@Table(
+    name = "evekit_data_planetary_route",
+    indexes = {
+        @Index(
+            name = "planetIDIndex",
+            columnList = "planetID",
+            unique = false),
+        @Index(
+            name = "routeIDIndex",
+            columnList = "routeID",
+            unique = false)
 })
 @NamedQueries({
     @NamedQuery(
@@ -75,7 +86,8 @@ public class PlanetaryRoute extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof PlanetaryRoute)) return false;
     PlanetaryRoute other = (PlanetaryRoute) sup;
     return planetID == other.planetID && routeID == other.routeID && sourcePinID == other.sourcePinID && destinationPinID == other.destinationPinID
@@ -160,7 +172,8 @@ public class PlanetaryRoute extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -190,7 +203,11 @@ public class PlanetaryRoute extends CachedData {
         + ", lifeEnd=" + lifeEnd + "]";
   }
 
-  public static PlanetaryRoute get(final SynchronizedEveAccount owner, final long time, final long planetID, final long routeID) {
+  public static PlanetaryRoute get(
+                                   final SynchronizedEveAccount owner,
+                                   final long time,
+                                   final long planetID,
+                                   final long routeID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<PlanetaryRoute>() {
         @Override
@@ -214,7 +231,9 @@ public class PlanetaryRoute extends CachedData {
     return null;
   }
 
-  public static List<PlanetaryRoute> getAllPlanetaryRoutes(final SynchronizedEveAccount owner, final long time) {
+  public static List<PlanetaryRoute> getAllPlanetaryRoutes(
+                                                           final SynchronizedEveAccount owner,
+                                                           final long time) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<PlanetaryRoute>>() {
         @Override
@@ -232,7 +251,10 @@ public class PlanetaryRoute extends CachedData {
     return Collections.emptyList();
   }
 
-  public static List<PlanetaryRoute> getAllPlanetaryRoutesByPlanet(final SynchronizedEveAccount owner, final long time, final long planetID) {
+  public static List<PlanetaryRoute> getAllPlanetaryRoutesByPlanet(
+                                                                   final SynchronizedEveAccount owner,
+                                                                   final long time,
+                                                                   final long planetID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<PlanetaryRoute>>() {
         @Override
@@ -250,4 +272,64 @@ public class PlanetaryRoute extends CachedData {
     }
     return Collections.emptyList();
   }
+
+  public static List<PlanetaryRoute> accessQuery(
+                                                 final SynchronizedEveAccount owner,
+                                                 final long contid,
+                                                 final int maxresults,
+                                                 final AttributeSelector at,
+                                                 final AttributeSelector planetID,
+                                                 final AttributeSelector routeID,
+                                                 final AttributeSelector sourcePinID,
+                                                 final AttributeSelector destinationPinID,
+                                                 final AttributeSelector contentTypeID,
+                                                 final AttributeSelector contentTypeName,
+                                                 final AttributeSelector quantity,
+                                                 final AttributeSelector waypoint1,
+                                                 final AttributeSelector waypoint2,
+                                                 final AttributeSelector waypoint3,
+                                                 final AttributeSelector waypoint4,
+                                                 final AttributeSelector waypoint5) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<PlanetaryRoute>>() {
+        @Override
+        public List<PlanetaryRoute> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM PlanetaryRoute c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addLongSelector(qs, "c", "planetID", planetID);
+          AttributeSelector.addLongSelector(qs, "c", "routeID", routeID);
+          AttributeSelector.addLongSelector(qs, "c", "sourcePinID", sourcePinID);
+          AttributeSelector.addLongSelector(qs, "c", "destinationPinID", destinationPinID);
+          AttributeSelector.addIntSelector(qs, "c", "contentTypeID", contentTypeID);
+          AttributeSelector.addStringSelector(qs, "c", "contentTypeName", contentTypeName, p);
+          AttributeSelector.addIntSelector(qs, "c", "quantity", quantity);
+          AttributeSelector.addLongSelector(qs, "c", "waypoint1", waypoint1);
+          AttributeSelector.addLongSelector(qs, "c", "waypoint2", waypoint2);
+          AttributeSelector.addLongSelector(qs, "c", "waypoint3", waypoint3);
+          AttributeSelector.addLongSelector(qs, "c", "waypoint4", waypoint4);
+          AttributeSelector.addLongSelector(qs, "c", "waypoint5", waypoint5);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<PlanetaryRoute> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), PlanetaryRoute.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
 }

@@ -17,11 +17,18 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_planetary_colony", indexes = {
-    @Index(name = "planetIDIndex", columnList = "planetID", unique = false),
+@Table(
+    name = "evekit_data_planetary_colony",
+    indexes = {
+        @Index(
+            name = "planetIDIndex",
+            columnList = "planetID",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -70,7 +77,8 @@ public class PlanetaryColony extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof PlanetaryColony)) return false;
     PlanetaryColony other = (PlanetaryColony) sup;
     return planetID == other.planetID && solarSystemID == other.solarSystemID && nullSafeObjectCompare(solarSystemName, other.solarSystemName)
@@ -150,7 +158,8 @@ public class PlanetaryColony extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -196,7 +205,10 @@ public class PlanetaryColony extends CachedData {
    *          planet ID of planet where colony is located
    * @return planetary colony with the given properties live at the given time, or null
    */
-  public static PlanetaryColony get(final SynchronizedEveAccount owner, final long time, final long planetID) {
+  public static PlanetaryColony get(
+                                    final SynchronizedEveAccount owner,
+                                    final long time,
+                                    final long planetID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<PlanetaryColony>() {
         @Override
@@ -228,7 +240,9 @@ public class PlanetaryColony extends CachedData {
    *          time at which colonies must be live
    * @return list of planetary colonies live at the given time
    */
-  public static List<PlanetaryColony> getAllPlanetaryColonies(final SynchronizedEveAccount owner, final long time) {
+  public static List<PlanetaryColony> getAllPlanetaryColonies(
+                                                              final SynchronizedEveAccount owner,
+                                                              final long time) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<PlanetaryColony>>() {
         @Override
@@ -238,6 +252,63 @@ public class PlanetaryColony extends CachedData {
           getter.setParameter("owner", owner);
           getter.setParameter("point", time);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<PlanetaryColony> accessQuery(
+                                                  final SynchronizedEveAccount owner,
+                                                  final long contid,
+                                                  final int maxresults,
+                                                  final AttributeSelector at,
+                                                  final AttributeSelector planetID,
+                                                  final AttributeSelector solarSystemID,
+                                                  final AttributeSelector solarSystemName,
+                                                  final AttributeSelector planetName,
+                                                  final AttributeSelector planetTypeID,
+                                                  final AttributeSelector planetTypeName,
+                                                  final AttributeSelector ownerID,
+                                                  final AttributeSelector ownerName,
+                                                  final AttributeSelector lastUpdate,
+                                                  final AttributeSelector upgradeLevel,
+                                                  final AttributeSelector numberOfPins) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<PlanetaryColony>>() {
+        @Override
+        public List<PlanetaryColony> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM PlanetaryColony c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addLongSelector(qs, "c", "planetID", planetID);
+          AttributeSelector.addIntSelector(qs, "c", "solarSystemID", solarSystemID);
+          AttributeSelector.addStringSelector(qs, "c", "solarSystemName", solarSystemName, p);
+          AttributeSelector.addStringSelector(qs, "c", "planetName", planetName, p);
+          AttributeSelector.addIntSelector(qs, "c", "planetTypeID", planetTypeID);
+          AttributeSelector.addStringSelector(qs, "c", "planetTypeName", planetTypeName, p);
+          AttributeSelector.addLongSelector(qs, "c", "ownerID", ownerID);
+          AttributeSelector.addStringSelector(qs, "c", "ownerName", ownerName, p);
+          AttributeSelector.addLongSelector(qs, "c", "lastUpdate", lastUpdate);
+          AttributeSelector.addIntSelector(qs, "c", "upgradeLevel", upgradeLevel);
+          AttributeSelector.addIntSelector(qs, "c", "numberOfPins", numberOfPins);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<PlanetaryColony> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), PlanetaryColony.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

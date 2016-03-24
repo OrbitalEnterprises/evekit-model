@@ -17,12 +17,25 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_planetary_link", indexes = {
-    @Index(name = "planetIDIndex", columnList = "planetID", unique = false), @Index(name = "sourcePinIDIndex", columnList = "sourcePinID", unique = false),
-    @Index(name = "destinationPinIDIndex", columnList = "destinationPinID", unique = false),
+@Table(
+    name = "evekit_data_planetary_link",
+    indexes = {
+        @Index(
+            name = "planetIDIndex",
+            columnList = "planetID",
+            unique = false),
+        @Index(
+            name = "sourcePinIDIndex",
+            columnList = "sourcePinID",
+            unique = false),
+        @Index(
+            name = "destinationPinIDIndex",
+            columnList = "destinationPinID",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -59,7 +72,8 @@ public class PlanetaryLink extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof PlanetaryLink)) return false;
     PlanetaryLink other = (PlanetaryLink) sup;
     return planetID == other.planetID && sourcePinID == other.sourcePinID && destinationPinID == other.destinationPinID && linkLevel == other.linkLevel;
@@ -101,7 +115,8 @@ public class PlanetaryLink extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -134,7 +149,12 @@ public class PlanetaryLink extends CachedData {
    *          destination pin ID of link
    * @return planetary link with given properties live at the given time, or null
    */
-  public static PlanetaryLink get(final SynchronizedEveAccount owner, final long time, final long planetID, final long sourcePin, final long destPin) {
+  public static PlanetaryLink get(
+                                  final SynchronizedEveAccount owner,
+                                  final long time,
+                                  final long planetID,
+                                  final long sourcePin,
+                                  final long destPin) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<PlanetaryLink>() {
         @Override
@@ -168,7 +188,9 @@ public class PlanetaryLink extends CachedData {
    *          time at which planetary links must be live
    * @return list of all planetary colonies live at the given time
    */
-  public static List<PlanetaryLink> getAllPlanetaryLinks(final SynchronizedEveAccount owner, final long time) {
+  public static List<PlanetaryLink> getAllPlanetaryLinks(
+                                                         final SynchronizedEveAccount owner,
+                                                         final long time) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<PlanetaryLink>>() {
         @Override
@@ -197,7 +219,10 @@ public class PlanetaryLink extends CachedData {
    *          planet ID for which links will be retrieved
    * @return list of planetary links for the given planet ID, live at the given time
    */
-  public static List<PlanetaryLink> getAllPlanetaryLinksByPlanet(final SynchronizedEveAccount owner, final long time, final long planetID) {
+  public static List<PlanetaryLink> getAllPlanetaryLinksByPlanet(
+                                                                 final SynchronizedEveAccount owner,
+                                                                 final long time,
+                                                                 final long planetID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<PlanetaryLink>>() {
         @Override
@@ -215,4 +240,46 @@ public class PlanetaryLink extends CachedData {
     }
     return Collections.emptyList();
   }
+
+  public static List<PlanetaryLink> accessQuery(
+                                                final SynchronizedEveAccount owner,
+                                                final long contid,
+                                                final int maxresults,
+                                                final AttributeSelector at,
+                                                final AttributeSelector planetID,
+                                                final AttributeSelector sourcePinID,
+                                                final AttributeSelector destinationPinID,
+                                                final AttributeSelector linkLevel) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<PlanetaryLink>>() {
+        @Override
+        public List<PlanetaryLink> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM PlanetaryLink c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeSelector.addLongSelector(qs, "c", "planetID", planetID);
+          AttributeSelector.addLongSelector(qs, "c", "sourcePinID", sourcePinID);
+          AttributeSelector.addLongSelector(qs, "c", "destinationPinID", destinationPinID);
+          AttributeSelector.addIntSelector(qs, "c", "linkLevel", linkLevel);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<PlanetaryLink> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), PlanetaryLink.class);
+          query.setParameter("owner", owner);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
 }

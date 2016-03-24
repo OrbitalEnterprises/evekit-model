@@ -19,11 +19,22 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_character_contact_notification", indexes = {
-    @Index(name = "notificationIDIndex", columnList = "notificationID", unique = false), @Index(name = "sentDateIndex", columnList = "sentDate", unique = false)
+@Table(
+    name = "evekit_data_character_contact_notification",
+    indexes = {
+        @Index(
+            name = "notificationIDIndex",
+            columnList = "notificationID",
+            unique = false),
+        @Index(
+            name = "sentDateIndex",
+            columnList = "sentDate",
+            unique = false)
 })
 @NamedQueries({
     @NamedQuery(
@@ -59,7 +70,8 @@ public class CharacterContactNotification extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof CharacterContactNotification)) return false;
     CharacterContactNotification other = (CharacterContactNotification) sup;
     return notificationID == other.notificationID && senderID == other.senderID && nullSafeObjectCompare(senderName, other.senderName)
@@ -107,7 +119,8 @@ public class CharacterContactNotification extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -141,7 +154,10 @@ public class CharacterContactNotification extends CachedData {
    *          notification ID
    * @return contact notification with the given ID live at the given time, or null
    */
-  public static CharacterContactNotification get(final SynchronizedEveAccount owner, final long time, final long notificationID) {
+  public static CharacterContactNotification get(
+                                                 final SynchronizedEveAccount owner,
+                                                 final long time,
+                                                 final long notificationID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<CharacterContactNotification>() {
         @Override
@@ -177,7 +193,11 @@ public class CharacterContactNotification extends CachedData {
    *          sentDate (exclusive) after which notifications will be retrieved
    * @return list of contact notifications live at the given time with sentDate after "contid"
    */
-  public static List<CharacterContactNotification> getAllNotifications(final SynchronizedEveAccount owner, final long time, int maxresults, final long contid) {
+  public static List<CharacterContactNotification> getAllNotifications(
+                                                                       final SynchronizedEveAccount owner,
+                                                                       final long time,
+                                                                       int maxresults,
+                                                                       final long contid) {
     final int maxr = OrbitalProperties.getNonzeroLimited(maxresults, (int) PersistentProperty
         .getLongPropertyWithFallback(OrbitalProperties.getPropertyName(CharacterContactNotification.class, "maxresults"), DEFAULT_MAX_RESULTS));
     try {
@@ -191,6 +211,52 @@ public class CharacterContactNotification extends CachedData {
           getter.setParameter("point", time);
           getter.setMaxResults(maxr);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<CharacterContactNotification> accessQuery(
+                                                               final SynchronizedEveAccount owner,
+                                                               final long contid,
+                                                               final int maxresults,
+                                                               final AttributeSelector at,
+                                                               final AttributeSelector notificationID,
+                                                               final AttributeSelector senderID,
+                                                               final AttributeSelector senderName,
+                                                               final AttributeSelector sentDate,
+                                                               final AttributeSelector messageData) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<CharacterContactNotification>>() {
+        @Override
+        public List<CharacterContactNotification> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM CharacterContactNotification c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addLongSelector(qs, "c", "notificationID", notificationID);
+          AttributeSelector.addLongSelector(qs, "c", "senderID", senderID);
+          AttributeSelector.addStringSelector(qs, "c", "senderName", senderName, p);
+          AttributeSelector.addLongSelector(qs, "c", "sentDate", sentDate);
+          AttributeSelector.addStringSelector(qs, "c", "messageData", messageData, p);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<CharacterContactNotification> query = EveKitUserAccountProvider.getFactory().getEntityManager()
+              .createQuery(qs.toString(), CharacterContactNotification.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

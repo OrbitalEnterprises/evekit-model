@@ -17,11 +17,17 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_skill_in_queue", indexes = {
-    @Index(name = "queuePositionIndex", columnList = "queuePosition", unique = false),
+@Table(
+    name = "evekit_data_skill_in_queue",
+    indexes = {
+        @Index(
+            name = "queuePositionIndex",
+            columnList = "queuePosition",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -61,7 +67,8 @@ public class SkillInQueue extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof SkillInQueue)) return false;
     SkillInQueue other = (SkillInQueue) sup;
     return endSP == other.endSP && endTime == other.endTime && level == other.level && queuePosition == other.queuePosition && startSP == other.startSP
@@ -119,7 +126,8 @@ public class SkillInQueue extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -140,7 +148,10 @@ public class SkillInQueue extends CachedData {
         + ", startTime=" + startTime + ", typeID=" + typeID + ", owner=" + owner + ", lifeStart=" + lifeStart + ", lifeEnd=" + lifeEnd + "]";
   }
 
-  public static SkillInQueue get(final SynchronizedEveAccount owner, final long time, final int queuePosition) {
+  public static SkillInQueue get(
+                                 final SynchronizedEveAccount owner,
+                                 final long time,
+                                 final int queuePosition) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<SkillInQueue>() {
         @Override
@@ -163,7 +174,10 @@ public class SkillInQueue extends CachedData {
     return null;
   }
 
-  public static List<SkillInQueue> getAtOrAfterPosition(final SynchronizedEveAccount owner, final long time, final int maxPosition) {
+  public static List<SkillInQueue> getAtOrAfterPosition(
+                                                        final SynchronizedEveAccount owner,
+                                                        final long time,
+                                                        final int maxPosition) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<SkillInQueue>>() {
         @Override
@@ -174,6 +188,53 @@ public class SkillInQueue extends CachedData {
           getter.setParameter("qmax", maxPosition);
           getter.setParameter("point", time);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<SkillInQueue> accessQuery(
+                                               final SynchronizedEveAccount owner,
+                                               final long contid,
+                                               final int maxresults,
+                                               final AttributeSelector at,
+                                               final AttributeSelector endSP,
+                                               final AttributeSelector endTime,
+                                               final AttributeSelector level,
+                                               final AttributeSelector queuePosition,
+                                               final AttributeSelector startSP,
+                                               final AttributeSelector startTime,
+                                               final AttributeSelector typeID) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<SkillInQueue>>() {
+        @Override
+        public List<SkillInQueue> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM SkillInQueue c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeSelector.addIntSelector(qs, "c", "endSP", endSP);
+          AttributeSelector.addLongSelector(qs, "c", "endTime", endTime);
+          AttributeSelector.addIntSelector(qs, "c", "level", level);
+          AttributeSelector.addIntSelector(qs, "c", "queuePosition", queuePosition);
+          AttributeSelector.addIntSelector(qs, "c", "startSP", startSP);
+          AttributeSelector.addLongSelector(qs, "c", "startTime", startTime);
+          AttributeSelector.addIntSelector(qs, "c", "typeID", typeID);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<SkillInQueue> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), SkillInQueue.class);
+          query.setParameter("owner", owner);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

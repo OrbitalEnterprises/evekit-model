@@ -19,11 +19,21 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_account_balance", indexes = {
-    @Index(name = "accountIDIndex", columnList = "accountID", unique = false), @Index(name = "accountKeyIndex", columnList = "accountKey", unique = false)
+@Table(
+    name = "evekit_data_account_balance",
+    indexes = {
+        @Index(
+            name = "accountIDIndex",
+            columnList = "accountID",
+            unique = false),
+        @Index(
+            name = "accountKeyIndex",
+            columnList = "accountKey",
+            unique = false)
 })
 @NamedQueries({
     @NamedQuery(
@@ -42,7 +52,9 @@ public class AccountBalance extends CachedData {
   private static final byte[] MASK = AccountAccessMask.createMask(AccountAccessMask.ACCESS_ACCOUNT_BALANCE);
   private int                 accountID;
   private int                 accountKey;
-  @Column(precision = 19, scale = 2)
+  @Column(
+      precision = 19,
+      scale = 2)
   private BigDecimal          balance;
 
   @SuppressWarnings("unused")
@@ -58,7 +70,8 @@ public class AccountBalance extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof AccountBalance)) return false;
     AccountBalance other = (AccountBalance) sup;
     return accountID == other.accountID && accountKey == other.accountKey && nullSafeObjectCompare(balance, other.balance);
@@ -95,7 +108,8 @@ public class AccountBalance extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -125,7 +139,10 @@ public class AccountBalance extends CachedData {
    *          account balance ID
    * @return an existing account balance, or null.
    */
-  public static AccountBalance get(final SynchronizedEveAccount owner, final long time, final int aid) {
+  public static AccountBalance get(
+                                   final SynchronizedEveAccount owner,
+                                   final long time,
+                                   final int aid) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<AccountBalance>() {
         @Override
@@ -159,7 +176,10 @@ public class AccountBalance extends CachedData {
    *          time at which the account balance should be live
    * @return an account balance with the given key, live at the given time, or null if no such account balance exists
    */
-  public static AccountBalance getByKey(final SynchronizedEveAccount owner, final long time, final int akey) {
+  public static AccountBalance getByKey(
+                                        final SynchronizedEveAccount owner,
+                                        final long time,
+                                        final int akey) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<AccountBalance>() {
         @Override
@@ -191,7 +211,9 @@ public class AccountBalance extends CachedData {
    *          time at which the account balances should be live
    * @return the list of account balances live at the given time
    */
-  public static List<AccountBalance> getAll(final SynchronizedEveAccount owner, final long time) {
+  public static List<AccountBalance> getAll(
+                                            final SynchronizedEveAccount owner,
+                                            final long time) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<AccountBalance>>() {
         @Override
@@ -201,6 +223,43 @@ public class AccountBalance extends CachedData {
           getter.setParameter("owner", owner);
           getter.setParameter("point", time);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<AccountBalance> accessQuery(
+                                                 final SynchronizedEveAccount owner,
+                                                 final long contid,
+                                                 final int maxresults,
+                                                 final AttributeSelector at,
+                                                 final AttributeSelector accountID,
+                                                 final AttributeSelector accountKey) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<AccountBalance>>() {
+        @Override
+        public List<AccountBalance> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM AccountBalance c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeSelector.addIntSelector(qs, "c", "accountID", accountID);
+          AttributeSelector.addIntSelector(qs, "c", "accountKey", accountKey);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<AccountBalance> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), AccountBalance.class);
+          query.setParameter("owner", owner);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

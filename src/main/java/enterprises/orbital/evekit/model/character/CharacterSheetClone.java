@@ -1,5 +1,7 @@
 package enterprises.orbital.evekit.model.character;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,10 +16,12 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_character_sheet_clone")
+@Table(
+    name = "evekit_data_character_sheet_clone")
 @NamedQueries({
     @NamedQuery(
         name = "CharacterSheetClone.get",
@@ -42,7 +46,8 @@ public class CharacterSheetClone extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof CharacterSheetClone)) return false;
     CharacterSheetClone other = (CharacterSheetClone) sup;
     return cloneJumpDate == other.cloneJumpDate;
@@ -69,7 +74,8 @@ public class CharacterSheetClone extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -83,7 +89,9 @@ public class CharacterSheetClone extends CachedData {
     return "CharacterSheetClone [cloneJumpDate=" + cloneJumpDate + ", owner=" + owner + ", lifeStart=" + lifeStart + ", lifeEnd=" + lifeEnd + "]";
   }
 
-  public static CharacterSheetClone get(final SynchronizedEveAccount owner, final long time) {
+  public static CharacterSheetClone get(
+                                        final SynchronizedEveAccount owner,
+                                        final long time) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<CharacterSheetClone>() {
         @Override
@@ -104,4 +112,41 @@ public class CharacterSheetClone extends CachedData {
     }
     return null;
   }
+
+  public static List<CharacterSheetClone> accessQuery(
+                                                      final SynchronizedEveAccount owner,
+                                                      final long contid,
+                                                      final int maxresults,
+                                                      final AttributeSelector at,
+                                                      final AttributeSelector cloneJumpDate) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<CharacterSheetClone>>() {
+        @Override
+        public List<CharacterSheetClone> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM CharacterSheetClone c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeSelector.addLongSelector(qs, "c", "cloneJumpDate", cloneJumpDate);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<CharacterSheetClone> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(),
+                                                                                                                        CharacterSheetClone.class);
+          query.setParameter("owner", owner);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
 }

@@ -19,12 +19,25 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_character_notification", indexes = {
-    @Index(name = "notificationIDIndex", columnList = "notificationID", unique = false),
-    @Index(name = "sentDateIndex", columnList = "sentDate", unique = false), @Index(name = "msgReadIndex", columnList = "msgRead", unique = false),
+@Table(
+    name = "evekit_data_character_notification",
+    indexes = {
+        @Index(
+            name = "notificationIDIndex",
+            columnList = "notificationID",
+            unique = false),
+        @Index(
+            name = "sentDateIndex",
+            columnList = "sentDate",
+            unique = false),
+        @Index(
+            name = "msgReadIndex",
+            columnList = "msgRead",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -63,7 +76,8 @@ public class CharacterNotification extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof CharacterNotification)) return false;
     CharacterNotification other = (CharacterNotification) sup;
     return notificationID == other.notificationID && typeID == other.typeID && senderID == other.senderID && sentDate == other.sentDate
@@ -111,7 +125,8 @@ public class CharacterNotification extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -130,7 +145,10 @@ public class CharacterNotification extends CachedData {
         + msgRead + ", owner=" + owner + ", lifeStart=" + lifeStart + ", lifeEnd=" + lifeEnd + "]";
   }
 
-  public static CharacterNotification get(final SynchronizedEveAccount owner, final long time, final long notificationID) {
+  public static CharacterNotification get(
+                                          final SynchronizedEveAccount owner,
+                                          final long time,
+                                          final long notificationID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<CharacterNotification>() {
         @Override
@@ -172,6 +190,50 @@ public class CharacterNotification extends CachedData {
           getter.setParameter("point", time);
           getter.setMaxResults(maxr);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<CharacterNotification> accessQuery(
+                                                        final SynchronizedEveAccount owner,
+                                                        final long contid,
+                                                        final int maxresults,
+                                                        final AttributeSelector at,
+                                                        final AttributeSelector notificationID,
+                                                        final AttributeSelector typeID,
+                                                        final AttributeSelector senderID,
+                                                        final AttributeSelector sentDate,
+                                                        final AttributeSelector msgRead) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<CharacterNotification>>() {
+        @Override
+        public List<CharacterNotification> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM CharacterNotification c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeSelector.addLongSelector(qs, "c", "notificationID", notificationID);
+          AttributeSelector.addIntSelector(qs, "c", "typeID", typeID);
+          AttributeSelector.addLongSelector(qs, "c", "senderID", senderID);
+          AttributeSelector.addLongSelector(qs, "c", "sentDate", sentDate);
+          AttributeSelector.addBooleanSelector(qs, "c", "msgRead", msgRead);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<CharacterNotification> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(),
+                                                                                                                          CharacterNotification.class);
+          query.setParameter("owner", owner);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

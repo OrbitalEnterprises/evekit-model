@@ -19,6 +19,8 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
@@ -166,6 +168,48 @@ public class CharacterMailMessageBody extends CachedData {
           getter.setParameter("owner", owner);
           getter.setParameter("point", time);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<CharacterMailMessageBody> accessQuery(
+                                                           final SynchronizedEveAccount owner,
+                                                           final long contid,
+                                                           final int maxresults,
+                                                           final AttributeSelector at,
+                                                           final AttributeSelector messageID,
+                                                           final AttributeSelector retrieved,
+                                                           final AttributeSelector body) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<CharacterMailMessageBody>>() {
+        @Override
+        public List<CharacterMailMessageBody> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM CharacterMailMessageBody c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addLongSelector(qs, "c", "messageID", messageID);
+          AttributeSelector.addBooleanSelector(qs, "c", "retrieved", retrieved);
+          AttributeSelector.addStringSelector(qs, "c", "body", body, p);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<CharacterMailMessageBody> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(),
+                                                                                                                             CharacterMailMessageBody.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

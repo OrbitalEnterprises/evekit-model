@@ -17,11 +17,22 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_character_medal", indexes = {
-    @Index(name = "medalIDIndex", columnList = "medalID", unique = false), @Index(name = "issuedIndex", columnList = "issued", unique = false)
+@Table(
+    name = "evekit_data_character_medal",
+    indexes = {
+        @Index(
+            name = "medalIDIndex",
+            columnList = "medalID",
+            unique = false),
+        @Index(
+            name = "issuedIndex",
+            columnList = "issued",
+            unique = false)
 })
 @NamedQueries({
     @NamedQuery(
@@ -63,7 +74,8 @@ public class CharacterMedal extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof CharacterMedal)) return false;
     CharacterMedal other = (CharacterMedal) sup;
     return nullSafeObjectCompare(description, other.description) && medalID == other.medalID && nullSafeObjectCompare(title, other.title)
@@ -127,7 +139,8 @@ public class CharacterMedal extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -158,7 +171,11 @@ public class CharacterMedal extends CachedData {
         + lifeEnd + "]";
   }
 
-  public static CharacterMedal get(final SynchronizedEveAccount owner, final long time, final int medalID, final long issued) {
+  public static CharacterMedal get(
+                                   final SynchronizedEveAccount owner,
+                                   final long time,
+                                   final int medalID,
+                                   final long issued) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<CharacterMedal>() {
         @Override
@@ -182,7 +199,9 @@ public class CharacterMedal extends CachedData {
     return null;
   }
 
-  public static List<CharacterMedal> getAllMedals(final SynchronizedEveAccount owner, final long time) {
+  public static List<CharacterMedal> getAllMedals(
+                                                  final SynchronizedEveAccount owner,
+                                                  final long time) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<CharacterMedal>>() {
         @Override
@@ -192,6 +211,57 @@ public class CharacterMedal extends CachedData {
           getter.setParameter("owner", owner);
           getter.setParameter("point", time);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<CharacterMedal> accessQuery(
+                                                 final SynchronizedEveAccount owner,
+                                                 final long contid,
+                                                 final int maxresults,
+                                                 final AttributeSelector at,
+                                                 final AttributeSelector description,
+                                                 final AttributeSelector medalID,
+                                                 final AttributeSelector title,
+                                                 final AttributeSelector corporationID,
+                                                 final AttributeSelector issued,
+                                                 final AttributeSelector issuerID,
+                                                 final AttributeSelector reason,
+                                                 final AttributeSelector status) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<CharacterMedal>>() {
+        @Override
+        public List<CharacterMedal> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM CharacterMedal c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addStringSelector(qs, "c", "description", description, p);
+          AttributeSelector.addIntSelector(qs, "c", "medalID", medalID);
+          AttributeSelector.addStringSelector(qs, "c", "title", title, p);
+          AttributeSelector.addLongSelector(qs, "c", "corporationID", corporationID);
+          AttributeSelector.addLongSelector(qs, "c", "issued", issued);
+          AttributeSelector.addLongSelector(qs, "c", "issuerID", issuerID);
+          AttributeSelector.addStringSelector(qs, "c", "reason", reason, p);
+          AttributeSelector.addStringSelector(qs, "c", "status", status, p);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<CharacterMedal> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), CharacterMedal.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

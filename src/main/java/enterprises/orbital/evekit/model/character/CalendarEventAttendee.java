@@ -17,11 +17,22 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_calendar_event_attendee", indexes = {
-    @Index(name = "eventIDIndex", columnList = "eventID", unique = false), @Index(name = "characterIDIndex", columnList = "characterID", unique = false),
+@Table(
+    name = "evekit_data_calendar_event_attendee",
+    indexes = {
+        @Index(
+            name = "eventIDIndex",
+            columnList = "eventID",
+            unique = false),
+        @Index(
+            name = "characterIDIndex",
+            columnList = "characterID",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -54,7 +65,8 @@ public class CalendarEventAttendee extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof CalendarEventAttendee)) return false;
     CalendarEventAttendee other = (CalendarEventAttendee) sup;
     return eventID == other.eventID && characterID == other.characterID && nullSafeObjectCompare(characterName, other.characterName)
@@ -97,7 +109,8 @@ public class CalendarEventAttendee extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -132,7 +145,11 @@ public class CalendarEventAttendee extends CachedData {
    *          character ID of attendee
    * @return calendar event attendee with the given parameters live at the given time, or null if no such attendee exists
    */
-  public static CalendarEventAttendee get(final SynchronizedEveAccount owner, final long time, final int eID, final long cID) {
+  public static CalendarEventAttendee get(
+                                          final SynchronizedEveAccount owner,
+                                          final long time,
+                                          final int eID,
+                                          final long cID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<CalendarEventAttendee>() {
         @Override
@@ -167,7 +184,10 @@ public class CalendarEventAttendee extends CachedData {
    *          event ID for the calendar event
    * @return list of calendar event attendees for the given event, live at the given time
    */
-  public static List<CalendarEventAttendee> getByEventID(final SynchronizedEveAccount owner, final long time, final int eID) {
+  public static List<CalendarEventAttendee> getByEventID(
+                                                         final SynchronizedEveAccount owner,
+                                                         final long time,
+                                                         final int eID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<CalendarEventAttendee>>() {
         @Override
@@ -178,6 +198,50 @@ public class CalendarEventAttendee extends CachedData {
           getter.setParameter("event", eID);
           getter.setParameter("point", time);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<CalendarEventAttendee> accessQuery(
+                                                        final SynchronizedEveAccount owner,
+                                                        final long contid,
+                                                        final int maxresults,
+                                                        final AttributeSelector at,
+                                                        final AttributeSelector eventID,
+                                                        final AttributeSelector characterID,
+                                                        final AttributeSelector characterName,
+                                                        final AttributeSelector response) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<CalendarEventAttendee>>() {
+        @Override
+        public List<CalendarEventAttendee> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM CalendarEventAttendee c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addIntSelector(qs, "c", "eventID", eventID);
+          AttributeSelector.addLongSelector(qs, "c", "characterID", characterID);
+          AttributeSelector.addStringSelector(qs, "c", "characterName", characterName, p);
+          AttributeSelector.addStringSelector(qs, "c", "response", response, p);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<CalendarEventAttendee> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(),
+                                                                                                                          CalendarEventAttendee.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

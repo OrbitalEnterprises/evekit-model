@@ -1,5 +1,7 @@
 package enterprises.orbital.evekit.model.character;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,10 +16,12 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_character_skill_in_training")
+@Table(
+    name = "evekit_data_character_skill_in_training")
 @NamedQueries({
     @NamedQuery(
         name = "CharacterSkillInTraining.get",
@@ -56,7 +60,8 @@ public class CharacterSkillInTraining extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof CharacterSkillInTraining)) return false;
     CharacterSkillInTraining other = (CharacterSkillInTraining) sup;
     return skillInTraining == other.skillInTraining && currentTrainingQueueTime == other.currentTrainingQueueTime
@@ -120,7 +125,8 @@ public class CharacterSkillInTraining extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -144,7 +150,9 @@ public class CharacterSkillInTraining extends CachedData {
         + ", lifeEnd=" + lifeEnd + "]";
   }
 
-  public static CharacterSkillInTraining get(final SynchronizedEveAccount owner, final long time) {
+  public static CharacterSkillInTraining get(
+                                             final SynchronizedEveAccount owner,
+                                             final long time) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<CharacterSkillInTraining>() {
         @Override
@@ -165,4 +173,55 @@ public class CharacterSkillInTraining extends CachedData {
     }
     return null;
   }
+
+  public static List<CharacterSkillInTraining> accessQuery(
+                                                           final SynchronizedEveAccount owner,
+                                                           final long contid,
+                                                           final int maxresults,
+                                                           final AttributeSelector at,
+                                                           final AttributeSelector skillInTraining,
+                                                           final AttributeSelector currentTrainingQueueTime,
+                                                           final AttributeSelector trainingStartTime,
+                                                           final AttributeSelector trainingEndTime,
+                                                           final AttributeSelector trainingStartSP,
+                                                           final AttributeSelector trainingDestinationSP,
+                                                           final AttributeSelector trainingToLevel,
+                                                           final AttributeSelector skillTypeID) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<CharacterSkillInTraining>>() {
+        @Override
+        public List<CharacterSkillInTraining> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM CharacterSkillInTraining c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeSelector.addBooleanSelector(qs, "c", "skillInTraining", skillInTraining);
+          AttributeSelector.addLongSelector(qs, "c", "currentTrainingQueueTime", currentTrainingQueueTime);
+          AttributeSelector.addLongSelector(qs, "c", "trainingStartTime", trainingStartTime);
+          AttributeSelector.addLongSelector(qs, "c", "trainingEndTime", trainingEndTime);
+          AttributeSelector.addIntSelector(qs, "c", "trainingStartSP", trainingStartSP);
+          AttributeSelector.addIntSelector(qs, "c", "trainingDestinationSP", trainingDestinationSP);
+          AttributeSelector.addIntSelector(qs, "c", "trainingToLevel", trainingToLevel);
+          AttributeSelector.addIntSelector(qs, "c", "skillTypeID", skillTypeID);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<CharacterSkillInTraining> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(),
+                                                                                                                             CharacterSkillInTraining.class);
+          query.setParameter("owner", owner);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
 }

@@ -17,11 +17,22 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_character_role", indexes = {
-    @Index(name = "roleCategoryIndex", columnList = "roleCategory", unique = false), @Index(name = "roleIDIndex", columnList = "roleID", unique = false),
+@Table(
+    name = "evekit_data_character_role",
+    indexes = {
+        @Index(
+            name = "roleCategoryIndex",
+            columnList = "roleCategory",
+            unique = false),
+        @Index(
+            name = "roleIDIndex",
+            columnList = "roleID",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -53,7 +64,8 @@ public class CharacterRole extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof CharacterRole)) return false;
     CharacterRole other = (CharacterRole) sup;
     return nullSafeObjectCompare(roleCategory, other.roleCategory) && roleID == other.roleID && nullSafeObjectCompare(roleName, other.roleName);
@@ -90,7 +102,8 @@ public class CharacterRole extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -111,7 +124,11 @@ public class CharacterRole extends CachedData {
         + ", lifeEnd=" + lifeEnd + "]";
   }
 
-  public static CharacterRole get(final SynchronizedEveAccount owner, final long time, final String roleCategory, final long roleID) {
+  public static CharacterRole get(
+                                  final SynchronizedEveAccount owner,
+                                  final long time,
+                                  final String roleCategory,
+                                  final long roleID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<CharacterRole>() {
         @Override
@@ -135,7 +152,9 @@ public class CharacterRole extends CachedData {
     return null;
   }
 
-  public static List<CharacterRole> getAllRoles(final SynchronizedEveAccount owner, final long time) {
+  public static List<CharacterRole> getAllRoles(
+                                                final SynchronizedEveAccount owner,
+                                                final long time) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<CharacterRole>>() {
         @Override
@@ -145,6 +164,47 @@ public class CharacterRole extends CachedData {
           getter.setParameter("owner", owner);
           getter.setParameter("point", time);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<CharacterRole> accessQuery(
+                                                final SynchronizedEveAccount owner,
+                                                final long contid,
+                                                final int maxresults,
+                                                final AttributeSelector at,
+                                                final AttributeSelector roleCategory,
+                                                final AttributeSelector roleID,
+                                                final AttributeSelector roleName) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<CharacterRole>>() {
+        @Override
+        public List<CharacterRole> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM CharacterRole c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addStringSelector(qs, "c", "roleCategory", roleCategory, p);
+          AttributeSelector.addLongSelector(qs, "c", "roleID", roleID);
+          AttributeSelector.addStringSelector(qs, "c", "roleName", roleName, p);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<CharacterRole> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), CharacterRole.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

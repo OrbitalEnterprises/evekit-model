@@ -23,12 +23,26 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_character_mail_message", indexes = {
-    @Index(name = "messageIDIndex", columnList = "messageID", unique = false), @Index(name = "sentDateIndex", columnList = "sentDate", unique = false),
-    @Index(name = "msgReadIndex", columnList = "msgRead", unique = false),
+@Table(
+    name = "evekit_data_character_mail_message",
+    indexes = {
+        @Index(
+            name = "messageIDIndex",
+            columnList = "messageID",
+            unique = false),
+        @Index(
+            name = "sentDateIndex",
+            columnList = "sentDate",
+            unique = false),
+        @Index(
+            name = "msgReadIndex",
+            columnList = "msgRead",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -49,12 +63,14 @@ public class CharacterMailMessage extends CachedData {
   private long                messageID;
   private long                senderID;
   private String              senderName;
-  @ElementCollection(fetch = FetchType.EAGER)
+  @ElementCollection(
+      fetch = FetchType.EAGER)
   private Set<Long>           toCharacterID       = new HashSet<Long>();
   private long                sentDate            = -1;
   private String              title;
   private long                corpOrAllianceID;
-  @ElementCollection(fetch = FetchType.EAGER)
+  @ElementCollection(
+      fetch = FetchType.EAGER)
   private Set<Long>           toListID            = new HashSet<Long>();
   private boolean             msgRead;
   private int                 senderTypeID;
@@ -81,7 +97,8 @@ public class CharacterMailMessage extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof CharacterMailMessage)) return false;
     CharacterMailMessage other = (CharacterMailMessage) sup;
     return messageID == other.messageID && senderID == other.senderID && nullSafeObjectCompare(senderName, other.senderName)
@@ -156,7 +173,8 @@ public class CharacterMailMessage extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -189,7 +207,10 @@ public class CharacterMailMessage extends CachedData {
         + ", senderTypeID=" + senderTypeID + ", owner=" + owner + ", lifeStart=" + lifeStart + ", lifeEnd=" + lifeEnd + "]";
   }
 
-  public static CharacterMailMessage get(final SynchronizedEveAccount owner, final long time, final long messageID) {
+  public static CharacterMailMessage get(
+                                         final SynchronizedEveAccount owner,
+                                         final long time,
+                                         final long messageID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<CharacterMailMessage>() {
         @Override
@@ -212,7 +233,12 @@ public class CharacterMailMessage extends CachedData {
     return null;
   }
 
-  public static List<Long> getMessageIDs(final SynchronizedEveAccount owner, final long time, final boolean unreadonly, int maxresults, final long contid) {
+  public static List<Long> getMessageIDs(
+                                         final SynchronizedEveAccount owner,
+                                         final long time,
+                                         final boolean unreadonly,
+                                         int maxresults,
+                                         final long contid) {
     final int maxr = OrbitalProperties.getNonzeroLimited(maxresults, (int) PersistentProperty
         .getLongPropertyWithFallback(OrbitalProperties.getPropertyName(CharacterMailMessage.class, "maxresults"), DEFAULT_MAX_RESULTS));
     try {
@@ -226,6 +252,62 @@ public class CharacterMailMessage extends CachedData {
           getter.setParameter("point", time);
           getter.setMaxResults(maxr);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<CharacterMailMessage> accessQuery(
+                                                       final SynchronizedEveAccount owner,
+                                                       final long contid,
+                                                       final int maxresults,
+                                                       final AttributeSelector at,
+                                                       final AttributeSelector messageID,
+                                                       final AttributeSelector senderID,
+                                                       final AttributeSelector senderName,
+                                                       final AttributeSelector toCharacterID,
+                                                       final AttributeSelector sentDate,
+                                                       final AttributeSelector title,
+                                                       final AttributeSelector corpOrAllianceID,
+                                                       final AttributeSelector toListID,
+                                                       final AttributeSelector msgRead,
+                                                       final AttributeSelector senderTypeID) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<CharacterMailMessage>>() {
+        @Override
+        public List<CharacterMailMessage> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM CharacterMailMessage c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addLongSelector(qs, "c", "messageID", messageID);
+          AttributeSelector.addLongSelector(qs, "c", "senderID", senderID);
+          AttributeSelector.addStringSelector(qs, "c", "senderName", senderName, p);
+          AttributeSelector.addSetLongSelector(qs, "c", "toCharacterID", toCharacterID);
+          AttributeSelector.addLongSelector(qs, "c", "sentDate", sentDate);
+          AttributeSelector.addStringSelector(qs, "c", "title", title, p);
+          AttributeSelector.addLongSelector(qs, "c", "corpOrAllianceID", corpOrAllianceID);
+          AttributeSelector.addSetLongSelector(qs, "c", "toListID", toListID);
+          AttributeSelector.addBooleanSelector(qs, "c", "msgRead", msgRead);
+          AttributeSelector.addIntSelector(qs, "c", "senderTypeID", senderTypeID);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<CharacterMailMessage> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(),
+                                                                                                                         CharacterMailMessage.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

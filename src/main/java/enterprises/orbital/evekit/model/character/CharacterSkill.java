@@ -19,11 +19,17 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_character_skill", indexes = {
-    @Index(name = "typeIDIndex", columnList = "typeID", unique = false),
+@Table(
+    name = "evekit_data_character_skill",
+    indexes = {
+        @Index(
+            name = "typeIDIndex",
+            columnList = "typeID",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -58,7 +64,8 @@ public class CharacterSkill extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof CharacterSkill)) return false;
     CharacterSkill other = (CharacterSkill) sup;
     return typeID == other.typeID && level == other.level && skillpoints == other.skillpoints && published == other.published;
@@ -106,7 +113,8 @@ public class CharacterSkill extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -118,7 +126,10 @@ public class CharacterSkill extends CachedData {
     return true;
   }
 
-  public static CharacterSkill get(final SynchronizedEveAccount owner, final long time, final int typeID) {
+  public static CharacterSkill get(
+                                   final SynchronizedEveAccount owner,
+                                   final long time,
+                                   final int typeID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<CharacterSkill>() {
         @Override
@@ -141,7 +152,11 @@ public class CharacterSkill extends CachedData {
     return null;
   }
 
-  public static List<CharacterSkill> getAll(final SynchronizedEveAccount owner, final long time, int maxresults, final int contid) {
+  public static List<CharacterSkill> getAll(
+                                            final SynchronizedEveAccount owner,
+                                            final long time,
+                                            int maxresults,
+                                            final int contid) {
     final int maxr = OrbitalProperties.getNonzeroLimited(maxresults, (int) PersistentProperty
         .getLongPropertyWithFallback(OrbitalProperties.getPropertyName(CharacterSkill.class, "maxresults"), DEFAULT_MAX_RESULTS));
     try {
@@ -155,6 +170,47 @@ public class CharacterSkill extends CachedData {
           getter.setParameter("point", time);
           getter.setMaxResults(maxr);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<CharacterSkill> accessQuery(
+                                                 final SynchronizedEveAccount owner,
+                                                 final long contid,
+                                                 final int maxresults,
+                                                 final AttributeSelector at,
+                                                 final AttributeSelector typeID,
+                                                 final AttributeSelector level,
+                                                 final AttributeSelector skillpoints,
+                                                 final AttributeSelector published) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<CharacterSkill>>() {
+        @Override
+        public List<CharacterSkill> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM CharacterSkill c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeSelector.addIntSelector(qs, "c", "typeID", typeID);
+          AttributeSelector.addIntSelector(qs, "c", "level", level);
+          AttributeSelector.addIntSelector(qs, "c", "skillpoints", skillpoints);
+          AttributeSelector.addBooleanSelector(qs, "c", "published", published);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<CharacterSkill> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), CharacterSkill.class);
+          query.setParameter("owner", owner);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {
