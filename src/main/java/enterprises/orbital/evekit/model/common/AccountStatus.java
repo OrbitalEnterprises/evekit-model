@@ -177,7 +177,8 @@ public class AccountStatus extends CachedData {
                                                 final AttributeSelector paidUntil,
                                                 final AttributeSelector createDate,
                                                 final AttributeSelector logonCount,
-                                                final AttributeSelector logonMinutes) {
+                                                final AttributeSelector logonMinutes,
+                                                final AttributeSelector multiCharacterTraining) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<AccountStatus>>() {
         @Override
@@ -193,6 +194,7 @@ public class AccountStatus extends CachedData {
           AttributeSelector.addLongSelector(qs, "c", "createDate", createDate);
           AttributeSelector.addIntSelector(qs, "c", "logonCount", logonCount);
           AttributeSelector.addIntSelector(qs, "c", "logonMinutes", logonMinutes);
+          AttributeSelector.addSetLongSelector(qs, "c", "multiCharacterTraining", multiCharacterTraining);
           // Set CID constraint
           qs.append(" and c.cid > ").append(contid);
           // Order by CID (asc)
