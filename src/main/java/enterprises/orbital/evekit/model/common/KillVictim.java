@@ -1,5 +1,7 @@
 package enterprises.orbital.evekit.model.common;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,11 +17,18 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_kill_victim", indexes = {
-    @Index(name = "killIDIndex", columnList = "killID", unique = false),
+@Table(
+    name = "evekit_data_kill_victim",
+    indexes = {
+        @Index(
+            name = "killIDIndex",
+            columnList = "killID",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -65,7 +74,8 @@ public class KillVictim extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof KillVictim)) return false;
     KillVictim other = (KillVictim) sup;
     return killID == other.killID && allianceID == other.allianceID && nullSafeObjectCompare(allianceName, other.allianceName)
@@ -146,7 +156,8 @@ public class KillVictim extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -192,7 +203,10 @@ public class KillVictim extends CachedData {
    *          kill ID to which the kill victim is associated
    * @return the kill victim with the appropriate parameters, live at the given time, or null
    */
-  public static KillVictim get(final SynchronizedEveAccount owner, final long time, final long killID) {
+  public static KillVictim get(
+                               final SynchronizedEveAccount owner,
+                               final long time,
+                               final long killID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<KillVictim>() {
         @Override
@@ -213,6 +227,63 @@ public class KillVictim extends CachedData {
       log.log(Level.SEVERE, "query error", e);
     }
     return null;
+  }
+
+  public static List<KillVictim> accessQuery(
+                                             final SynchronizedEveAccount owner,
+                                             final long contid,
+                                             final int maxresults,
+                                             final AttributeSelector at,
+                                             final AttributeSelector killID,
+                                             final AttributeSelector allianceID,
+                                             final AttributeSelector allianceName,
+                                             final AttributeSelector killCharacterID,
+                                             final AttributeSelector killCharacterName,
+                                             final AttributeSelector killCorporationID,
+                                             final AttributeSelector killCorporationName,
+                                             final AttributeSelector damageTaken,
+                                             final AttributeSelector factionID,
+                                             final AttributeSelector factionName,
+                                             final AttributeSelector shipTypeID) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<KillVictim>>() {
+        @Override
+        public List<KillVictim> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM KillVictim c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addLongSelector(qs, "c", "killID", killID);
+          AttributeSelector.addLongSelector(qs, "c", "allianceID", allianceID);
+          AttributeSelector.addStringSelector(qs, "c", "allianceName", allianceName, p);
+          AttributeSelector.addLongSelector(qs, "c", "killCharacterID", killCharacterID);
+          AttributeSelector.addStringSelector(qs, "c", "killCharacterName", killCharacterName, p);
+          AttributeSelector.addLongSelector(qs, "c", "killCorporationID", killCorporationID);
+          AttributeSelector.addStringSelector(qs, "c", "killCorporationName", killCorporationName, p);
+          AttributeSelector.addLongSelector(qs, "c", "damageTaken", damageTaken);
+          AttributeSelector.addLongSelector(qs, "c", "factionID", factionID);
+          AttributeSelector.addStringSelector(qs, "c", "factionName", factionName, p);
+          AttributeSelector.addIntSelector(qs, "c", "shipTypeID", shipTypeID);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<KillVictim> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), KillVictim.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
   }
 
 }

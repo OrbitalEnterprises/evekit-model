@@ -17,11 +17,22 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_contact_label", indexes = {
-    @Index(name = "listIndex", columnList = "list", unique = false), @Index(name = "labelIDIndex", columnList = "labelID", unique = false),
+@Table(
+    name = "evekit_data_contact_label",
+    indexes = {
+        @Index(
+            name = "listIndex",
+            columnList = "list",
+            unique = false),
+        @Index(
+            name = "labelIDIndex",
+            columnList = "labelID",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -56,7 +67,8 @@ public class ContactLabel extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof ContactLabel)) return false;
     ContactLabel other = (ContactLabel) sup;
     return nullSafeObjectCompare(list, other.list) && labelID == other.labelID && nullSafeObjectCompare(name, other.name);
@@ -93,7 +105,8 @@ public class ContactLabel extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -114,7 +127,11 @@ public class ContactLabel extends CachedData {
         + "]";
   }
 
-  public static ContactLabel get(final SynchronizedEveAccount owner, final long time, final String list, final long labelID) {
+  public static ContactLabel get(
+                                 final SynchronizedEveAccount owner,
+                                 final long time,
+                                 final String list,
+                                 final long labelID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<ContactLabel>() {
         @Override
@@ -138,7 +155,9 @@ public class ContactLabel extends CachedData {
     return null;
   }
 
-  public static List<ContactLabel> getAllContactLabels(final SynchronizedEveAccount owner, final long time) {
+  public static List<ContactLabel> getAllContactLabels(
+                                                       final SynchronizedEveAccount owner,
+                                                       final long time) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<ContactLabel>>() {
         @Override
@@ -156,7 +175,10 @@ public class ContactLabel extends CachedData {
     return Collections.emptyList();
   }
 
-  public static List<ContactLabel> getByList(final SynchronizedEveAccount owner, final long time, final String list) {
+  public static List<ContactLabel> getByList(
+                                             final SynchronizedEveAccount owner,
+                                             final long time,
+                                             final String list) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<ContactLabel>>() {
         @Override
@@ -167,6 +189,47 @@ public class ContactLabel extends CachedData {
           getter.setParameter("list", list);
           getter.setParameter("point", time);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<ContactLabel> accessQuery(
+                                               final SynchronizedEveAccount owner,
+                                               final long contid,
+                                               final int maxresults,
+                                               final AttributeSelector at,
+                                               final AttributeSelector list,
+                                               final AttributeSelector labelID,
+                                               final AttributeSelector name) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<ContactLabel>>() {
+        @Override
+        public List<ContactLabel> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM ContactLabel c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addStringSelector(qs, "c", "list", list, p);
+          AttributeSelector.addLongSelector(qs, "c", "labelID", labelID);
+          AttributeSelector.addStringSelector(qs, "c", "name", name, p);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<ContactLabel> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), ContactLabel.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

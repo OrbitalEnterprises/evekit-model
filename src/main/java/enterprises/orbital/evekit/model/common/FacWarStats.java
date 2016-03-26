@@ -1,5 +1,7 @@
 package enterprises.orbital.evekit.model.common;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,12 +16,17 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_facwarstats")
+@Table(
+    name = "evekit_data_facwarstats")
 @NamedQueries({
-    @NamedQuery(name = "FacWarStats.get", query = "SELECT c FROM FacWarStats c where c.owner = :owner and c.lifeStart <= :point and c.lifeEnd > :point"),
+    @NamedQuery(
+        name = "FacWarStats.get",
+        query = "SELECT c FROM FacWarStats c where c.owner = :owner and c.lifeStart <= :point and c.lifeEnd > :point"),
 })
 // 2 hour cache time - API caches for 1 hour
 public class FacWarStats extends CachedData {
@@ -62,7 +69,8 @@ public class FacWarStats extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof FacWarStats)) return false;
     FacWarStats other = (FacWarStats) sup;
     return currentRank == other.currentRank && enlisted == other.enlisted && factionID == other.factionID
@@ -148,7 +156,8 @@ public class FacWarStats extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -187,7 +196,9 @@ public class FacWarStats extends CachedData {
    *          time at which stats must be live
    * @return stats instance live at the given time, or null
    */
-  public static FacWarStats get(final SynchronizedEveAccount owner, final long time) {
+  public static FacWarStats get(
+                                final SynchronizedEveAccount owner,
+                                final long time) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<FacWarStats>() {
         @Override
@@ -206,6 +217,65 @@ public class FacWarStats extends CachedData {
       log.log(Level.SEVERE, "query error", e);
     }
     return null;
+  }
+
+  public static List<FacWarStats> accessQuery(
+                                              final SynchronizedEveAccount owner,
+                                              final long contid,
+                                              final int maxresults,
+                                              final AttributeSelector at,
+                                              final AttributeSelector currentRank,
+                                              final AttributeSelector enlisted,
+                                              final AttributeSelector factionID,
+                                              final AttributeSelector factionName,
+                                              final AttributeSelector highestRank,
+                                              final AttributeSelector killsLastWeek,
+                                              final AttributeSelector killsTotal,
+                                              final AttributeSelector killsYesterday,
+                                              final AttributeSelector pilots,
+                                              final AttributeSelector victoryPointsLastWeek,
+                                              final AttributeSelector victoryPointsTotal,
+                                              final AttributeSelector victoryPointsYesterday) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<FacWarStats>>() {
+        @Override
+        public List<FacWarStats> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM FacWarStats c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addIntSelector(qs, "c", "currentRank", currentRank);
+          AttributeSelector.addLongSelector(qs, "c", "enlisted", enlisted);
+          AttributeSelector.addIntSelector(qs, "c", "factionID", factionID);
+          AttributeSelector.addStringSelector(qs, "c", "factionName", factionName, p);
+          AttributeSelector.addIntSelector(qs, "c", "highestRank", highestRank);
+          AttributeSelector.addIntSelector(qs, "c", "killsLastWeek", killsLastWeek);
+          AttributeSelector.addIntSelector(qs, "c", "killsTotal", killsTotal);
+          AttributeSelector.addIntSelector(qs, "c", "killsYesterday", killsYesterday);
+          AttributeSelector.addIntSelector(qs, "c", "pilots", pilots);
+          AttributeSelector.addIntSelector(qs, "c", "victoryPointsLastWeek", victoryPointsLastWeek);
+          AttributeSelector.addIntSelector(qs, "c", "victoryPointsTotal", victoryPointsTotal);
+          AttributeSelector.addIntSelector(qs, "c", "victoryPointsYesterday", victoryPointsYesterday);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<FacWarStats> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), FacWarStats.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
   }
 
 }

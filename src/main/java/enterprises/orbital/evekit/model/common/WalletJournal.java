@@ -21,12 +21,26 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_wallet_journal", indexes = {
-    @Index(name = "accountKeyIndex", columnList = "accountKey", unique = false), @Index(name = "refIDIndex", columnList = "refID", unique = false),
-    @Index(name = "dateIndex", columnList = "date", unique = false),
+@Table(
+    name = "evekit_data_wallet_journal",
+    indexes = {
+        @Index(
+            name = "accountKeyIndex",
+            columnList = "accountKey",
+            unique = false),
+        @Index(
+            name = "refIDIndex",
+            columnList = "refID",
+            unique = false),
+        @Index(
+            name = "dateIndex",
+            columnList = "date",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -60,13 +74,19 @@ public class WalletJournal extends CachedData {
   private long                ownerID2;
   private String              argName1;
   private long                argID1;
-  @Column(precision = 19, scale = 2)
+  @Column(
+      precision = 19,
+      scale = 2)
   private BigDecimal          amount;
-  @Column(precision = 19, scale = 2)
+  @Column(
+      precision = 19,
+      scale = 2)
   private BigDecimal          balance;
   private String              reason;
   private long                taxReceiverID;
-  @Column(precision = 19, scale = 2)
+  @Column(
+      precision = 19,
+      scale = 2)
   private BigDecimal          taxAmount;
 
   @SuppressWarnings("unused")
@@ -95,7 +115,8 @@ public class WalletJournal extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof WalletJournal)) return false;
     WalletJournal other = (WalletJournal) sup;
 
@@ -197,7 +218,8 @@ public class WalletJournal extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -253,7 +275,10 @@ public class WalletJournal extends CachedData {
    *          journal entry refID
    * @return an existing journal entry, or null if a live entry with the given attributes can not be found
    */
-  public static WalletJournal get(final SynchronizedEveAccount owner, final long time, final long refID) {
+  public static WalletJournal get(
+                                  final SynchronizedEveAccount owner,
+                                  final long time,
+                                  final long refID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<WalletJournal>() {
         @Override
@@ -289,7 +314,11 @@ public class WalletJournal extends CachedData {
    *          minimum date (exclusive) for returned journal entries
    * @return a list of journal entries live at the given time, no longer than maxresults, with date greater than contid, ordered increasing by date
    */
-  public static List<WalletJournal> getAllForward(final SynchronizedEveAccount owner, final long time, int maxresults, final long contid) {
+  public static List<WalletJournal> getAllForward(
+                                                  final SynchronizedEveAccount owner,
+                                                  final long time,
+                                                  int maxresults,
+                                                  final long contid) {
     final int maxr = OrbitalProperties.getNonzeroLimited(maxresults, (int) PersistentProperty
         .getLongPropertyWithFallback(OrbitalProperties.getPropertyName(WalletJournal.class, "maxresults"), DEFAULT_MAX_RESULTS));
     try {
@@ -324,7 +353,11 @@ public class WalletJournal extends CachedData {
    *          maximum date (exclusive) for returned journal entries
    * @return a list of journal entries live at the given time, no longer than maxresults, with date less than contid, ordered decreasing by date
    */
-  public static List<WalletJournal> getAllBackward(final SynchronizedEveAccount owner, final long time, int maxresults, final long contid) {
+  public static List<WalletJournal> getAllBackward(
+                                                   final SynchronizedEveAccount owner,
+                                                   final long time,
+                                                   int maxresults,
+                                                   final long contid) {
     final int maxr = OrbitalProperties.getNonzeroLimited(maxresults, (int) PersistentProperty
         .getLongPropertyWithFallback(OrbitalProperties.getPropertyName(WalletJournal.class, "maxresults"), DEFAULT_MAX_RESULTS));
     try {
@@ -385,6 +418,71 @@ public class WalletJournal extends CachedData {
           getter.setParameter("point", time);
           getter.setMaxResults(maxr);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<WalletJournal> accessQuery(
+                                                final SynchronizedEveAccount owner,
+                                                final long contid,
+                                                final int maxresults,
+                                                final AttributeSelector at,
+                                                final AttributeSelector accountKey,
+                                                final AttributeSelector refID,
+                                                final AttributeSelector date,
+                                                final AttributeSelector refTypeID,
+                                                final AttributeSelector ownerName1,
+                                                final AttributeSelector ownerID1,
+                                                final AttributeSelector ownerName2,
+                                                final AttributeSelector ownerID2,
+                                                final AttributeSelector argName1,
+                                                final AttributeSelector argID1,
+                                                final AttributeSelector amount,
+                                                final AttributeSelector balance,
+                                                final AttributeSelector reason,
+                                                final AttributeSelector taxReceiverID,
+                                                final AttributeSelector taxAmount) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<WalletJournal>>() {
+        @Override
+        public List<WalletJournal> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM WalletJournal c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addIntSelector(qs, "c", "accountKey", accountKey);
+          AttributeSelector.addLongSelector(qs, "c", "refID", refID);
+          AttributeSelector.addLongSelector(qs, "c", "date", date);
+          AttributeSelector.addIntSelector(qs, "c", "refTypeID", refTypeID);
+          AttributeSelector.addStringSelector(qs, "c", "ownerName1", ownerName1, p);
+          AttributeSelector.addLongSelector(qs, "c", "ownerID1", ownerID1);
+          AttributeSelector.addStringSelector(qs, "c", "ownerName2", ownerName2, p);
+          AttributeSelector.addLongSelector(qs, "c", "ownerID2", ownerID2);
+          AttributeSelector.addStringSelector(qs, "c", "argName1", argName1, p);
+          AttributeSelector.addLongSelector(qs, "c", "argID1", argID1);
+          AttributeSelector.addDoubleSelector(qs, "c", "amount", amount);
+          AttributeSelector.addDoubleSelector(qs, "c", "balance", balance);
+          AttributeSelector.addStringSelector(qs, "c", "reason", reason, p);
+          AttributeSelector.addLongSelector(qs, "c", "taxReceiverID", taxReceiverID);
+          AttributeSelector.addDoubleSelector(qs, "c", "taxAmount", taxAmount);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<WalletJournal> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), WalletJournal.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

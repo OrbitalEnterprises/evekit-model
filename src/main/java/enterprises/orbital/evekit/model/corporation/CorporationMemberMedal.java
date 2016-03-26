@@ -19,12 +19,26 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_corporation_member_medal", indexes = {
-    @Index(name = "medalIDIndex", columnList = "medalID", unique = false), @Index(name = "characterIDIndex", columnList = "characterID", unique = false),
-    @Index(name = "issuedIndex", columnList = "issued", unique = false),
+@Table(
+    name = "evekit_data_corporation_member_medal",
+    indexes = {
+        @Index(
+            name = "medalIDIndex",
+            columnList = "medalID",
+            unique = false),
+        @Index(
+            name = "characterIDIndex",
+            columnList = "characterID",
+            unique = false),
+        @Index(
+            name = "issuedIndex",
+            columnList = "issued",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -66,7 +80,8 @@ public class CorporationMemberMedal extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof CorporationMemberMedal)) return false;
     CorporationMemberMedal other = (CorporationMemberMedal) sup;
     return medalID == other.medalID && characterID == other.characterID && issued == other.issued && issuerID == other.issuerID
@@ -119,7 +134,8 @@ public class CorporationMemberMedal extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -143,7 +159,12 @@ public class CorporationMemberMedal extends CachedData {
         + reason + ", status=" + status + ", owner=" + owner + ", lifeStart=" + lifeStart + ", lifeEnd=" + lifeEnd + "]";
   }
 
-  public static CorporationMemberMedal get(final SynchronizedEveAccount owner, final long time, final int medalID, final long characterID, final long issued) {
+  public static CorporationMemberMedal get(
+                                           final SynchronizedEveAccount owner,
+                                           final long time,
+                                           final int medalID,
+                                           final long characterID,
+                                           final long issued) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<CorporationMemberMedal>() {
         @Override
@@ -168,7 +189,11 @@ public class CorporationMemberMedal extends CachedData {
     return null;
   }
 
-  public static List<CorporationMemberMedal> getAllForward(final SynchronizedEveAccount owner, final long time, int maxresults, final long contid) {
+  public static List<CorporationMemberMedal> getAllForward(
+                                                           final SynchronizedEveAccount owner,
+                                                           final long time,
+                                                           int maxresults,
+                                                           final long contid) {
     final int maxr = OrbitalProperties.getNonzeroLimited(maxresults, (int) PersistentProperty
         .getLongPropertyWithFallback(OrbitalProperties.getPropertyName(CorporationMemberMedal.class, "maxresults"), DEFAULT_MAX_RESULTS));
     try {
@@ -190,7 +215,11 @@ public class CorporationMemberMedal extends CachedData {
     return Collections.emptyList();
   }
 
-  public static List<CorporationMemberMedal> getAllBackward(final SynchronizedEveAccount owner, final long time, int maxresults, final long contid) {
+  public static List<CorporationMemberMedal> getAllBackward(
+                                                            final SynchronizedEveAccount owner,
+                                                            final long time,
+                                                            int maxresults,
+                                                            final long contid) {
     final int maxr = OrbitalProperties.getNonzeroLimited(maxresults, (int) PersistentProperty
         .getLongPropertyWithFallback(OrbitalProperties.getPropertyName(CorporationMemberMedal.class, "maxresults"), DEFAULT_MAX_RESULTS));
     try {
@@ -204,6 +233,54 @@ public class CorporationMemberMedal extends CachedData {
           getter.setParameter("point", time);
           getter.setMaxResults(maxr);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<CorporationMemberMedal> accessQuery(
+                                                         final SynchronizedEveAccount owner,
+                                                         final long contid,
+                                                         final int maxresults,
+                                                         final AttributeSelector at,
+                                                         final AttributeSelector medalID,
+                                                         final AttributeSelector characterID,
+                                                         final AttributeSelector issued,
+                                                         final AttributeSelector issuerID,
+                                                         final AttributeSelector reason,
+                                                         final AttributeSelector status) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<CorporationMemberMedal>>() {
+        @Override
+        public List<CorporationMemberMedal> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM CorporationMemberMedal c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addIntSelector(qs, "c", "medalID", medalID);
+          AttributeSelector.addLongSelector(qs, "c", "characterID", characterID);
+          AttributeSelector.addLongSelector(qs, "c", "issued", issued);
+          AttributeSelector.addLongSelector(qs, "c", "issuerID", issuerID);
+          AttributeSelector.addStringSelector(qs, "c", "reason", reason, p);
+          AttributeSelector.addStringSelector(qs, "c", "status", status, p);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<CorporationMemberMedal> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(),
+                                                                                                                           CorporationMemberMedal.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

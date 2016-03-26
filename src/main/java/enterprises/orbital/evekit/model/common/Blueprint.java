@@ -19,11 +19,18 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_blueprint", indexes = {
-    @Index(name = "itemIDIndex", columnList = "itemID", unique = false)
+@Table(
+    name = "evekit_data_blueprint",
+    indexes = {
+        @Index(
+            name = "itemIDIndex",
+            columnList = "itemID",
+            unique = false)
 })
 @NamedQueries({
     @NamedQuery(
@@ -68,7 +75,8 @@ public class Blueprint extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof Blueprint)) return false;
     Blueprint other = (Blueprint) sup;
     return itemID == other.itemID && locationID == other.locationID && typeID == other.typeID && nullSafeObjectCompare(typeName, other.typeName)
@@ -137,7 +145,8 @@ public class Blueprint extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -174,7 +183,10 @@ public class Blueprint extends CachedData {
    *          blueprint itemID
    * @return blueprint with the given ID live at the given time, or null.
    */
-  public static Blueprint get(final SynchronizedEveAccount owner, final long time, final long itemID) {
+  public static Blueprint get(
+                              final SynchronizedEveAccount owner,
+                              final long time,
+                              final long itemID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<Blueprint>() {
         @Override
@@ -209,7 +221,11 @@ public class Blueprint extends CachedData {
    *          itemID (exclusive) from which to start returning results
    * @return a list of blueprints no longer than maxresults with itemID greater than contid
    */
-  public static List<Blueprint> getAllBlueprints(final SynchronizedEveAccount owner, final long time, int maxresults, final long contid) {
+  public static List<Blueprint> getAllBlueprints(
+                                                 final SynchronizedEveAccount owner,
+                                                 final long time,
+                                                 int maxresults,
+                                                 final long contid) {
     final int maxr = OrbitalProperties.getNonzeroLimited(maxresults,
                                                          (int) PersistentProperty.getLongPropertyWithFallback(
                                                                                                               OrbitalProperties.getPropertyName(Blueprint.class,
@@ -226,6 +242,59 @@ public class Blueprint extends CachedData {
           getter.setParameter("point", time);
           getter.setMaxResults(maxr);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<Blueprint> accessQuery(
+                                            final SynchronizedEveAccount owner,
+                                            final long contid,
+                                            final int maxresults,
+                                            final AttributeSelector at,
+                                            final AttributeSelector itemID,
+                                            final AttributeSelector locationID,
+                                            final AttributeSelector typeID,
+                                            final AttributeSelector typeName,
+                                            final AttributeSelector flagID,
+                                            final AttributeSelector quantity,
+                                            final AttributeSelector timeEfficiency,
+                                            final AttributeSelector materialEfficiency,
+                                            final AttributeSelector runs) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<Blueprint>>() {
+        @Override
+        public List<Blueprint> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM Blueprint c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addLongSelector(qs, "c", "itemID", itemID);
+          AttributeSelector.addLongSelector(qs, "c", "locationID", locationID);
+          AttributeSelector.addIntSelector(qs, "c", "typeID", typeID);
+          AttributeSelector.addStringSelector(qs, "c", "typeName", typeName, p);
+          AttributeSelector.addIntSelector(qs, "c", "flagID", flagID);
+          AttributeSelector.addIntSelector(qs, "c", "quantity", quantity);
+          AttributeSelector.addIntSelector(qs, "c", "timeEfficiency", timeEfficiency);
+          AttributeSelector.addIntSelector(qs, "c", "materialEfficiency", materialEfficiency);
+          AttributeSelector.addIntSelector(qs, "c", "runs", runs);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<Blueprint> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), Blueprint.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

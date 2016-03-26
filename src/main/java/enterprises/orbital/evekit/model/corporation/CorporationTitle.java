@@ -21,11 +21,18 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_corporation_title", indexes = {
-    @Index(name = "titleIDIndex", columnList = "titleID", unique = false),
+@Table(
+    name = "evekit_data_corporation_title",
+    indexes = {
+        @Index(
+            name = "titleIDIndex",
+            columnList = "titleID",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -42,21 +49,29 @@ public class CorporationTitle extends CachedData {
   private long                titleID;
   private String              titleName;
   // The following collections map to role ID.
-  @ElementCollection(fetch = FetchType.EAGER)
+  @ElementCollection(
+      fetch = FetchType.EAGER)
   private Set<Long>           grantableRoles        = new HashSet<Long>();
-  @ElementCollection(fetch = FetchType.EAGER)
+  @ElementCollection(
+      fetch = FetchType.EAGER)
   private Set<Long>           grantableRolesAtBase  = new HashSet<Long>();
-  @ElementCollection(fetch = FetchType.EAGER)
+  @ElementCollection(
+      fetch = FetchType.EAGER)
   private Set<Long>           grantableRolesAtHQ    = new HashSet<Long>();
-  @ElementCollection(fetch = FetchType.EAGER)
+  @ElementCollection(
+      fetch = FetchType.EAGER)
   private Set<Long>           grantableRolesAtOther = new HashSet<Long>();
-  @ElementCollection(fetch = FetchType.EAGER)
+  @ElementCollection(
+      fetch = FetchType.EAGER)
   private Set<Long>           roles                 = new HashSet<Long>();
-  @ElementCollection(fetch = FetchType.EAGER)
+  @ElementCollection(
+      fetch = FetchType.EAGER)
   private Set<Long>           rolesAtBase           = new HashSet<Long>();
-  @ElementCollection(fetch = FetchType.EAGER)
+  @ElementCollection(
+      fetch = FetchType.EAGER)
   private Set<Long>           rolesAtHQ             = new HashSet<Long>();
-  @ElementCollection(fetch = FetchType.EAGER)
+  @ElementCollection(
+      fetch = FetchType.EAGER)
   private Set<Long>           rolesAtOther          = new HashSet<Long>();
 
   @SuppressWarnings("unused")
@@ -80,7 +95,8 @@ public class CorporationTitle extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof CorporationTitle)) return false;
     CorporationTitle other = (CorporationTitle) sup;
     return titleID == other.titleID && nullSafeObjectCompare(titleName, other.titleName) && nullSafeObjectCompare(grantableRoles, other.grantableRoles)
@@ -156,7 +172,8 @@ public class CorporationTitle extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -200,7 +217,10 @@ public class CorporationTitle extends CachedData {
         + ", lifeEnd=" + lifeEnd + "]";
   }
 
-  public static CorporationTitle get(final SynchronizedEveAccount owner, final long time, final long titleID) {
+  public static CorporationTitle get(
+                                     final SynchronizedEveAccount owner,
+                                     final long time,
+                                     final long titleID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<CorporationTitle>() {
         @Override
@@ -223,7 +243,9 @@ public class CorporationTitle extends CachedData {
     return null;
   }
 
-  public static List<CorporationTitle> getAll(final SynchronizedEveAccount owner, final long time) {
+  public static List<CorporationTitle> getAll(
+                                              final SynchronizedEveAccount owner,
+                                              final long time) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<CorporationTitle>>() {
         @Override
@@ -233,6 +255,61 @@ public class CorporationTitle extends CachedData {
           getter.setParameter("owner", owner);
           getter.setParameter("point", time);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<CorporationTitle> accessQuery(
+                                                   final SynchronizedEveAccount owner,
+                                                   final long contid,
+                                                   final int maxresults,
+                                                   final AttributeSelector at,
+                                                   final AttributeSelector titleID,
+                                                   final AttributeSelector titleName,
+                                                   final AttributeSelector grantableRoles,
+                                                   final AttributeSelector grantableRolesAtBase,
+                                                   final AttributeSelector grantableRolesAtHQ,
+                                                   final AttributeSelector grantableRolesAtOther,
+                                                   final AttributeSelector roles,
+                                                   final AttributeSelector rolesAtBase,
+                                                   final AttributeSelector rolesAtHQ,
+                                                   final AttributeSelector rolesAtOther) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<CorporationTitle>>() {
+        @Override
+        public List<CorporationTitle> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM CorporationTitle c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addLongSelector(qs, "c", "titleID", titleID);
+          AttributeSelector.addStringSelector(qs, "c", "titleName", titleName, p);
+          AttributeSelector.addSetLongSelector(qs, "c", "grantableRoles", grantableRoles);
+          AttributeSelector.addSetLongSelector(qs, "c", "grantableRolesAtBase", grantableRolesAtBase);
+          AttributeSelector.addSetLongSelector(qs, "c", "grantableRolesAtHQ", grantableRolesAtHQ);
+          AttributeSelector.addSetLongSelector(qs, "c", "grantableRolesAtOther", grantableRolesAtOther);
+          AttributeSelector.addSetLongSelector(qs, "c", "roles", roles);
+          AttributeSelector.addSetLongSelector(qs, "c", "rolesAtBase", rolesAtBase);
+          AttributeSelector.addSetLongSelector(qs, "c", "rolesAtHQ", rolesAtHQ);
+          AttributeSelector.addSetLongSelector(qs, "c", "rolesAtOther", rolesAtOther);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<CorporationTitle> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), CorporationTitle.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

@@ -19,12 +19,22 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_kill_attacker", indexes = {
-    @Index(name = "killIDIndex", columnList = "killID", unique = false),
-    @Index(name = "attackerCharacterIDIndex", columnList = "attackerCharacterID", unique = false),
+@Table(
+    name = "evekit_data_kill_attacker",
+    indexes = {
+        @Index(
+            name = "killIDIndex",
+            columnList = "killID",
+            unique = false),
+        @Index(
+            name = "attackerCharacterIDIndex",
+            columnList = "attackerCharacterID",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -80,7 +90,8 @@ public class KillAttacker extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof KillAttacker)) return false;
     KillAttacker other = (KillAttacker) sup;
     return killID == other.killID && attackerCharacterID == other.attackerCharacterID && allianceID == other.allianceID
@@ -178,7 +189,8 @@ public class KillAttacker extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -230,7 +242,11 @@ public class KillAttacker extends CachedData {
    *          attacker character ID of kill attacker
    * @return a kill attacker with the given parameters live at the given time, or null
    */
-  public static KillAttacker get(final SynchronizedEveAccount owner, final long time, final long killID, final long attackerCharacterID) {
+  public static KillAttacker get(
+                                 final SynchronizedEveAccount owner,
+                                 final long time,
+                                 final long killID,
+                                 final long attackerCharacterID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<KillAttacker>() {
         @Override
@@ -289,6 +305,69 @@ public class KillAttacker extends CachedData {
           getter.setParameter("point", time);
           getter.setMaxResults(maxr);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<KillAttacker> accessQuery(
+                                               final SynchronizedEveAccount owner,
+                                               final long contid,
+                                               final int maxresults,
+                                               final AttributeSelector at,
+                                               final AttributeSelector killID,
+                                               final AttributeSelector attackerCharacterID,
+                                               final AttributeSelector allianceID,
+                                               final AttributeSelector allianceName,
+                                               final AttributeSelector attackerCharacterName,
+                                               final AttributeSelector attackerCorporationID,
+                                               final AttributeSelector attackerCorporationName,
+                                               final AttributeSelector damageDone,
+                                               final AttributeSelector factionID,
+                                               final AttributeSelector factionName,
+                                               final AttributeSelector securityStatus,
+                                               final AttributeSelector shipTypeID,
+                                               final AttributeSelector weaponTypeID,
+                                               final AttributeSelector finalBlow) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<KillAttacker>>() {
+        @Override
+        public List<KillAttacker> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM KillAttacker c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addLongSelector(qs, "c", "killID", killID);
+          AttributeSelector.addLongSelector(qs, "c", "attackerCharacterID", attackerCharacterID);
+          AttributeSelector.addLongSelector(qs, "c", "allianceID", allianceID);
+          AttributeSelector.addStringSelector(qs, "c", "allianceName", allianceName, p);
+          AttributeSelector.addStringSelector(qs, "c", "attackerCharacterName", attackerCharacterName, p);
+          AttributeSelector.addLongSelector(qs, "c", "attackerCorporationID", attackerCorporationID);
+          AttributeSelector.addStringSelector(qs, "c", "attackerCorporationName", attackerCorporationName, p);
+          AttributeSelector.addIntSelector(qs, "c", "damageDone", damageDone);
+          AttributeSelector.addIntSelector(qs, "c", "factionID", factionID);
+          AttributeSelector.addStringSelector(qs, "c", "factionName", factionName, p);
+          AttributeSelector.addDoubleSelector(qs, "c", "securityStatus", securityStatus);
+          AttributeSelector.addIntSelector(qs, "c", "shipTypeID", shipTypeID);
+          AttributeSelector.addIntSelector(qs, "c", "weaponTypeID", weaponTypeID);
+          AttributeSelector.addBooleanSelector(qs, "c", "finalBlow", finalBlow);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<KillAttacker> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), KillAttacker.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

@@ -19,12 +19,25 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_kill_item", indexes = {
-    @Index(name = "killIDIndex", columnList = "killID", unique = false), @Index(name = "sequenceIndex", columnList = "sequence", unique = false),
-    @Index(name = "containerSequenceIndex", columnList = "containerSequence", unique = false),
+@Table(
+    name = "evekit_data_kill_item",
+    indexes = {
+        @Index(
+            name = "killIDIndex",
+            columnList = "killID",
+            unique = false),
+        @Index(
+            name = "sequenceIndex",
+            columnList = "sequence",
+            unique = false),
+        @Index(
+            name = "containerSequenceIndex",
+            columnList = "containerSequence",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -74,7 +87,8 @@ public class KillItem extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof KillItem)) return false;
     KillItem other = (KillItem) sup;
     return killID == other.killID && typeID == other.typeID && flag == other.flag && qtyDestroyed == other.qtyDestroyed && qtyDropped == other.qtyDropped
@@ -137,7 +151,8 @@ public class KillItem extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -173,7 +188,11 @@ public class KillItem extends CachedData {
    *          sequence number for this kill item
    * @return the kill item with the specified parameters live at the given time, or null.
    */
-  public static KillItem get(final SynchronizedEveAccount owner, final long time, final long killID, final int sequence) {
+  public static KillItem get(
+                             final SynchronizedEveAccount owner,
+                             final long time,
+                             final long killID,
+                             final int sequence) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<KillItem>() {
         @Override
@@ -210,7 +229,11 @@ public class KillItem extends CachedData {
    *          sequence number of container holding the desired kill items
    * @return the list of kill items stored in the given container, live at the given time
    */
-  public static List<KillItem> getContainedKillItems(final SynchronizedEveAccount owner, final long time, final long killID, final int containerSequence) {
+  public static List<KillItem> getContainedKillItems(
+                                                     final SynchronizedEveAccount owner,
+                                                     final long time,
+                                                     final long killID,
+                                                     final int containerSequence) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<KillItem>>() {
         @Override
@@ -244,7 +267,12 @@ public class KillItem extends CachedData {
    *          sequence number (exclusive) after which kill items will be returned
    * @return the list of kill items with the appropriate properties, live at the given time, with sequence number after "contid"
    */
-  public static List<KillItem> getAllKillItems(final SynchronizedEveAccount owner, final long time, final long killID, int maxresults, final int contid) {
+  public static List<KillItem> getAllKillItems(
+                                               final SynchronizedEveAccount owner,
+                                               final long time,
+                                               final long killID,
+                                               int maxresults,
+                                               final int contid) {
     final int maxr = OrbitalProperties.getNonzeroLimited(maxresults,
                                                          (int) PersistentProperty.getLongPropertyWithFallback(
                                                                                                               OrbitalProperties.getPropertyName(KillItem.class,
@@ -261,6 +289,55 @@ public class KillItem extends CachedData {
           getter.setParameter("point", time);
           getter.setMaxResults(maxr);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<KillItem> accessQuery(
+                                           final SynchronizedEveAccount owner,
+                                           final long contid,
+                                           final int maxresults,
+                                           final AttributeSelector at,
+                                           final AttributeSelector killID,
+                                           final AttributeSelector typeID,
+                                           final AttributeSelector flag,
+                                           final AttributeSelector qtyDestroyed,
+                                           final AttributeSelector qtyDropped,
+                                           final AttributeSelector singleton,
+                                           final AttributeSelector sequence,
+                                           final AttributeSelector containerSequence) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<KillItem>>() {
+        @Override
+        public List<KillItem> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM KillItem c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeSelector.addLongSelector(qs, "c", "killID", killID);
+          AttributeSelector.addLongSelector(qs, "c", "typeID", typeID);
+          AttributeSelector.addLongSelector(qs, "c", "flag", flag);
+          AttributeSelector.addLongSelector(qs, "c", "qtyDestroyed", qtyDestroyed);
+          AttributeSelector.addLongSelector(qs, "c", "qtyDropped", qtyDropped);
+          AttributeSelector.addLongSelector(qs, "c", "singleton", singleton);
+          AttributeSelector.addLongSelector(qs, "c", "sequence", sequence);
+          AttributeSelector.addLongSelector(qs, "c", "containerSequence", containerSequence);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<KillItem> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), KillItem.class);
+          query.setParameter("owner", owner);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

@@ -1,5 +1,7 @@
 package enterprises.orbital.evekit.model.corporation;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,6 +18,8 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
@@ -308,6 +312,85 @@ public class CorporationSheet extends CachedData {
       log.log(Level.SEVERE, "query error", e);
     }
     return null;
+  }
+
+  public static List<CorporationSheet> accessQuery(
+                                                   final SynchronizedEveAccount owner,
+                                                   final long contid,
+                                                   final int maxresults,
+                                                   final AttributeSelector at,
+                                                   final AttributeSelector allianceID,
+                                                   final AttributeSelector allianceName,
+                                                   final AttributeSelector ceoID,
+                                                   final AttributeSelector ceoName,
+                                                   final AttributeSelector corporationID,
+                                                   final AttributeSelector corporationName,
+                                                   final AttributeSelector description,
+                                                   final AttributeSelector logoColor1,
+                                                   final AttributeSelector logoColor2,
+                                                   final AttributeSelector logoColor3,
+                                                   final AttributeSelector logoGraphicID,
+                                                   final AttributeSelector logoShape1,
+                                                   final AttributeSelector logoShape2,
+                                                   final AttributeSelector logoShape3,
+                                                   final AttributeSelector memberCount,
+                                                   final AttributeSelector memberLimit,
+                                                   final AttributeSelector shares,
+                                                   final AttributeSelector stationID,
+                                                   final AttributeSelector stationName,
+                                                   final AttributeSelector taxRate,
+                                                   final AttributeSelector ticker,
+                                                   final AttributeSelector url) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<CorporationSheet>>() {
+        @Override
+        public List<CorporationSheet> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM CorporationSheet c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addLongSelector(qs, "c", "allianceID", allianceID);
+          AttributeSelector.addStringSelector(qs, "c", "allianceName", allianceName, p);
+          AttributeSelector.addLongSelector(qs, "c", "ceoID", ceoID);
+          AttributeSelector.addStringSelector(qs, "c", "ceoName", ceoName, p);
+          AttributeSelector.addLongSelector(qs, "c", "corporationID", corporationID);
+          AttributeSelector.addStringSelector(qs, "c", "corporationName", corporationName, p);
+          AttributeSelector.addStringSelector(qs, "c", "description", description, p);
+          AttributeSelector.addIntSelector(qs, "c", "logoColor1", logoColor1);
+          AttributeSelector.addIntSelector(qs, "c", "logoColor2", logoColor2);
+          AttributeSelector.addIntSelector(qs, "c", "logoColor3", logoColor3);
+          AttributeSelector.addIntSelector(qs, "c", "logoGraphicID", logoGraphicID);
+          AttributeSelector.addIntSelector(qs, "c", "logoShape1", logoShape1);
+          AttributeSelector.addIntSelector(qs, "c", "logoShape2", logoShape2);
+          AttributeSelector.addIntSelector(qs, "c", "logoShape3", logoShape3);
+          AttributeSelector.addIntSelector(qs, "c", "memberCount", memberCount);
+          AttributeSelector.addIntSelector(qs, "c", "memberLimit", memberLimit);
+          AttributeSelector.addIntSelector(qs, "c", "shares", shares);
+          AttributeSelector.addLongSelector(qs, "c", "stationID", stationID);
+          AttributeSelector.addStringSelector(qs, "c", "stationName", stationName, p);
+          AttributeSelector.addDoubleSelector(qs, "c", "taxRate", taxRate);
+          AttributeSelector.addStringSelector(qs, "c", "ticker", ticker, p);
+          AttributeSelector.addStringSelector(qs, "c", "url", url, p);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<CorporationSheet> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), CorporationSheet.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
   }
 
 }

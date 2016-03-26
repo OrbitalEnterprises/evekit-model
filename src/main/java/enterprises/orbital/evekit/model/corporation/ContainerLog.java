@@ -19,11 +19,18 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_container_log", indexes = {
-    @Index(name = "logTimeIndex", columnList = "logTime", unique = false),
+@Table(
+    name = "evekit_data_container_log",
+    indexes = {
+        @Index(
+            name = "logTimeIndex",
+            columnList = "logTime",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -80,7 +87,8 @@ public class ContainerLog extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof ContainerLog)) return false;
     ContainerLog other = (ContainerLog) sup;
     return logTime == other.logTime && nullSafeObjectCompare(action, other.action) && actorID == other.actorID
@@ -170,7 +178,8 @@ public class ContainerLog extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -209,7 +218,10 @@ public class ContainerLog extends CachedData {
         + lifeStart + ", lifeEnd=" + lifeEnd + "]";
   }
 
-  public static ContainerLog get(final SynchronizedEveAccount owner, final long time, final long logTime) {
+  public static ContainerLog get(
+                                 final SynchronizedEveAccount owner,
+                                 final long time,
+                                 final long logTime) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<ContainerLog>() {
         @Override
@@ -232,7 +244,11 @@ public class ContainerLog extends CachedData {
     return null;
   }
 
-  public static List<ContainerLog> getAllForward(final SynchronizedEveAccount owner, final long time, int maxresults, final long contid) {
+  public static List<ContainerLog> getAllForward(
+                                                 final SynchronizedEveAccount owner,
+                                                 final long time,
+                                                 int maxresults,
+                                                 final long contid) {
     final int maxr = OrbitalProperties.getNonzeroLimited(maxresults, (int) PersistentProperty
         .getLongPropertyWithFallback(OrbitalProperties.getPropertyName(ContainerLog.class, "maxresults"), DEFAULT_MAX_RESULTS));
     try {
@@ -254,7 +270,11 @@ public class ContainerLog extends CachedData {
     return Collections.emptyList();
   }
 
-  public static List<ContainerLog> getAllBackward(final SynchronizedEveAccount owner, final long time, int maxresults, final long contid) {
+  public static List<ContainerLog> getAllBackward(
+                                                  final SynchronizedEveAccount owner,
+                                                  final long time,
+                                                  int maxresults,
+                                                  final long contid) {
     final int maxr = OrbitalProperties.getNonzeroLimited(maxresults, (int) PersistentProperty
         .getLongPropertyWithFallback(OrbitalProperties.getPropertyName(ContainerLog.class, "maxresults"), DEFAULT_MAX_RESULTS));
     try {
@@ -268,6 +288,67 @@ public class ContainerLog extends CachedData {
           getter.setParameter("point", time);
           getter.setMaxResults(maxr);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<ContainerLog> accessQuery(
+                                               final SynchronizedEveAccount owner,
+                                               final long contid,
+                                               final int maxresults,
+                                               final AttributeSelector at,
+                                               final AttributeSelector logTime,
+                                               final AttributeSelector action,
+                                               final AttributeSelector actorID,
+                                               final AttributeSelector actorName,
+                                               final AttributeSelector flag,
+                                               final AttributeSelector itemID,
+                                               final AttributeSelector itemTypeID,
+                                               final AttributeSelector locationID,
+                                               final AttributeSelector newConfiguration,
+                                               final AttributeSelector oldConfiguration,
+                                               final AttributeSelector passwordType,
+                                               final AttributeSelector quantity,
+                                               final AttributeSelector typeID) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<ContainerLog>>() {
+        @Override
+        public List<ContainerLog> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM ContainerLog c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addLongSelector(qs, "c", "logTime", logTime);
+          AttributeSelector.addStringSelector(qs, "c", "action", action, p);
+          AttributeSelector.addLongSelector(qs, "c", "actorID", actorID);
+          AttributeSelector.addStringSelector(qs, "c", "actorName", actorName, p);
+          AttributeSelector.addIntSelector(qs, "c", "flag", flag);
+          AttributeSelector.addLongSelector(qs, "c", "itemID", itemID);
+          AttributeSelector.addLongSelector(qs, "c", "itemTypeID", itemTypeID);
+          AttributeSelector.addIntSelector(qs, "c", "locationID", locationID);
+          AttributeSelector.addStringSelector(qs, "c", "newConfiguration", newConfiguration, p);
+          AttributeSelector.addStringSelector(qs, "c", "oldConfiguration", oldConfiguration, p);
+          AttributeSelector.addStringSelector(qs, "c", "passwordType", passwordType, p);
+          AttributeSelector.addIntSelector(qs, "c", "quantity", quantity);
+          AttributeSelector.addLongSelector(qs, "c", "typeID", typeID);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<ContainerLog> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), ContainerLog.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

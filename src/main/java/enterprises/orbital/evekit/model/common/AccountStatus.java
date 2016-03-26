@@ -1,6 +1,7 @@
 package enterprises.orbital.evekit.model.common;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,12 +21,16 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_account_status")
+@Table(
+    name = "evekit_data_account_status")
 @NamedQueries({
-    @NamedQuery(name = "AccountStatus.get", query = "SELECT c FROM AccountStatus c where c.owner = :owner and c.lifeStart <= :point and c.lifeEnd > :point"),
+    @NamedQuery(
+        name = "AccountStatus.get",
+        query = "SELECT c FROM AccountStatus c where c.owner = :owner and c.lifeStart <= :point and c.lifeEnd > :point"),
 })
 // 2 hour cache time - API caches for 1 hour
 public class AccountStatus extends CachedData {
@@ -35,7 +40,8 @@ public class AccountStatus extends CachedData {
   private long                createDate;
   private int                 logonCount;
   private int                 logonMinutes;
-  @ElementCollection(fetch = FetchType.EAGER)
+  @ElementCollection(
+      fetch = FetchType.EAGER)
   private List<Long>          multiCharacterTraining = new ArrayList<Long>();
 
   @SuppressWarnings("unused")
@@ -53,7 +59,8 @@ public class AccountStatus extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof AccountStatus)) return false;
     AccountStatus other = (AccountStatus) sup;
     boolean listEquals = multiCharacterTraining.size() == other.multiCharacterTraining.size();
@@ -107,7 +114,8 @@ public class AccountStatus extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -137,7 +145,9 @@ public class AccountStatus extends CachedData {
    *          time at which the account status should be live
    * @return an existing account status, or null
    */
-  public static AccountStatus get(final SynchronizedEveAccount owner, final long time) {
+  public static AccountStatus get(
+                                  final SynchronizedEveAccount owner,
+                                  final long time) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<AccountStatus>() {
         @Override
@@ -158,4 +168,46 @@ public class AccountStatus extends CachedData {
     }
     return null;
   }
+
+  public static List<AccountStatus> accessQuery(
+                                                final SynchronizedEveAccount owner,
+                                                final long contid,
+                                                final int maxresults,
+                                                final AttributeSelector at,
+                                                final AttributeSelector paidUntil,
+                                                final AttributeSelector createDate,
+                                                final AttributeSelector logonCount,
+                                                final AttributeSelector logonMinutes) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<AccountStatus>>() {
+        @Override
+        public List<AccountStatus> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM AccountStatus c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeSelector.addLongSelector(qs, "c", "paidUntil", paidUntil);
+          AttributeSelector.addLongSelector(qs, "c", "createDate", createDate);
+          AttributeSelector.addIntSelector(qs, "c", "logonCount", logonCount);
+          AttributeSelector.addIntSelector(qs, "c", "logonMinutes", logonMinutes);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<AccountStatus> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), AccountStatus.class);
+          query.setParameter("owner", owner);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
 }

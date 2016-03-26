@@ -21,11 +21,22 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_contract", indexes = {
-    @Index(name = "contractIDIndex", columnList = "contractID", unique = false), @Index(name = "dateIssuedIndex", columnList = "dateIssued", unique = false),
+@Table(
+    name = "evekit_data_contract",
+    indexes = {
+        @Index(
+            name = "contractIDIndex",
+            columnList = "contractID",
+            unique = false),
+        @Index(
+            name = "dateIssuedIndex",
+            columnList = "dateIssued",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -60,13 +71,21 @@ public class Contract extends CachedData {
   private long                dateAccepted        = -1;
   private int                 numDays;
   private long                dateCompleted       = -1;
-  @Column(precision = 19, scale = 2)
+  @Column(
+      precision = 19,
+      scale = 2)
   private BigDecimal          price;
-  @Column(precision = 19, scale = 2)
+  @Column(
+      precision = 19,
+      scale = 2)
   private BigDecimal          reward;
-  @Column(precision = 19, scale = 2)
+  @Column(
+      precision = 19,
+      scale = 2)
   private BigDecimal          collateral;
-  @Column(precision = 19, scale = 2)
+  @Column(
+      precision = 19,
+      scale = 2)
   private BigDecimal          buyout;
   private long                volume;
 
@@ -105,7 +124,8 @@ public class Contract extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof Contract)) return false;
     Contract other = (Contract) sup;
     return contractID == other.contractID && issuerID == other.issuerID && issuerCorpID == other.issuerCorpID && assigneeID == other.assigneeID
@@ -243,7 +263,8 @@ public class Contract extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -309,7 +330,10 @@ public class Contract extends CachedData {
    *          contract ID
    * @return contract with the given ID live at the given time, or null.
    */
-  public static Contract get(final SynchronizedEveAccount owner, final long time, final long contractID) {
+  public static Contract get(
+                             final SynchronizedEveAccount owner,
+                             final long time,
+                             final long contractID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<Contract>() {
         @Override
@@ -344,7 +368,11 @@ public class Contract extends CachedData {
    *          contractID (exclusive) from which to start returning results
    * @return a list of contracts no longer than maxresults with contractID greater than contid
    */
-  public static List<Contract> getAllContracts(final SynchronizedEveAccount owner, final long time, int maxresults, final long contid) {
+  public static List<Contract> getAllContracts(
+                                               final SynchronizedEveAccount owner,
+                                               final long time,
+                                               int maxresults,
+                                               final long contid) {
     final int maxr = OrbitalProperties.getNonzeroLimited(maxresults,
                                                          (int) PersistentProperty.getLongPropertyWithFallback(
                                                                                                               OrbitalProperties.getPropertyName(Contract.class,
@@ -409,6 +437,85 @@ public class Contract extends CachedData {
           getter.setParameter("point", time);
           getter.setMaxResults(maxr);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<Contract> accessQuery(
+                                           final SynchronizedEveAccount owner,
+                                           final long contid,
+                                           final int maxresults,
+                                           final AttributeSelector at,
+                                           final AttributeSelector contractID,
+                                           final AttributeSelector issuerID,
+                                           final AttributeSelector issuerCorpID,
+                                           final AttributeSelector assigneeID,
+                                           final AttributeSelector acceptorID,
+                                           final AttributeSelector startStationID,
+                                           final AttributeSelector endStationID,
+                                           final AttributeSelector type,
+                                           final AttributeSelector status,
+                                           final AttributeSelector title,
+                                           final AttributeSelector forCorp,
+                                           final AttributeSelector availability,
+                                           final AttributeSelector dateIssued,
+                                           final AttributeSelector dateExpired,
+                                           final AttributeSelector dateAccepted,
+                                           final AttributeSelector numDays,
+                                           final AttributeSelector dateCompleted,
+                                           final AttributeSelector price,
+                                           final AttributeSelector reward,
+                                           final AttributeSelector collateral,
+                                           final AttributeSelector buyout,
+                                           final AttributeSelector volume) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<Contract>>() {
+        @Override
+        public List<Contract> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM Contract c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addLongSelector(qs, "c", "contractID", contractID);
+          AttributeSelector.addLongSelector(qs, "c", "issuerID", issuerID);
+          AttributeSelector.addLongSelector(qs, "c", "issuerCorpID", issuerCorpID);
+          AttributeSelector.addLongSelector(qs, "c", "assigneeID", assigneeID);
+          AttributeSelector.addLongSelector(qs, "c", "acceptorID", acceptorID);
+          AttributeSelector.addIntSelector(qs, "c", "startStationID", startStationID);
+          AttributeSelector.addIntSelector(qs, "c", "endStationID", endStationID);
+          AttributeSelector.addStringSelector(qs, "c", "type", type, p);
+          AttributeSelector.addStringSelector(qs, "c", "status", status, p);
+          AttributeSelector.addStringSelector(qs, "c", "title", title, p);
+          AttributeSelector.addBooleanSelector(qs, "c", "forCorp", forCorp);
+          AttributeSelector.addStringSelector(qs, "c", "availability", availability, p);
+          AttributeSelector.addLongSelector(qs, "c", "dateIssued", dateIssued);
+          AttributeSelector.addLongSelector(qs, "c", "dateExpired", dateExpired);
+          AttributeSelector.addLongSelector(qs, "c", "dateAccepted", dateAccepted);
+          AttributeSelector.addIntSelector(qs, "c", "numDays", numDays);
+          AttributeSelector.addLongSelector(qs, "c", "dateCompleted", dateCompleted);
+          AttributeSelector.addDoubleSelector(qs, "c", "price", price);
+          AttributeSelector.addDoubleSelector(qs, "c", "reward", reward);
+          AttributeSelector.addDoubleSelector(qs, "c", "collateral", collateral);
+          AttributeSelector.addDoubleSelector(qs, "c", "buyout", buyout);
+          AttributeSelector.addLongSelector(qs, "c", "volume", volume);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<Contract> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), Contract.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

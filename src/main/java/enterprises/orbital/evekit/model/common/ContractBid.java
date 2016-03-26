@@ -21,11 +21,21 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_contract_bid", indexes = {
-    @Index(name = "contractIDIndex", columnList = "contractID", unique = false), @Index(name = "bidIDIndex", columnList = "bidID", unique = false),
+@Table(
+    name = "evekit_data_contract_bid",
+    indexes = {
+        @Index(
+            name = "contractIDIndex",
+            columnList = "contractID",
+            unique = false),
+        @Index(
+            name = "bidIDIndex",
+            columnList = "bidID",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -47,7 +57,9 @@ public class ContractBid extends CachedData {
   private long                contractID;
   private long                bidderID;
   private long                dateBid             = -1;
-  @Column(precision = 19, scale = 2)
+  @Column(
+      precision = 19,
+      scale = 2)
   private BigDecimal          amount;
 
   @SuppressWarnings("unused")
@@ -66,7 +78,8 @@ public class ContractBid extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof ContractBid)) return false;
     ContractBid other = (ContractBid) sup;
     return bidID == other.bidID && contractID == other.contractID && bidderID == other.bidderID && dateBid == other.dateBid
@@ -114,7 +127,8 @@ public class ContractBid extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -148,7 +162,11 @@ public class ContractBid extends CachedData {
    *          bid ID of bid
    * @return contract bid with the given properties live at the given time, or null.
    */
-  public static ContractBid get(final SynchronizedEveAccount owner, final long time, final long contractID, final long bidID) {
+  public static ContractBid get(
+                                final SynchronizedEveAccount owner,
+                                final long time,
+                                final long contractID,
+                                final long bidID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<ContractBid>() {
         @Override
@@ -185,7 +203,11 @@ public class ContractBid extends CachedData {
    *          sortKey (exclusive) from which to start returning results
    * @return a list of contract bids no longer than maxresults with sortKey (lexicographically) greater than contid
    */
-  public static List<ContractBid> getAllBids(final SynchronizedEveAccount owner, final long time, int maxresults, final long contid) {
+  public static List<ContractBid> getAllBids(
+                                             final SynchronizedEveAccount owner,
+                                             final long time,
+                                             int maxresults,
+                                             final long contid) {
     final int maxr = OrbitalProperties.getNonzeroLimited(maxresults, (int) PersistentProperty
         .getLongPropertyWithFallback(OrbitalProperties.getPropertyName(ContractBid.class, "maxresults"), DEFAULT_MAX_RESULTS));
     try {
@@ -241,6 +263,49 @@ public class ContractBid extends CachedData {
           getter.setParameter("point", time);
           getter.setMaxResults(maxr);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<ContractBid> accessQuery(
+                                              final SynchronizedEveAccount owner,
+                                              final long contid,
+                                              final int maxresults,
+                                              final AttributeSelector at,
+                                              final AttributeSelector bidID,
+                                              final AttributeSelector contractID,
+                                              final AttributeSelector bidderID,
+                                              final AttributeSelector dateBid,
+                                              final AttributeSelector amount) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<ContractBid>>() {
+        @Override
+        public List<ContractBid> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM ContractBid c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeSelector.addLongSelector(qs, "c", "bidID", bidID);
+          AttributeSelector.addLongSelector(qs, "c", "contractID", contractID);
+          AttributeSelector.addLongSelector(qs, "c", "bidderID", bidderID);
+          AttributeSelector.addLongSelector(qs, "c", "dateBid", dateBid);
+          AttributeSelector.addDoubleSelector(qs, "c", "amount", amount);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<ContractBid> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), ContractBid.class);
+          query.setParameter("owner", owner);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

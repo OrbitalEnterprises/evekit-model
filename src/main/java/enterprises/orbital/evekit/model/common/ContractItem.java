@@ -19,11 +19,21 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_contract_item", indexes = {
-    @Index(name = "contractIDIndex", columnList = "contractID", unique = false), @Index(name = "recordIDIndex", columnList = "recordID", unique = false),
+@Table(
+    name = "evekit_data_contract_item",
+    indexes = {
+        @Index(
+            name = "contractIDIndex",
+            columnList = "contractID",
+            unique = false),
+        @Index(
+            name = "recordIDIndex",
+            columnList = "recordID",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -64,7 +74,8 @@ public class ContractItem extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof ContractItem)) return false;
     ContractItem other = (ContractItem) sup;
     return contractID == other.contractID && recordID == other.recordID && typeID == other.typeID && quantity == other.quantity
@@ -122,7 +133,8 @@ public class ContractItem extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -156,7 +168,11 @@ public class ContractItem extends CachedData {
    *          record ID of contract item
    * @return the contract item with the specified parameters live at the give time, or null
    */
-  public static ContractItem get(final SynchronizedEveAccount owner, final long time, final long contractID, final long recordID) {
+  public static ContractItem get(
+                                 final SynchronizedEveAccount owner,
+                                 final long time,
+                                 final long contractID,
+                                 final long recordID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<ContractItem>() {
         @Override
@@ -215,6 +231,53 @@ public class ContractItem extends CachedData {
           getter.setParameter("point", time);
           getter.setMaxResults(maxr);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<ContractItem> accessQuery(
+                                               final SynchronizedEveAccount owner,
+                                               final long contid,
+                                               final int maxresults,
+                                               final AttributeSelector at,
+                                               final AttributeSelector contractID,
+                                               final AttributeSelector recordID,
+                                               final AttributeSelector typeID,
+                                               final AttributeSelector quantity,
+                                               final AttributeSelector rawQuantity,
+                                               final AttributeSelector singleton,
+                                               final AttributeSelector included) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<ContractItem>>() {
+        @Override
+        public List<ContractItem> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM ContractItem c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeSelector.addLongSelector(qs, "c", "contractID", contractID);
+          AttributeSelector.addLongSelector(qs, "c", "recordID", recordID);
+          AttributeSelector.addIntSelector(qs, "c", "typeID", typeID);
+          AttributeSelector.addLongSelector(qs, "c", "quantity", quantity);
+          AttributeSelector.addIntSelector(qs, "c", "rawQuantity", rawQuantity);
+          AttributeSelector.addBooleanSelector(qs, "c", "singleton", singleton);
+          AttributeSelector.addBooleanSelector(qs, "c", "included", included);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<ContractItem> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), ContractItem.class);
+          query.setParameter("owner", owner);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

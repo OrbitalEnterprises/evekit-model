@@ -17,11 +17,18 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_security_title", indexes = {
-    @Index(name = "titleIDIndex", columnList = "titleID", unique = false),
+@Table(
+    name = "evekit_data_security_title",
+    indexes = {
+        @Index(
+            name = "titleIDIndex",
+            columnList = "titleID",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -51,7 +58,8 @@ public class SecurityTitle extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof SecurityTitle)) return false;
     SecurityTitle other = (SecurityTitle) sup;
     return titleID == other.titleID && nullSafeObjectCompare(titleName, other.titleName);
@@ -83,7 +91,8 @@ public class SecurityTitle extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -100,7 +109,10 @@ public class SecurityTitle extends CachedData {
     return "SecurityTitle [titleID=" + titleID + ", titleName=" + titleName + ", owner=" + owner + ", lifeStart=" + lifeStart + ", lifeEnd=" + lifeEnd + "]";
   }
 
-  public static SecurityTitle get(final SynchronizedEveAccount owner, final long time, final long titleID) {
+  public static SecurityTitle get(
+                                  final SynchronizedEveAccount owner,
+                                  final long time,
+                                  final long titleID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<SecurityTitle>() {
         @Override
@@ -123,7 +135,9 @@ public class SecurityTitle extends CachedData {
     return null;
   }
 
-  public static List<SecurityTitle> getAll(final SynchronizedEveAccount owner, final long time) {
+  public static List<SecurityTitle> getAll(
+                                           final SynchronizedEveAccount owner,
+                                           final long time) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<SecurityTitle>>() {
         @Override
@@ -133,6 +147,45 @@ public class SecurityTitle extends CachedData {
           getter.setParameter("owner", owner);
           getter.setParameter("point", time);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<SecurityTitle> accessQuery(
+                                                final SynchronizedEveAccount owner,
+                                                final long contid,
+                                                final int maxresults,
+                                                final AttributeSelector at,
+                                                final AttributeSelector titleID,
+                                                final AttributeSelector titleName) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<SecurityTitle>>() {
+        @Override
+        public List<SecurityTitle> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM SecurityTitle c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addLongSelector(qs, "c", "titleID", titleID);
+          AttributeSelector.addStringSelector(qs, "c", "titleName", titleName, p);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<SecurityTitle> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), SecurityTitle.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

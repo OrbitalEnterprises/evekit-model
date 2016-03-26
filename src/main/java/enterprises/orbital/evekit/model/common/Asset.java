@@ -19,11 +19,21 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_asset", indexes = {
-    @Index(name = "itemIDIndex", columnList = "itemID", unique = false), @Index(name = "containerIndex", columnList = "container", unique = false)
+@Table(
+    name = "evekit_data_asset",
+    indexes = {
+        @Index(
+            name = "itemIDIndex",
+            columnList = "itemID",
+            unique = false),
+        @Index(
+            name = "containerIndex",
+            columnList = "container",
+            unique = false)
 })
 @NamedQueries({
     @NamedQuery(
@@ -71,7 +81,8 @@ public class Asset extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof Asset)) return false;
     Asset other = (Asset) sup;
     return itemID == other.itemID && locationID == other.locationID && typeID == other.typeID && quantity == other.quantity && flag == other.flag
@@ -134,7 +145,8 @@ public class Asset extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -168,7 +180,10 @@ public class Asset extends CachedData {
    *          asset ID
    * @return an existing asset, or null.
    */
-  public static Asset get(final SynchronizedEveAccount owner, final long time, final long itemID) {
+  public static Asset get(
+                          final SynchronizedEveAccount owner,
+                          final long time,
+                          final long itemID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<Asset>() {
         @Override
@@ -203,7 +218,11 @@ public class Asset extends CachedData {
    *          itemID (exclusive) from which to start returning results
    * @return a list of assets no longer than maxresults with itemID greater than contid
    */
-  public static List<Asset> getAllAssets(final SynchronizedEveAccount owner, final long time, int maxresults, final long contid) {
+  public static List<Asset> getAllAssets(
+                                         final SynchronizedEveAccount owner,
+                                         final long time,
+                                         int maxresults,
+                                         final long contid) {
     String key = OrbitalProperties.getPropertyName(Asset.class, "maxresults");
     final int maxr = OrbitalProperties.getNonzeroLimited(maxresults, (int) PersistentProperty.getLongPropertyWithFallback(key, DEFAULT_MAX_RESULTS));
 
@@ -240,7 +259,12 @@ public class Asset extends CachedData {
    *          itemID from which to start returning results
    * @return a list of assets contained by the given asset, no longer than maxresults, with itemID greater than contid
    */
-  public static List<Asset> getContainedAssets(final SynchronizedEveAccount owner, final long containerID, final long time, int maxresults, final long contid) {
+  public static List<Asset> getContainedAssets(
+                                               final SynchronizedEveAccount owner,
+                                               final long containerID,
+                                               final long time,
+                                               int maxresults,
+                                               final long contid) {
     String key = OrbitalProperties.getPropertyName(Asset.class, "maxresults");
     final int maxr = OrbitalProperties.getNonzeroLimited(maxresults, (int) PersistentProperty.getLongPropertyWithFallback(key, DEFAULT_MAX_RESULTS));
 
@@ -255,6 +279,55 @@ public class Asset extends CachedData {
           getter.setParameter("point", time);
           getter.setMaxResults(maxr);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<Asset> accessQuery(
+                                        final SynchronizedEveAccount owner,
+                                        final long contid,
+                                        final int maxresults,
+                                        final AttributeSelector at,
+                                        final AttributeSelector itemID,
+                                        final AttributeSelector locationID,
+                                        final AttributeSelector typeID,
+                                        final AttributeSelector quantity,
+                                        final AttributeSelector flag,
+                                        final AttributeSelector singleton,
+                                        final AttributeSelector rawQuantity,
+                                        final AttributeSelector container) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<Asset>>() {
+        @Override
+        public List<Asset> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM Asset c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeSelector.addLongSelector(qs, "c", "itemID", itemID);
+          AttributeSelector.addLongSelector(qs, "c", "locationID", locationID);
+          AttributeSelector.addIntSelector(qs, "c", "typeID", typeID);
+          AttributeSelector.addIntSelector(qs, "c", "quantity", quantity);
+          AttributeSelector.addIntSelector(qs, "c", "flag", flag);
+          AttributeSelector.addBooleanSelector(qs, "c", "singleton", singleton);
+          AttributeSelector.addIntSelector(qs, "c", "rawQuantity", rawQuantity);
+          AttributeSelector.addLongSelector(qs, "c", "container", container);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<Asset> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), Asset.class);
+          query.setParameter("owner", owner);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

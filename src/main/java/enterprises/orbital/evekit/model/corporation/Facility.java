@@ -17,11 +17,18 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_facility", indexes = {
-    @Index(name = "facilityIDIndex", columnList = "facilityID", unique = false),
+@Table(
+    name = "evekit_data_facility",
+    indexes = {
+        @Index(
+            name = "facilityIDIndex",
+            columnList = "facilityID",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -66,7 +73,8 @@ public class Facility extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof Facility)) return false;
     Facility other = (Facility) sup;
     return facilityID == other.facilityID && typeID == other.typeID && nullSafeObjectCompare(typeName, other.typeName) && solarSystemID == other.solarSystemID
@@ -137,7 +145,8 @@ public class Facility extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -167,7 +176,10 @@ public class Facility extends CachedData {
         + owner + ", lifeStart=" + lifeStart + ", lifeEnd=" + lifeEnd + "]";
   }
 
-  public static Facility get(final SynchronizedEveAccount owner, final long time, final long facilityID) {
+  public static Facility get(
+                             final SynchronizedEveAccount owner,
+                             final long time,
+                             final long facilityID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<Facility>() {
         @Override
@@ -189,7 +201,9 @@ public class Facility extends CachedData {
     return null;
   }
 
-  public static List<Facility> getAll(final SynchronizedEveAccount owner, final long time) {
+  public static List<Facility> getAll(
+                                      final SynchronizedEveAccount owner,
+                                      final long time) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<Facility>>() {
         @Override
@@ -198,6 +212,59 @@ public class Facility extends CachedData {
           getter.setParameter("owner", owner);
           getter.setParameter("point", time);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<Facility> accessQuery(
+                                           final SynchronizedEveAccount owner,
+                                           final long contid,
+                                           final int maxresults,
+                                           final AttributeSelector at,
+                                           final AttributeSelector facilityID,
+                                           final AttributeSelector typeID,
+                                           final AttributeSelector typeName,
+                                           final AttributeSelector solarSystemID,
+                                           final AttributeSelector solarSystemName,
+                                           final AttributeSelector regionID,
+                                           final AttributeSelector regionName,
+                                           final AttributeSelector starbaseModifier,
+                                           final AttributeSelector tax) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<Facility>>() {
+        @Override
+        public List<Facility> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM Facility c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addLongSelector(qs, "c", "facilityID", facilityID);
+          AttributeSelector.addIntSelector(qs, "c", "typeID", typeID);
+          AttributeSelector.addStringSelector(qs, "c", "typeName", typeName, p);
+          AttributeSelector.addIntSelector(qs, "c", "solarSystemID", solarSystemID);
+          AttributeSelector.addStringSelector(qs, "c", "solarSystemName", solarSystemName, p);
+          AttributeSelector.addIntSelector(qs, "c", "regionID", regionID);
+          AttributeSelector.addStringSelector(qs, "c", "regionName", regionName, p);
+          AttributeSelector.addIntSelector(qs, "c", "starbaseModifier", starbaseModifier);
+          AttributeSelector.addDoubleSelector(qs, "c", "tax", tax);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<Facility> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), Facility.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

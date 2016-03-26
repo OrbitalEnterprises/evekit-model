@@ -19,11 +19,22 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_standing", indexes = {
-    @Index(name = "standingEntityIndex", columnList = "standingEntity", unique = false), @Index(name = "fromIDIndex", columnList = "fromID", unique = false),
+@Table(
+    name = "evekit_data_standing",
+    indexes = {
+        @Index(
+            name = "standingEntityIndex",
+            columnList = "standingEntity",
+            unique = false),
+        @Index(
+            name = "fromIDIndex",
+            columnList = "fromID",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -61,7 +72,8 @@ public class Standing extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof Standing)) return false;
     Standing other = (Standing) sup;
     return nullSafeObjectCompare(standingEntity, other.standingEntity) && fromID == other.fromID && nullSafeObjectCompare(fromName, other.fromName)
@@ -106,7 +118,8 @@ public class Standing extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -141,7 +154,11 @@ public class Standing extends CachedData {
    *          from ID with which the standing is associated
    * @return standing with the given parameters, live at the given time, or null
    */
-  public static Standing get(final SynchronizedEveAccount owner, final long time, final String standingEntity, final int fromID) {
+  public static Standing get(
+                             final SynchronizedEveAccount owner,
+                             final long time,
+                             final String standingEntity,
+                             final int fromID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<Standing>() {
         @Override
@@ -178,7 +195,11 @@ public class Standing extends CachedData {
    *          sortKey (exclusive) after which results will be returned
    * @return list of standings live at the given time with sortKey (lexicographically) greater than "contid"
    */
-  public static List<Standing> getAllStandings(final SynchronizedEveAccount owner, final long time, int maxresults, final long contid) {
+  public static List<Standing> getAllStandings(
+                                               final SynchronizedEveAccount owner,
+                                               final long time,
+                                               int maxresults,
+                                               final long contid) {
     final int maxr = OrbitalProperties.getNonzeroLimited(maxresults,
                                                          (int) PersistentProperty.getLongPropertyWithFallback(
                                                                                                               OrbitalProperties.getPropertyName(Standing.class,
@@ -239,6 +260,49 @@ public class Standing extends CachedData {
           getter.setParameter("point", time);
           getter.setMaxResults(maxr);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<Standing> accessQuery(
+                                           final SynchronizedEveAccount owner,
+                                           final long contid,
+                                           final int maxresults,
+                                           final AttributeSelector at,
+                                           final AttributeSelector standingEntity,
+                                           final AttributeSelector fromID,
+                                           final AttributeSelector fromName,
+                                           final AttributeSelector standing) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<Standing>>() {
+        @Override
+        public List<Standing> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM Standing c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addStringSelector(qs, "c", "standingEntity", standingEntity, p);
+          AttributeSelector.addIntSelector(qs, "c", "fromID", fromID);
+          AttributeSelector.addStringSelector(qs, "c", "fromName", fromName, p);
+          AttributeSelector.addDoubleSelector(qs, "c", "standing", standing);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<Standing> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), Standing.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

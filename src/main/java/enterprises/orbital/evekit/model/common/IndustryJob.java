@@ -21,12 +21,26 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_industry_job", indexes = {
-    @Index(name = "jobIDIndex", columnList = "jobID", unique = false), @Index(name = "startDateIndex", columnList = "startDate", unique = false),
-    @Index(name = "completedDateIndex", columnList = "completedDate", unique = false),
+@Table(
+    name = "evekit_data_industry_job",
+    indexes = {
+        @Index(
+            name = "jobIDIndex",
+            columnList = "jobID",
+            unique = false),
+        @Index(
+            name = "startDateIndex",
+            columnList = "startDate",
+            unique = false),
+        @Index(
+            name = "completedDateIndex",
+            columnList = "completedDate",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -61,7 +75,9 @@ public class IndustryJob extends CachedData {
   private long                blueprintLocationID;
   private long                outputLocationID;
   private int                 runs;
-  @Column(precision = 19, scale = 2)
+  @Column(
+      precision = 19,
+      scale = 2)
   private BigDecimal          cost;
   private long                teamID;
   private int                 licensedRuns;
@@ -119,7 +135,8 @@ public class IndustryJob extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof IndustryJob)) return false;
     IndustryJob other = (IndustryJob) sup;
     return jobID == other.jobID && installerID == other.installerID && nullSafeObjectCompare(installerName, other.installerName)
@@ -291,7 +308,8 @@ public class IndustryJob extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -360,7 +378,10 @@ public class IndustryJob extends CachedData {
    *          job ID
    * @return industry job with the given ID live at the given time, or null
    */
-  public static IndustryJob get(final SynchronizedEveAccount owner, final long time, final long jobID) {
+  public static IndustryJob get(
+                                final SynchronizedEveAccount owner,
+                                final long time,
+                                final long jobID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<IndustryJob>() {
         @Override
@@ -396,7 +417,11 @@ public class IndustryJob extends CachedData {
    *          startDate (exclusive) from which to start returning industry jobs
    * @return list of industry jobs live at the given time with startDate greater than "contid"
    */
-  public static List<IndustryJob> getAllForward(final SynchronizedEveAccount owner, final long time, int maxresults, final long contid) {
+  public static List<IndustryJob> getAllForward(
+                                                final SynchronizedEveAccount owner,
+                                                final long time,
+                                                int maxresults,
+                                                final long contid) {
     final int maxr = OrbitalProperties.getNonzeroLimited(maxresults, (int) PersistentProperty
         .getLongPropertyWithFallback(OrbitalProperties.getPropertyName(IndustryJob.class, "maxresults"), DEFAULT_MAX_RESULTS));
     try {
@@ -431,7 +456,11 @@ public class IndustryJob extends CachedData {
    *          startDate (exclusive) before which industry jobs will be returned
    * @return list of industry jobs live at the given time with startDate less than "contid"
    */
-  public static List<IndustryJob> getAllBackward(final SynchronizedEveAccount owner, final long time, int maxresults, final long contid) {
+  public static List<IndustryJob> getAllBackward(
+                                                 final SynchronizedEveAccount owner,
+                                                 final long time,
+                                                 int maxresults,
+                                                 final long contid) {
     final int maxr = OrbitalProperties.getNonzeroLimited(maxresults, (int) PersistentProperty
         .getLongPropertyWithFallback(OrbitalProperties.getPropertyName(IndustryJob.class, "maxresults"), DEFAULT_MAX_RESULTS));
     try {
@@ -466,7 +495,11 @@ public class IndustryJob extends CachedData {
    *          startDate (exclusive) after which industry jobs will be returned
    * @return list of incomplete industry jobs live at the given time with startDate greater than "contid"
    */
-  public static List<IndustryJob> getAllIncomplete(final SynchronizedEveAccount owner, final long time, int maxresults, final long contid) {
+  public static List<IndustryJob> getAllIncomplete(
+                                                   final SynchronizedEveAccount owner,
+                                                   final long time,
+                                                   int maxresults,
+                                                   final long contid) {
     final int maxr = OrbitalProperties.getNonzeroLimited(maxresults, (int) PersistentProperty
         .getLongPropertyWithFallback(OrbitalProperties.getPropertyName(IndustryJob.class, "maxresults"), DEFAULT_MAX_RESULTS));
     try {
@@ -480,6 +513,97 @@ public class IndustryJob extends CachedData {
           getter.setParameter("point", time);
           getter.setMaxResults(maxr);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<IndustryJob> accessQuery(
+                                              final SynchronizedEveAccount owner,
+                                              final long contid,
+                                              final int maxresults,
+                                              final AttributeSelector at,
+                                              final AttributeSelector jobID,
+                                              final AttributeSelector installerID,
+                                              final AttributeSelector installerName,
+                                              final AttributeSelector facilityID,
+                                              final AttributeSelector solarSystemID,
+                                              final AttributeSelector solarSystemName,
+                                              final AttributeSelector stationID,
+                                              final AttributeSelector activityID,
+                                              final AttributeSelector blueprintID,
+                                              final AttributeSelector blueprintTypeID,
+                                              final AttributeSelector blueprintTypeName,
+                                              final AttributeSelector blueprintLocationID,
+                                              final AttributeSelector outputLocationID,
+                                              final AttributeSelector runs,
+                                              final AttributeSelector cost,
+                                              final AttributeSelector teamID,
+                                              final AttributeSelector licensedRuns,
+                                              final AttributeSelector probability,
+                                              final AttributeSelector productTypeID,
+                                              final AttributeSelector productTypeName,
+                                              final AttributeSelector status,
+                                              final AttributeSelector timeInSeconds,
+                                              final AttributeSelector startDate,
+                                              final AttributeSelector endDate,
+                                              final AttributeSelector pauseDate,
+                                              final AttributeSelector completedDate,
+                                              final AttributeSelector completedCharacterID,
+                                              final AttributeSelector successfulRuns) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<IndustryJob>>() {
+        @Override
+        public List<IndustryJob> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM IndustryJob c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addLongSelector(qs, "c", "jobID", jobID);
+          AttributeSelector.addLongSelector(qs, "c", "installerID", installerID);
+          AttributeSelector.addStringSelector(qs, "c", "installerName", installerName, p);
+          AttributeSelector.addLongSelector(qs, "c", "facilityID", facilityID);
+          AttributeSelector.addLongSelector(qs, "c", "solarSystemID", solarSystemID);
+          AttributeSelector.addStringSelector(qs, "c", "solarSystemName", solarSystemName, p);
+          AttributeSelector.addLongSelector(qs, "c", "stationID", stationID);
+          AttributeSelector.addLongSelector(qs, "c", "activityID", activityID);
+          AttributeSelector.addLongSelector(qs, "c", "blueprintID", blueprintID);
+          AttributeSelector.addLongSelector(qs, "c", "blueprintTypeID", blueprintTypeID);
+          AttributeSelector.addStringSelector(qs, "c", "blueprintTypeName", blueprintTypeName, p);
+          AttributeSelector.addLongSelector(qs, "c", "blueprintLocationID", blueprintLocationID);
+          AttributeSelector.addLongSelector(qs, "c", "outputLocationID", outputLocationID);
+          AttributeSelector.addIntSelector(qs, "c", "runs", runs);
+          AttributeSelector.addDoubleSelector(qs, "c", "cost", cost);
+          AttributeSelector.addLongSelector(qs, "c", "teamID", teamID);
+          AttributeSelector.addIntSelector(qs, "c", "licensedRuns", licensedRuns);
+          AttributeSelector.addDoubleSelector(qs, "c", "probability", probability);
+          AttributeSelector.addLongSelector(qs, "c", "productTypeID", productTypeID);
+          AttributeSelector.addStringSelector(qs, "c", "productTypeName", productTypeName, p);
+          AttributeSelector.addIntSelector(qs, "c", "status", status);
+          AttributeSelector.addLongSelector(qs, "c", "timeInSeconds", timeInSeconds);
+          AttributeSelector.addLongSelector(qs, "c", "startDate", startDate);
+          AttributeSelector.addLongSelector(qs, "c", "endDate", endDate);
+          AttributeSelector.addLongSelector(qs, "c", "pauseDate", pauseDate);
+          AttributeSelector.addLongSelector(qs, "c", "completedDate", completedDate);
+          AttributeSelector.addLongSelector(qs, "c", "completedCharacterID", completedCharacterID);
+          AttributeSelector.addIntSelector(qs, "c", "successfulRuns", successfulRuns);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<IndustryJob> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), IndustryJob.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

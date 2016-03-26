@@ -17,11 +17,22 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_division", indexes = {
-    @Index(name = "walletIndex", columnList = "wallet", unique = false), @Index(name = "accountKeyIndex", columnList = "accountKey", unique = false),
+@Table(
+    name = "evekit_data_division",
+    indexes = {
+        @Index(
+            name = "walletIndex",
+            columnList = "wallet",
+            unique = false),
+        @Index(
+            name = "accountKeyIndex",
+            columnList = "accountKey",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -53,7 +64,8 @@ public class Division extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof Division)) return false;
     Division other = (Division) sup;
     return wallet == other.wallet && accountKey == other.accountKey && nullSafeObjectCompare(description, other.description);
@@ -90,7 +102,8 @@ public class Division extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -109,7 +122,11 @@ public class Division extends CachedData {
         + ", lifeEnd=" + lifeEnd + "]";
   }
 
-  public static Division get(final SynchronizedEveAccount owner, final long time, final boolean wallet, final int accountKey) {
+  public static Division get(
+                             final SynchronizedEveAccount owner,
+                             final long time,
+                             final boolean wallet,
+                             final int accountKey) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<Division>() {
         @Override
@@ -133,7 +150,10 @@ public class Division extends CachedData {
     return null;
   }
 
-  public static List<Division> getAllByType(final SynchronizedEveAccount owner, final long time, final boolean wallet) {
+  public static List<Division> getAllByType(
+                                            final SynchronizedEveAccount owner,
+                                            final long time,
+                                            final boolean wallet) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<Division>>() {
         @Override
@@ -143,6 +163,47 @@ public class Division extends CachedData {
           getter.setParameter("wallet", wallet);
           getter.setParameter("point", time);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<Division> accessQuery(
+                                           final SynchronizedEveAccount owner,
+                                           final long contid,
+                                           final int maxresults,
+                                           final AttributeSelector at,
+                                           final AttributeSelector wallet,
+                                           final AttributeSelector accountKey,
+                                           final AttributeSelector description) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<Division>>() {
+        @Override
+        public List<Division> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM Division c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addBooleanSelector(qs, "c", "wallet", wallet);
+          AttributeSelector.addIntSelector(qs, "c", "accountKey", accountKey);
+          AttributeSelector.addStringSelector(qs, "c", "description", description, p);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<Division> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), Division.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

@@ -19,11 +19,22 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_contact", indexes = {
-    @Index(name = "listIndex", columnList = "list", unique = false), @Index(name = "contactIDIndex", columnList = "contactID", unique = false),
+@Table(
+    name = "evekit_data_contact",
+    indexes = {
+        @Index(
+            name = "listIndex",
+            columnList = "list",
+            unique = false),
+        @Index(
+            name = "contactIDIndex",
+            columnList = "contactID",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -73,7 +84,8 @@ public class Contact extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof Contact)) return false;
     Contact other = (Contact) sup;
     return nullSafeObjectCompare(list, other.list) && contactID == other.contactID && nullSafeObjectCompare(contactName, other.contactName)
@@ -133,7 +145,8 @@ public class Contact extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -171,7 +184,11 @@ public class Contact extends CachedData {
    *          contact ID
    * @return contact with the given properties live at the given time, or null.
    */
-  public static Contact get(final SynchronizedEveAccount owner, final long time, final String list, final int contactID) {
+  public static Contact get(
+                            final SynchronizedEveAccount owner,
+                            final long time,
+                            final String list,
+                            final int contactID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<Contact>() {
         @Override
@@ -207,7 +224,11 @@ public class Contact extends CachedData {
    *          sortKey (exclusive) from which to start returning results.
    * @return a list of contacts no longer than maxresults with sortKey (lexicographically) greater than contid
    */
-  public static List<Contact> getAllContacts(final SynchronizedEveAccount owner, final long time, int maxresults, final long contid) {
+  public static List<Contact> getAllContacts(
+                                             final SynchronizedEveAccount owner,
+                                             final long time,
+                                             int maxresults,
+                                             final long contid) {
     final int maxr = OrbitalProperties.getNonzeroLimited(maxresults,
                                                          (int) PersistentProperty.getLongPropertyWithFallback(
                                                                                                               OrbitalProperties.getPropertyName(Contact.class,
@@ -246,7 +267,12 @@ public class Contact extends CachedData {
    *          sortKey (exclusive) from which to start returning results
    * @return a list of contacts from the given list, no longer than maxresults, with sortKey (lexicographically) greater than contid
    */
-  public static List<Contact> getByList(final SynchronizedEveAccount owner, final long time, final String list, int maxresults, final long contid) {
+  public static List<Contact> getByList(
+                                        final SynchronizedEveAccount owner,
+                                        final long time,
+                                        final String list,
+                                        int maxresults,
+                                        final long contid) {
     final int maxr = OrbitalProperties.getNonzeroLimited(maxresults,
                                                          (int) PersistentProperty.getLongPropertyWithFallback(
                                                                                                               OrbitalProperties.getPropertyName(Contact.class,
@@ -263,6 +289,55 @@ public class Contact extends CachedData {
           getter.setParameter("point", time);
           getter.setMaxResults(maxr);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<Contact> accessQuery(
+                                          final SynchronizedEveAccount owner,
+                                          final long contid,
+                                          final int maxresults,
+                                          final AttributeSelector at,
+                                          final AttributeSelector list,
+                                          final AttributeSelector contactID,
+                                          final AttributeSelector contactName,
+                                          final AttributeSelector standing,
+                                          final AttributeSelector contactTypeID,
+                                          final AttributeSelector inWatchlist,
+                                          final AttributeSelector labelMask) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<Contact>>() {
+        @Override
+        public List<Contact> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM Contact c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addStringSelector(qs, "c", "list", list, p);
+          AttributeSelector.addIntSelector(qs, "c", "contactID", contactID);
+          AttributeSelector.addStringSelector(qs, "c", "contactName", contactName, p);
+          AttributeSelector.addDoubleSelector(qs, "c", "standing", standing);
+          AttributeSelector.addIntSelector(qs, "c", "contactTypeID", contactTypeID);
+          AttributeSelector.addBooleanSelector(qs, "c", "inWatchlist", inWatchlist);
+          AttributeSelector.addLongSelector(qs, "c", "labelMask", labelMask);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<Contact> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), Contact.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

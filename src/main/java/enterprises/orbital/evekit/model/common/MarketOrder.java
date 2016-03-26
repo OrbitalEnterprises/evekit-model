@@ -21,12 +21,25 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_market_order", indexes = {
-    @Index(name = "orderIDIndex", columnList = "orderID", unique = false), @Index(name = "issuedIndex", columnList = "issued", unique = false),
-    @Index(name = "orderStateIndex", columnList = "orderState", unique = false),
+@Table(
+    name = "evekit_data_market_order",
+    indexes = {
+        @Index(
+            name = "orderIDIndex",
+            columnList = "orderID",
+            unique = false),
+        @Index(
+            name = "issuedIndex",
+            columnList = "issued",
+            unique = false),
+        @Index(
+            name = "orderStateIndex",
+            columnList = "orderState",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -52,12 +65,16 @@ public class MarketOrder extends CachedData {
   private boolean             bid;
   private long                charID;
   private int                 duration;
-  @Column(precision = 19, scale = 2)
+  @Column(
+      precision = 19,
+      scale = 2)
   private BigDecimal          escrow;
   private long                issued              = -1;
   private int                 minVolume;
   private int                 orderState;
-  @Column(precision = 19, scale = 2)
+  @Column(
+      precision = 19,
+      scale = 2)
   private BigDecimal          price;
   private int                 orderRange;
   private long                stationID;
@@ -92,7 +109,8 @@ public class MarketOrder extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof MarketOrder)) return false;
     MarketOrder other = (MarketOrder) sup;
     return orderID == other.orderID && accountKey == other.accountKey && bid == other.bid && charID == other.charID && duration == other.duration
@@ -192,7 +210,8 @@ public class MarketOrder extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -238,7 +257,10 @@ public class MarketOrder extends CachedData {
    *          market order ID
    * @return market order with the given parameters, live at the given time, or null
    */
-  public static MarketOrder get(final SynchronizedEveAccount owner, final long time, final long orderID) {
+  public static MarketOrder get(
+                                final SynchronizedEveAccount owner,
+                                final long time,
+                                final long orderID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<MarketOrder>() {
         @Override
@@ -274,7 +296,11 @@ public class MarketOrder extends CachedData {
    *          issued time (exclusive) after which market orders should be returned
    * @return list of market orders live at the given time with issued date greater than "contid"
    */
-  public static List<MarketOrder> getAllForward(final SynchronizedEveAccount owner, final long time, int maxresults, final long contid) {
+  public static List<MarketOrder> getAllForward(
+                                                final SynchronizedEveAccount owner,
+                                                final long time,
+                                                int maxresults,
+                                                final long contid) {
     final int maxr = OrbitalProperties.getNonzeroLimited(maxresults, (int) PersistentProperty
         .getLongPropertyWithFallback(OrbitalProperties.getPropertyName(MarketOrder.class, "maxresults"), DEFAULT_MAX_RESULTS));
     try {
@@ -309,7 +335,11 @@ public class MarketOrder extends CachedData {
    *          issued date (exclusive) before which market orders should be retrieved
    * @return list of market orders live at the given time with issued date less than "contid"
    */
-  public static List<MarketOrder> getAllBackward(final SynchronizedEveAccount owner, final long time, int maxresults, final long contid) {
+  public static List<MarketOrder> getAllBackward(
+                                                 final SynchronizedEveAccount owner,
+                                                 final long time,
+                                                 int maxresults,
+                                                 final long contid) {
     final int maxr = OrbitalProperties.getNonzeroLimited(maxresults, (int) PersistentProperty
         .getLongPropertyWithFallback(OrbitalProperties.getPropertyName(MarketOrder.class, "maxresults"), DEFAULT_MAX_RESULTS));
     try {
@@ -370,6 +400,69 @@ public class MarketOrder extends CachedData {
           getter.setParameter("point", time);
           getter.setMaxResults(maxr);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<MarketOrder> accessQuery(
+                                              final SynchronizedEveAccount owner,
+                                              final long contid,
+                                              final int maxresults,
+                                              final AttributeSelector at,
+                                              final AttributeSelector orderID,
+                                              final AttributeSelector accountKey,
+                                              final AttributeSelector bid,
+                                              final AttributeSelector charID,
+                                              final AttributeSelector duration,
+                                              final AttributeSelector escrow,
+                                              final AttributeSelector issued,
+                                              final AttributeSelector minVolume,
+                                              final AttributeSelector orderState,
+                                              final AttributeSelector price,
+                                              final AttributeSelector orderRange,
+                                              final AttributeSelector stationID,
+                                              final AttributeSelector typeID,
+                                              final AttributeSelector volEntered,
+                                              final AttributeSelector volRemaining) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<MarketOrder>>() {
+        @Override
+        public List<MarketOrder> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM MarketOrder c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeSelector.addLongSelector(qs, "c", "orderID", orderID);
+          AttributeSelector.addIntSelector(qs, "c", "accountKey", accountKey);
+          AttributeSelector.addBooleanSelector(qs, "c", "bid", bid);
+          AttributeSelector.addLongSelector(qs, "c", "charID", charID);
+          AttributeSelector.addIntSelector(qs, "c", "duration", duration);
+          AttributeSelector.addDoubleSelector(qs, "c", "escrow", escrow);
+          AttributeSelector.addLongSelector(qs, "c", "issued", issued);
+          AttributeSelector.addIntSelector(qs, "c", "minVolume", minVolume);
+          AttributeSelector.addIntSelector(qs, "c", "orderState", orderState);
+          AttributeSelector.addDoubleSelector(qs, "c", "price", price);
+          AttributeSelector.addIntSelector(qs, "c", "orderRange", orderRange);
+          AttributeSelector.addLongSelector(qs, "c", "stationID", stationID);
+          AttributeSelector.addIntSelector(qs, "c", "typeID", typeID);
+          AttributeSelector.addIntSelector(qs, "c", "volEntered", volEntered);
+          AttributeSelector.addIntSelector(qs, "c", "volRemaining", volRemaining);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<MarketOrder> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), MarketOrder.class);
+          query.setParameter("owner", owner);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

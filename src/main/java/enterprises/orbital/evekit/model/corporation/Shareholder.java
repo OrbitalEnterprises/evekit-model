@@ -17,11 +17,18 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_shareholder", indexes = {
-    @Index(name = "shareholderIDIndex", columnList = "shareholderID", unique = false),
+@Table(
+    name = "evekit_data_shareholder",
+    indexes = {
+        @Index(
+            name = "shareholderIDIndex",
+            columnList = "shareholderID",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -60,7 +67,8 @@ public class Shareholder extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof Shareholder)) return false;
     Shareholder other = (Shareholder) sup;
     return shareholderID == other.shareholderID && isCorporation == other.isCorporation && shareholderCorporationID == other.shareholderCorporationID
@@ -114,7 +122,8 @@ public class Shareholder extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -139,7 +148,10 @@ public class Shareholder extends CachedData {
         + ", lifeStart=" + lifeStart + ", lifeEnd=" + lifeEnd + "]";
   }
 
-  public static Shareholder get(final SynchronizedEveAccount owner, final long time, final long shareholderID) {
+  public static Shareholder get(
+                                final SynchronizedEveAccount owner,
+                                final long time,
+                                final long shareholderID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<Shareholder>() {
         @Override
@@ -162,7 +174,9 @@ public class Shareholder extends CachedData {
     return null;
   }
 
-  public static List<Shareholder> getAll(final SynchronizedEveAccount owner, final long time) {
+  public static List<Shareholder> getAll(
+                                         final SynchronizedEveAccount owner,
+                                         final long time) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<Shareholder>>() {
         @Override
@@ -171,6 +185,53 @@ public class Shareholder extends CachedData {
           getter.setParameter("owner", owner);
           getter.setParameter("point", time);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<Shareholder> accessQuery(
+                                              final SynchronizedEveAccount owner,
+                                              final long contid,
+                                              final int maxresults,
+                                              final AttributeSelector at,
+                                              final AttributeSelector shareholderID,
+                                              final AttributeSelector isCorporation,
+                                              final AttributeSelector shareholderCorporationID,
+                                              final AttributeSelector shareholderCorporationName,
+                                              final AttributeSelector shareholderName,
+                                              final AttributeSelector shares) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<Shareholder>>() {
+        @Override
+        public List<Shareholder> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM Shareholder c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addLongSelector(qs, "c", "shareholderID", shareholderID);
+          AttributeSelector.addBooleanSelector(qs, "c", "isCorporation", isCorporation);
+          AttributeSelector.addLongSelector(qs, "c", "shareholderCorporationID", shareholderCorporationID);
+          AttributeSelector.addStringSelector(qs, "c", "shareholderCorporationName", shareholderCorporationName, p);
+          AttributeSelector.addStringSelector(qs, "c", "shareholderName", shareholderName, p);
+          AttributeSelector.addIntSelector(qs, "c", "shares", shares);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<Shareholder> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), Shareholder.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

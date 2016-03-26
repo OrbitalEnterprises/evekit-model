@@ -17,11 +17,17 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_starbase_detail", indexes = {
-    @Index(name = "itemIDIndex", columnList = "itemID", unique = false),
+@Table(
+    name = "evekit_data_starbase_detail",
+    indexes = {
+        @Index(
+            name = "itemIDIndex",
+            columnList = "itemID",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -84,7 +90,8 @@ public class StarbaseDetail extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof StarbaseDetail)) return false;
     StarbaseDetail other = (StarbaseDetail) sup;
     return itemID == other.itemID && state == other.state && stateTimestamp == other.stateTimestamp && onlineTimestamp == other.onlineTimestamp
@@ -197,7 +204,8 @@ public class StarbaseDetail extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -233,7 +241,10 @@ public class StarbaseDetail extends CachedData {
         + "]";
   }
 
-  public static StarbaseDetail get(final SynchronizedEveAccount owner, final long time, final long itemID) {
+  public static StarbaseDetail get(
+                                   final SynchronizedEveAccount owner,
+                                   final long time,
+                                   final long itemID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<StarbaseDetail>() {
         @Override
@@ -256,7 +267,9 @@ public class StarbaseDetail extends CachedData {
     return null;
   }
 
-  public static List<StarbaseDetail> getAll(final SynchronizedEveAccount owner, final long time) {
+  public static List<StarbaseDetail> getAll(
+                                            final SynchronizedEveAccount owner,
+                                            final long time) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<StarbaseDetail>>() {
         @Override
@@ -266,6 +279,73 @@ public class StarbaseDetail extends CachedData {
           getter.setParameter("owner", owner);
           getter.setParameter("point", time);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<StarbaseDetail> accessQuery(
+                                                 final SynchronizedEveAccount owner,
+                                                 final long contid,
+                                                 final int maxresults,
+                                                 final AttributeSelector at,
+                                                 final AttributeSelector itemID,
+                                                 final AttributeSelector state,
+                                                 final AttributeSelector stateTimestamp,
+                                                 final AttributeSelector onlineTimestamp,
+                                                 final AttributeSelector usageFlags,
+                                                 final AttributeSelector deployFlags,
+                                                 final AttributeSelector allowAllianceMembers,
+                                                 final AttributeSelector allowCorporationMembers,
+                                                 final AttributeSelector useStandingsFrom,
+                                                 final AttributeSelector onAggressionEnabled,
+                                                 final AttributeSelector onAggressionStanding,
+                                                 final AttributeSelector onCorporationWarEnabled,
+                                                 final AttributeSelector onCorporationWarStanding,
+                                                 final AttributeSelector onStandingDropEnabled,
+                                                 final AttributeSelector onStandingDropStanding,
+                                                 final AttributeSelector onStatusDropEnabled,
+                                                 final AttributeSelector onStatusDropStanding) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<StarbaseDetail>>() {
+        @Override
+        public List<StarbaseDetail> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM StarbaseDetail c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeSelector.addLongSelector(qs, "c", "itemID", itemID);
+          AttributeSelector.addIntSelector(qs, "c", "state", state);
+          AttributeSelector.addLongSelector(qs, "c", "stateTimestamp", stateTimestamp);
+          AttributeSelector.addLongSelector(qs, "c", "onlineTimestamp", onlineTimestamp);
+          AttributeSelector.addIntSelector(qs, "c", "usageFlags", usageFlags);
+          AttributeSelector.addIntSelector(qs, "c", "deployFlags", deployFlags);
+          AttributeSelector.addBooleanSelector(qs, "c", "allowAllianceMembers", allowAllianceMembers);
+          AttributeSelector.addBooleanSelector(qs, "c", "allowCorporationMembers", allowCorporationMembers);
+          AttributeSelector.addLongSelector(qs, "c", "useStandingsFrom", useStandingsFrom);
+          AttributeSelector.addBooleanSelector(qs, "c", "onAggressionEnabled", onAggressionEnabled);
+          AttributeSelector.addIntSelector(qs, "c", "onAggressionStanding", onAggressionStanding);
+          AttributeSelector.addBooleanSelector(qs, "c", "onCorporationWarEnabled", onCorporationWarEnabled);
+          AttributeSelector.addIntSelector(qs, "c", "onCorporationWarStanding", onCorporationWarStanding);
+          AttributeSelector.addBooleanSelector(qs, "c", "onStandingDropEnabled", onStandingDropEnabled);
+          AttributeSelector.addIntSelector(qs, "c", "onStandingDropStanding", onStandingDropStanding);
+          AttributeSelector.addBooleanSelector(qs, "c", "onStatusDropEnabled", onStatusDropEnabled);
+          AttributeSelector.addIntSelector(qs, "c", "onStatusDropStanding", onStatusDropStanding);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<StarbaseDetail> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), StarbaseDetail.class);
+          query.setParameter("owner", owner);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

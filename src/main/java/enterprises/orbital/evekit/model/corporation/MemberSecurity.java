@@ -23,11 +23,18 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_member_security", indexes = {
-    @Index(name = "characterIDIndex", columnList = "characterID", unique = false),
+@Table(
+    name = "evekit_data_member_security",
+    indexes = {
+        @Index(
+            name = "characterIDIndex",
+            columnList = "characterID",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -45,23 +52,32 @@ public class MemberSecurity extends CachedData {
   private long                characterID;
   private String              name;
   // Role collections map role ID, title collection maps title ID
-  @ElementCollection(fetch = FetchType.EAGER)
+  @ElementCollection(
+      fetch = FetchType.EAGER)
   private Set<Long>           grantableRoles        = new HashSet<Long>();
-  @ElementCollection(fetch = FetchType.EAGER)
+  @ElementCollection(
+      fetch = FetchType.EAGER)
   private Set<Long>           grantableRolesAtBase  = new HashSet<Long>();
-  @ElementCollection(fetch = FetchType.EAGER)
+  @ElementCollection(
+      fetch = FetchType.EAGER)
   private Set<Long>           grantableRolesAtHQ    = new HashSet<Long>();
-  @ElementCollection(fetch = FetchType.EAGER)
+  @ElementCollection(
+      fetch = FetchType.EAGER)
   private Set<Long>           grantableRolesAtOther = new HashSet<Long>();
-  @ElementCollection(fetch = FetchType.EAGER)
+  @ElementCollection(
+      fetch = FetchType.EAGER)
   private Set<Long>           roles                 = new HashSet<Long>();
-  @ElementCollection(fetch = FetchType.EAGER)
+  @ElementCollection(
+      fetch = FetchType.EAGER)
   private Set<Long>           rolesAtBase           = new HashSet<Long>();
-  @ElementCollection(fetch = FetchType.EAGER)
+  @ElementCollection(
+      fetch = FetchType.EAGER)
   private Set<Long>           rolesAtHQ             = new HashSet<Long>();
-  @ElementCollection(fetch = FetchType.EAGER)
+  @ElementCollection(
+      fetch = FetchType.EAGER)
   private Set<Long>           rolesAtOther          = new HashSet<Long>();
-  @ElementCollection(fetch = FetchType.EAGER)
+  @ElementCollection(
+      fetch = FetchType.EAGER)
   private Set<Long>           titles                = new HashSet<Long>();
 
   @SuppressWarnings("unused")
@@ -86,7 +102,8 @@ public class MemberSecurity extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof MemberSecurity)) return false;
     MemberSecurity other = (MemberSecurity) sup;
     return characterID == other.characterID && nullSafeObjectCompare(name, other.name) && nullSafeObjectCompare(grantableRoles, other.grantableRoles)
@@ -167,7 +184,8 @@ public class MemberSecurity extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -214,7 +232,10 @@ public class MemberSecurity extends CachedData {
         + ", lifeStart=" + lifeStart + ", lifeEnd=" + lifeEnd + "]";
   }
 
-  public static MemberSecurity get(final SynchronizedEveAccount owner, final long time, final long characterID) {
+  public static MemberSecurity get(
+                                   final SynchronizedEveAccount owner,
+                                   final long time,
+                                   final long characterID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<MemberSecurity>() {
         @Override
@@ -237,7 +258,11 @@ public class MemberSecurity extends CachedData {
     return null;
   }
 
-  public static List<MemberSecurity> getAll(final SynchronizedEveAccount owner, final long time, int maxresults, final long contid) {
+  public static List<MemberSecurity> getAll(
+                                            final SynchronizedEveAccount owner,
+                                            final long time,
+                                            int maxresults,
+                                            final long contid) {
     final int maxr = OrbitalProperties.getNonzeroLimited(maxresults, (int) PersistentProperty
         .getLongPropertyWithFallback(OrbitalProperties.getPropertyName(MemberSecurity.class, "maxresults"), DEFAULT_MAX_RESULTS));
     try {
@@ -251,6 +276,63 @@ public class MemberSecurity extends CachedData {
           getter.setParameter("point", time);
           getter.setMaxResults(maxr);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<MemberSecurity> accessQuery(
+                                                 final SynchronizedEveAccount owner,
+                                                 final long contid,
+                                                 final int maxresults,
+                                                 final AttributeSelector at,
+                                                 final AttributeSelector characterID,
+                                                 final AttributeSelector name,
+                                                 final AttributeSelector grantableRoles,
+                                                 final AttributeSelector grantableRolesAtBase,
+                                                 final AttributeSelector grantableRolesAtHQ,
+                                                 final AttributeSelector grantableRolesAtOther,
+                                                 final AttributeSelector roles,
+                                                 final AttributeSelector rolesAtBase,
+                                                 final AttributeSelector rolesAtHQ,
+                                                 final AttributeSelector rolesAtOther,
+                                                 final AttributeSelector titles) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<MemberSecurity>>() {
+        @Override
+        public List<MemberSecurity> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM MemberSecurity c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addLongSelector(qs, "c", "characterID", characterID);
+          AttributeSelector.addStringSelector(qs, "c", "name", name, p);
+          AttributeSelector.addSetLongSelector(qs, "c", "grantableRoles", grantableRoles);
+          AttributeSelector.addSetLongSelector(qs, "c", "grantableRolesAtBase", grantableRolesAtBase);
+          AttributeSelector.addSetLongSelector(qs, "c", "grantableRolesAtHQ", grantableRolesAtHQ);
+          AttributeSelector.addSetLongSelector(qs, "c", "grantableRolesAtOther", grantableRolesAtOther);
+          AttributeSelector.addSetLongSelector(qs, "c", "roles", roles);
+          AttributeSelector.addSetLongSelector(qs, "c", "rolesAtBase", rolesAtBase);
+          AttributeSelector.addSetLongSelector(qs, "c", "rolesAtHQ", rolesAtHQ);
+          AttributeSelector.addSetLongSelector(qs, "c", "rolesAtOther", rolesAtOther);
+          AttributeSelector.addSetLongSelector(qs, "c", "titles", titles);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<MemberSecurity> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), MemberSecurity.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

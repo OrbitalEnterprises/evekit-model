@@ -17,11 +17,18 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_customs_office", indexes = {
-    @Index(name = "itemIDIndex", columnList = "itemID", unique = false),
+@Table(
+    name = "evekit_data_customs_office",
+    indexes = {
+        @Index(
+            name = "itemIDIndex",
+            columnList = "itemID",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -77,7 +84,8 @@ public class CustomsOffice extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof CustomsOffice)) return false;
     CustomsOffice other = (CustomsOffice) sup;
     return itemID == other.itemID && solarSystemID == other.solarSystemID && nullSafeObjectCompare(solarSystemName, other.solarSystemName)
@@ -183,7 +191,8 @@ public class CustomsOffice extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -216,7 +225,10 @@ public class CustomsOffice extends CachedData {
         + taxRateStandingHorrible + ", owner=" + owner + ", lifeStart=" + lifeStart + ", lifeEnd=" + lifeEnd + "]";
   }
 
-  public static CustomsOffice get(final SynchronizedEveAccount owner, final long time, final long itemID) {
+  public static CustomsOffice get(
+                                  final SynchronizedEveAccount owner,
+                                  final long time,
+                                  final long itemID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<CustomsOffice>() {
         @Override
@@ -239,7 +251,9 @@ public class CustomsOffice extends CachedData {
     return null;
   }
 
-  public static List<CustomsOffice> getAll(final SynchronizedEveAccount owner, final long time) {
+  public static List<CustomsOffice> getAll(
+                                           final SynchronizedEveAccount owner,
+                                           final long time) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<CustomsOffice>>() {
         @Override
@@ -249,6 +263,69 @@ public class CustomsOffice extends CachedData {
           getter.setParameter("owner", owner);
           getter.setParameter("point", time);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<CustomsOffice> accessQuery(
+                                                final SynchronizedEveAccount owner,
+                                                final long contid,
+                                                final int maxresults,
+                                                final AttributeSelector at,
+                                                final AttributeSelector itemID,
+                                                final AttributeSelector solarSystemID,
+                                                final AttributeSelector solarSystemName,
+                                                final AttributeSelector reinforceHour,
+                                                final AttributeSelector allowAlliance,
+                                                final AttributeSelector allowStandings,
+                                                final AttributeSelector standingLevel,
+                                                final AttributeSelector taxRateAlliance,
+                                                final AttributeSelector taxRateCorp,
+                                                final AttributeSelector taxRateStandingHigh,
+                                                final AttributeSelector taxRateStandingGood,
+                                                final AttributeSelector taxRateStandingNeutral,
+                                                final AttributeSelector taxRateStandingBad,
+                                                final AttributeSelector taxRateStandingHorrible) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<CustomsOffice>>() {
+        @Override
+        public List<CustomsOffice> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM CustomsOffice c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addLongSelector(qs, "c", "itemID", itemID);
+          AttributeSelector.addIntSelector(qs, "c", "solarSystemID", solarSystemID);
+          AttributeSelector.addStringSelector(qs, "c", "solarSystemName", solarSystemName, p);
+          AttributeSelector.addIntSelector(qs, "c", "reinforceHour", reinforceHour);
+          AttributeSelector.addBooleanSelector(qs, "c", "allowAlliance", allowAlliance);
+          AttributeSelector.addBooleanSelector(qs, "c", "allowStandings", allowStandings);
+          AttributeSelector.addDoubleSelector(qs, "c", "standingLevel", standingLevel);
+          AttributeSelector.addDoubleSelector(qs, "c", "taxRateAlliance", taxRateAlliance);
+          AttributeSelector.addDoubleSelector(qs, "c", "taxRateCorp", taxRateCorp);
+          AttributeSelector.addDoubleSelector(qs, "c", "taxRateStandingHigh", taxRateStandingHigh);
+          AttributeSelector.addDoubleSelector(qs, "c", "taxRateStandingGood", taxRateStandingGood);
+          AttributeSelector.addDoubleSelector(qs, "c", "taxRateStandingNeutral", taxRateStandingNeutral);
+          AttributeSelector.addDoubleSelector(qs, "c", "taxRateStandingBad", taxRateStandingBad);
+          AttributeSelector.addDoubleSelector(qs, "c", "taxRateStandingHorrible", taxRateStandingHorrible);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<CustomsOffice> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), CustomsOffice.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {

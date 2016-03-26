@@ -19,11 +19,18 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_outpost", indexes = {
-    @Index(name = "stationIDIndex", columnList = "stationID", unique = false),
+@Table(
+    name = "evekit_data_outpost",
+    indexes = {
+        @Index(
+            name = "stationIDIndex",
+            columnList = "stationID",
+            unique = false),
 })
 @NamedQueries({
     @NamedQuery(
@@ -41,9 +48,13 @@ public class Outpost extends CachedData {
   private long                ownerID;
   private String              stationName;
   private long                solarSystemID;
-  @Column(precision = 19, scale = 2)
+  @Column(
+      precision = 19,
+      scale = 2)
   private BigDecimal          dockingCostPerShipVolume;
-  @Column(precision = 19, scale = 2)
+  @Column(
+      precision = 19,
+      scale = 2)
   private BigDecimal          officeRentalCost;
   private int                 stationTypeID;
   private double              reprocessingEfficiency;
@@ -78,7 +89,8 @@ public class Outpost extends CachedData {
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     if (!(sup instanceof Outpost)) return false;
     Outpost other = (Outpost) sup;
     return stationID == other.stationID && ownerID == other.ownerID && nullSafeObjectCompare(stationName, other.stationName)
@@ -172,7 +184,8 @@ public class Outpost extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -207,7 +220,10 @@ public class Outpost extends CachedData {
         + ", x=" + x + ", y=" + y + ", z=" + z + "]";
   }
 
-  public static Outpost get(final SynchronizedEveAccount owner, final long time, final long stationID) {
+  public static Outpost get(
+                            final SynchronizedEveAccount owner,
+                            final long time,
+                            final long stationID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<Outpost>() {
         @Override
@@ -229,7 +245,9 @@ public class Outpost extends CachedData {
     return null;
   }
 
-  public static List<Outpost> getAll(final SynchronizedEveAccount owner, final long time) {
+  public static List<Outpost> getAll(
+                                     final SynchronizedEveAccount owner,
+                                     final long time) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<Outpost>>() {
         @Override
@@ -238,6 +256,67 @@ public class Outpost extends CachedData {
           getter.setParameter("owner", owner);
           getter.setParameter("point", time);
           return getter.getResultList();
+        }
+      });
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "query error", e);
+    }
+    return Collections.emptyList();
+  }
+
+  public static List<Outpost> accessQuery(
+                                          final SynchronizedEveAccount owner,
+                                          final long contid,
+                                          final int maxresults,
+                                          final AttributeSelector at,
+                                          final AttributeSelector stationID,
+                                          final AttributeSelector ownerID,
+                                          final AttributeSelector stationName,
+                                          final AttributeSelector solarSystemID,
+                                          final AttributeSelector dockingCostPerShipVolume,
+                                          final AttributeSelector officeRentalCost,
+                                          final AttributeSelector stationTypeID,
+                                          final AttributeSelector reprocessingEfficiency,
+                                          final AttributeSelector reprocessingStationTake,
+                                          final AttributeSelector standingOwnerID,
+                                          final AttributeSelector x,
+                                          final AttributeSelector y,
+                                          final AttributeSelector z) {
+    try {
+      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<Outpost>>() {
+        @Override
+        public List<Outpost> run() throws Exception {
+          StringBuilder qs = new StringBuilder();
+          qs.append("SELECT c FROM Outpost c WHERE ");
+          // Constrain to specified owner
+          qs.append("c.owner = :owner");
+          // Constrain lifeline
+          AttributeSelector.addLifelineSelector(qs, "c", at);
+          // Constrain attributes
+          AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addLongSelector(qs, "c", "stationID", stationID);
+          AttributeSelector.addLongSelector(qs, "c", "ownerID", ownerID);
+          AttributeSelector.addStringSelector(qs, "c", "stationName", stationName, p);
+          AttributeSelector.addLongSelector(qs, "c", "solarSystemID", solarSystemID);
+          AttributeSelector.addDoubleSelector(qs, "c", "dockingCostPerShipVolume", dockingCostPerShipVolume);
+          AttributeSelector.addDoubleSelector(qs, "c", "officeRentalCost", officeRentalCost);
+          AttributeSelector.addIntSelector(qs, "c", "stationTypeID", stationTypeID);
+          AttributeSelector.addDoubleSelector(qs, "c", "reprocessingEfficiency", reprocessingEfficiency);
+          AttributeSelector.addDoubleSelector(qs, "c", "reprocessingStationTake", reprocessingStationTake);
+          AttributeSelector.addLongSelector(qs, "c", "standingOwnerID", standingOwnerID);
+          AttributeSelector.addLongSelector(qs, "c", "x", x);
+          AttributeSelector.addLongSelector(qs, "c", "y", y);
+          AttributeSelector.addLongSelector(qs, "c", "z", z);
+          // Set CID constraint
+          qs.append(" and c.cid > ").append(contid);
+          // Order by CID (asc)
+          qs.append(" order by cid asc");
+          // Return result
+          TypedQuery<Outpost> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), Outpost.class);
+          query.setParameter("owner", owner);
+          p.fillParams(query);
+          query.setMaxResults(maxresults);
+          return query.getResultList();
         }
       });
     } catch (Exception e) {
