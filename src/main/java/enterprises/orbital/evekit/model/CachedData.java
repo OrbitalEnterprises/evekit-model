@@ -365,13 +365,25 @@ public abstract class CachedData {
     return null;
   }
 
+  public static CachedData get(
+                               final long cid) {
+    String type = ModelTypeMap.retrieveType(cid);
+    if (type == null) return null;
+    return CachedData.get(cid, type);
+  }
+
   public static <A extends CachedData> A updateData(
                                                     final A data) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<A>() {
         @Override
         public A run() throws Exception {
-          return EveKitUserAccountProvider.getFactory().getEntityManager().merge(data);
+          A result = EveKitUserAccountProvider.getFactory().getEntityManager().merge(data);
+          // Ensure type map entry exists
+          String typeName = data.getClass().getSimpleName();
+          ModelTypeMap tn = new ModelTypeMap(result.getCid(), typeName);
+          if (ModelTypeMap.update(tn) == null) return null;
+          return result;
         }
       });
     } catch (Exception e) {
@@ -399,6 +411,7 @@ public abstract class CachedData {
             query.setMaxResults(1000);
             for (CachedData next : query.getResultList()) {
               EveKitUserAccountProvider.getFactory().getEntityManager().remove(next);
+              ModelTypeMap.cleanup(next.getCid());
               removed++;
             }
             return removed;

@@ -47,7 +47,7 @@ public class MetaDataTest {
     targetData = CachedData.updateData(targetData);
 
     // Now pull tag out
-    CachedData copy = CachedData.get(targetData.getCid(), "Kill");
+    CachedData copy = CachedData.get(targetData.getCid(), "CachedData");
     Assert.assertNotNull(copy);
     Assert.assertEquals("testvalue", copy.getMetaData("testkey"));
   }
@@ -75,7 +75,7 @@ public class MetaDataTest {
     targetData = CachedData.updateData(targetData);
 
     // Check against target fetched from DB
-    CachedData copy = CachedData.get(targetData.getCid(), "Kill");
+    CachedData copy = CachedData.get(targetData.getCid(), "CachedData");
     Assert.assertNotNull(copy);
     Assert.assertEquals("testvalue", copy.getMetaData("testkey"));
   }
@@ -154,7 +154,8 @@ public class MetaDataTest {
     targetData = CachedData.updateData(targetData);
     targetData.setMetaData("testkey", "newvalue");
     targetData = CachedData.updateData(targetData);
-    CachedData copy = CachedData.get(targetData.getCid(), "Kill");
+    CachedData copy = CachedData.get(targetData.getCid(), "CachedData");
+    Assert.assertTrue(targetData != copy);
     Assert.assertNotNull(copy);
     Assert.assertEquals(targetData, copy);
   }

@@ -6,7 +6,6 @@ import org.junit.Assert;
 
 import enterprises.orbital.evekit.TestBase;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
-import enterprises.orbital.evekit.model.CachedData;
 
 public class AbstractModelTester<A extends CachedData> extends AbstractAccountBasedTest {
 
@@ -15,7 +14,9 @@ public class AbstractModelTester<A extends CachedData> extends AbstractAccountBa
   }
 
   public interface ModelRetriever<A> {
-    public A getModel(SynchronizedEveAccount account, long time);
+    public A getModel(
+                      SynchronizedEveAccount account,
+                      long time);
   }
 
   public interface CtorVariants<A> {
@@ -34,7 +35,10 @@ public class AbstractModelTester<A extends CachedData> extends AbstractAccountBa
   // 4) Test other non-standard retrieval variants
   // @formatter:on
 
-  protected void runBasicTests(ClassUnderTestConstructor<A> ctor, CtorVariants<A> vars, byte[] mask) {
+  protected void runBasicTests(
+                               ClassUnderTestConstructor<A> ctor,
+                               CtorVariants<A> vars,
+                               byte[] mask) {
     long time = TestBase.getRandomInt(100000000) + 5000L;
     A cut = ctor.getCUT();
     cut.setup(testAccount, time);
@@ -53,7 +57,10 @@ public class AbstractModelTester<A extends CachedData> extends AbstractAccountBa
     Assert.assertEquals(Long.MAX_VALUE, cut.getLifeEnd());
   }
 
-  protected void runGetLifelineTest(ClassUnderTestConstructor<A> eolMaker, ClassUnderTestConstructor<A> liveMaker, ModelRetriever<A> modelGetter) {
+  protected void runGetLifelineTest(
+                                    ClassUnderTestConstructor<A> eolMaker,
+                                    ClassUnderTestConstructor<A> liveMaker,
+                                    ModelRetriever<A> modelGetter) {
     A eol, live;
     long t1 = TestBase.getRandomInt(10000000) + 5000L;
     long t2 = t1 + TestBase.getRandomInt(10000) + 5000L;
@@ -64,6 +71,8 @@ public class AbstractModelTester<A extends CachedData> extends AbstractAccountBa
     eol.evolve(live, t2);
     eol = CachedData.updateData(eol);
     live = CachedData.updateData(live);
+    Assert.assertNotNull(ModelTypeMap.retrieve(eol.getCid()));
+    Assert.assertNotNull(ModelTypeMap.retrieve(live.getCid()));
 
     A eolCheck = modelGetter.getModel(testAccount, t1 + 5);
     A liveCheck = modelGetter.getModel(testAccount, t2 + 5);
