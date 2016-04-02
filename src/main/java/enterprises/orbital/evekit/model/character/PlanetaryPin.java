@@ -37,7 +37,7 @@ import enterprises.orbital.evekit.model.CachedData;
 @NamedQueries({
     @NamedQuery(
         name = "PlanetaryPin.getByPlanetAndPinID",
-        query = "SELECT c FROM PlanetaryPin c where c.owner = :owner and c.planetID = :planet and c.pinID = :pin and c.lifeStart <= :point and c.lifeEnd > :point"),
+        query = "SELECT c FROM PlanetaryPin c where c.owner = :owner and c.planetID = :planet and c.pinID = :pin and c.contentTypeID = :ctID and c.lifeStart <= :point and c.lifeEnd > :point"),
     @NamedQuery(
         name = "PlanetaryPin.getAll",
         query = "SELECT c FROM PlanetaryPin c where c.owner = :owner and c.lifeStart <= :point and c.lifeEnd > :point order by c.cid asc"),
@@ -237,7 +237,8 @@ public class PlanetaryPin extends CachedData {
                                  final SynchronizedEveAccount owner,
                                  final long time,
                                  final long planetID,
-                                 final long pinID) {
+                                 final long pinID,
+                                 final int contentTypeID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<PlanetaryPin>() {
         @Override
@@ -247,6 +248,7 @@ public class PlanetaryPin extends CachedData {
           getter.setParameter("owner", owner);
           getter.setParameter("planet", planetID);
           getter.setParameter("pin", pinID);
+          getter.setParameter("ctID", contentTypeID);
           getter.setParameter("point", time);
           try {
             return getter.getSingleResult();

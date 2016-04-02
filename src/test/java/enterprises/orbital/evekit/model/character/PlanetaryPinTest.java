@@ -12,7 +12,6 @@ import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AbstractModelTester;
 import enterprises.orbital.evekit.model.CachedData;
-import enterprises.orbital.evekit.model.character.PlanetaryPin;
 
 public class PlanetaryPinTest extends AbstractModelTester<PlanetaryPin> {
   final long                                    planetID         = TestBase.getRandomInt(100000000);
@@ -120,8 +119,10 @@ public class PlanetaryPinTest extends AbstractModelTester<PlanetaryPin> {
     runGetLifelineTest(eol, live, new ModelRetriever<PlanetaryPin>() {
 
       @Override
-      public PlanetaryPin getModel(SynchronizedEveAccount account, long time) {
-        return PlanetaryPin.get(account, time, planetID, pinID);
+      public PlanetaryPin getModel(
+                                   SynchronizedEveAccount account,
+                                   long time) {
+        return PlanetaryPin.get(account, time, planetID, pinID, contentTypeID);
       }
 
     });
@@ -133,23 +134,32 @@ public class PlanetaryPinTest extends AbstractModelTester<PlanetaryPin> {
     // - pins for a different account
     // - pins not live at the given time
     PlanetaryPin existing;
-    Map<Long, Map<Long, PlanetaryPin>> listCheck = new HashMap<Long, Map<Long, PlanetaryPin>>();
+    Map<Long, Map<Long, Map<Integer, PlanetaryPin>>> listCheck = new HashMap<Long, Map<Long, Map<Integer, PlanetaryPin>>>();
 
     existing = new PlanetaryPin(
         planetID, pinID, typeID, typeName, schematicID, lastLaunchTime, cycleTime, quantityPerCycle, installTime, expiryTime, contentTypeID, contentTypeName,
         contentQuantity, longitude, latitude);
     existing.setup(testAccount, 7777L);
     existing = CachedData.updateData(existing);
-    listCheck.put(planetID, new HashMap<Long, PlanetaryPin>());
-    listCheck.get(planetID).put(pinID, existing);
+    listCheck.put(planetID, new HashMap<Long, Map<Integer, PlanetaryPin>>());
+    listCheck.get(planetID).put(pinID, new HashMap<Integer, PlanetaryPin>());
+    listCheck.get(planetID).get(pinID).put(contentTypeID, existing);
+
+    existing = new PlanetaryPin(
+        planetID, pinID, typeID, typeName, schematicID, lastLaunchTime, cycleTime, quantityPerCycle, installTime, expiryTime, contentTypeID + 10,
+        contentTypeName, contentQuantity, longitude, latitude);
+    existing.setup(testAccount, 7777L);
+    existing = CachedData.updateData(existing);
+    listCheck.get(planetID).get(pinID).put(contentTypeID + 10, existing);
 
     existing = new PlanetaryPin(
         planetID + 10, pinID + 10, typeID, typeName, schematicID, lastLaunchTime, cycleTime, quantityPerCycle, installTime, expiryTime, contentTypeID,
         contentTypeName, contentQuantity, longitude, latitude);
     existing.setup(testAccount, 7777L);
     existing = CachedData.updateData(existing);
-    listCheck.put(planetID + 10, new HashMap<Long, PlanetaryPin>());
-    listCheck.get(planetID + 10).put(pinID + 10, existing);
+    listCheck.put(planetID + 10, new HashMap<Long, Map<Integer, PlanetaryPin>>());
+    listCheck.get(planetID + 10).put(pinID + 10, new HashMap<Integer, PlanetaryPin>());
+    listCheck.get(planetID + 10).get(pinID + 10).put(contentTypeID, existing);
 
     // Associated with different account
     existing = new PlanetaryPin(
@@ -174,13 +184,15 @@ public class PlanetaryPinTest extends AbstractModelTester<PlanetaryPin> {
     CachedData.updateData(existing);
 
     List<PlanetaryPin> result = PlanetaryPin.getAllPlanetaryPins(testAccount, 8888L);
-    Assert.assertEquals(listCheck.size(), result.size());
+    Assert.assertEquals(3, result.size());
     for (PlanetaryPin next : result) {
       long planetID = next.getPlanetID();
       long pinID = next.getPinID();
+      int contentTypeID = next.getContentTypeID();
       Assert.assertTrue(listCheck.containsKey(planetID));
       Assert.assertTrue(listCheck.get(planetID).containsKey(pinID));
-      Assert.assertEquals(listCheck.get(planetID).get(pinID), next);
+      Assert.assertTrue(listCheck.get(planetID).get(pinID).containsKey(contentTypeID));
+      Assert.assertEquals(listCheck.get(planetID).get(pinID).get(contentTypeID), next);
     }
 
   }
