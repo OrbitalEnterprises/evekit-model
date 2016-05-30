@@ -7,14 +7,14 @@
   </parent>
   <groupId>enterprises.orbital.evekit</groupId>
   <artifactId>model</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.2</version>
   <name>EveKit Model</name>
   <description>EveKit Synchronized Data Model</description>
   <url>https://github.com/OrbitalEnterprises/evekit-model</url>
   <scm>
   	<url>https://github.com/OrbitalEnterprises/evekit-model</url>
   	<connection>scm:git:https://github.com/OrbitalEnterprises/evekit-model.git</connection>
-  	<tag>rel_1_0_0</tag>
+  	<tag>rel_1_0_2</tag>
   	<developerConnection>scm:git:git@github.com:OrbitalEnterprises/evekit-model.git</developerConnection>
   </scm>
   
@@ -22,7 +22,7 @@
   	<dependency>
   		<groupId>enterprises.orbital.evekit</groupId>
   		<artifactId>account-manager</artifactId>
-  		<version>1.0.0</version>
+  		<version>1.0.2</version>
   	</dependency>
     <dependency>
 	    <groupId>org.hsqldb</groupId>
