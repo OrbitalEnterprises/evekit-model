@@ -51,7 +51,9 @@ public class CharacterSheet extends CachedData {
   private String                corporationName;
   private String                race;
   private long                  doB               = -1;
+  private int                   bloodlineID;
   private String                bloodline;
+  private int                   ancestryID;
   private String                ancestry;
   private String                gender;
   private String                allianceName;
@@ -73,10 +75,10 @@ public class CharacterSheet extends CachedData {
   @SuppressWarnings("unused")
   private CharacterSheet() {}
 
-  public CharacterSheet(long characterID, String name, long corporationID, String corporationName, String race, long doB, String bloodline, String ancestry,
-                        String gender, String allianceName, long allianceID, String factionName, long factionID, int intelligence, int memory, int charisma,
-                        int perception, int willpower, long homeStationID, long lastRespecDate, long lastTimedRespec, int freeRespecs, int freeSkillPoints,
-                        long remoteStationDate) {
+  public CharacterSheet(long characterID, String name, long corporationID, String corporationName, String race, long doB, int bloodlineID, String bloodline,
+                        int ancestryID, String ancestry, String gender, String allianceName, long allianceID, String factionName, long factionID,
+                        int intelligence, int memory, int charisma, int perception, int willpower, long homeStationID, long lastRespecDate,
+                        long lastTimedRespec, int freeRespecs, int freeSkillPoints, long remoteStationDate) {
     super();
     this.characterID = characterID;
     this.name = name;
@@ -84,7 +86,9 @@ public class CharacterSheet extends CachedData {
     this.corporationName = corporationName;
     this.race = race;
     this.doB = doB;
+    this.bloodlineID = bloodlineID;
     this.bloodline = bloodline;
+    this.ancestryID = ancestryID;
     this.ancestry = ancestry;
     this.gender = gender;
     this.allianceName = allianceName;
@@ -114,7 +118,8 @@ public class CharacterSheet extends CachedData {
     CharacterSheet other = (CharacterSheet) sup;
     return characterID == other.characterID && nullSafeObjectCompare(name, other.name) && corporationID == other.corporationID
         && nullSafeObjectCompare(corporationName, other.corporationName) && nullSafeObjectCompare(race, other.race) && doB == other.doB
-        && nullSafeObjectCompare(bloodline, other.bloodline) && nullSafeObjectCompare(ancestry, other.ancestry) && nullSafeObjectCompare(gender, other.gender)
+        && bloodlineID == other.bloodlineID && nullSafeObjectCompare(bloodline, other.bloodline) && ancestryID == other.ancestryID
+        && nullSafeObjectCompare(ancestry, other.ancestry) && nullSafeObjectCompare(gender, other.gender)
         && nullSafeObjectCompare(allianceName, other.allianceName) && allianceID == other.allianceID && nullSafeObjectCompare(factionName, other.factionName)
         && factionID == other.factionID && intelligence == other.intelligence && memory == other.memory && charisma == other.charisma
         && perception == other.perception && willpower == other.willpower && homeStationID == other.homeStationID && lastRespecDate == other.lastRespecDate
@@ -186,8 +191,21 @@ public class CharacterSheet extends CachedData {
     return doB;
   }
 
+  public int getBloodlineID() {
+    return bloodlineID;
+  }
+
   public String getBloodline() {
     return bloodline;
+  }
+
+  public int getAncestryID() {
+    return ancestryID;
+  }
+
+  public void setAncestryID(
+                            int ancestryID) {
+    this.ancestryID = ancestryID;
   }
 
   public String getAncestry() {
@@ -233,7 +251,9 @@ public class CharacterSheet extends CachedData {
     result = prime * result + (int) (allianceID ^ (allianceID >>> 32));
     result = prime * result + ((allianceName == null) ? 0 : allianceName.hashCode());
     result = prime * result + ((ancestry == null) ? 0 : ancestry.hashCode());
+    result = prime * result + ancestryID;
     result = prime * result + ((bloodline == null) ? 0 : bloodline.hashCode());
+    result = prime * result + bloodlineID;
     result = prime * result + (int) (characterID ^ (characterID >>> 32));
     result = prime * result + charisma;
     result = prime * result + (int) (corporationID ^ (corporationID >>> 32));
@@ -271,9 +291,11 @@ public class CharacterSheet extends CachedData {
     if (ancestry == null) {
       if (other.ancestry != null) return false;
     } else if (!ancestry.equals(other.ancestry)) return false;
+    if (ancestryID != other.ancestryID) return false;
     if (bloodline == null) {
       if (other.bloodline != null) return false;
     } else if (!bloodline.equals(other.bloodline)) return false;
+    if (bloodlineID != other.bloodlineID) return false;
     if (characterID != other.characterID) return false;
     if (charisma != other.charisma) return false;
     if (corporationID != other.corporationID) return false;
@@ -310,11 +332,11 @@ public class CharacterSheet extends CachedData {
   @Override
   public String toString() {
     return "CharacterSheet [characterID=" + characterID + ", name=" + name + ", corporationID=" + corporationID + ", corporationName=" + corporationName
-        + ", race=" + race + ", doB=" + doB + ", bloodline=" + bloodline + ", ancestry=" + ancestry + ", gender=" + gender + ", allianceName=" + allianceName
-        + ", allianceID=" + allianceID + ", factionName=" + factionName + ", factionID=" + factionID + ", intelligence=" + intelligence + ", memory=" + memory
-        + ", charisma=" + charisma + ", perception=" + perception + ", willpower=" + willpower + ", homeStationID=" + homeStationID + ", lastRespecDate="
-        + lastRespecDate + ", lastTimedRespec=" + lastTimedRespec + ", freeRespecs=" + freeRespecs + ", freeSkillPoints=" + freeSkillPoints
-        + ", remoteStationDate=" + remoteStationDate + "]";
+        + ", race=" + race + ", doB=" + doB + ", bloodlineID=" + bloodlineID + ", bloodline=" + bloodline + ", ancestryID=" + ancestryID + ", ancestry="
+        + ancestry + ", gender=" + gender + ", allianceName=" + allianceName + ", allianceID=" + allianceID + ", factionName=" + factionName + ", factionID="
+        + factionID + ", intelligence=" + intelligence + ", memory=" + memory + ", charisma=" + charisma + ", perception=" + perception + ", willpower="
+        + willpower + ", homeStationID=" + homeStationID + ", lastRespecDate=" + lastRespecDate + ", lastTimedRespec=" + lastTimedRespec + ", freeRespecs="
+        + freeRespecs + ", freeSkillPoints=" + freeSkillPoints + ", remoteStationDate=" + remoteStationDate + "]";
   }
 
   public static CharacterSheet get(
@@ -352,7 +374,9 @@ public class CharacterSheet extends CachedData {
                                                  final AttributeSelector corporationName,
                                                  final AttributeSelector race,
                                                  final AttributeSelector doB,
+                                                 final AttributeSelector bloodlineID,
                                                  final AttributeSelector bloodline,
+                                                 final AttributeSelector ancestryID,
                                                  final AttributeSelector ancestry,
                                                  final AttributeSelector gender,
                                                  final AttributeSelector allianceName,
@@ -389,7 +413,9 @@ public class CharacterSheet extends CachedData {
           AttributeSelector.addStringSelector(qs, "c", "corporationName", corporationName, p);
           AttributeSelector.addStringSelector(qs, "c", "race", race, p);
           AttributeSelector.addLongSelector(qs, "c", "doB", doB);
+          AttributeSelector.addIntSelector(qs, "c", "bloodlineID", bloodlineID);
           AttributeSelector.addStringSelector(qs, "c", "bloodline", bloodline, p);
+          AttributeSelector.addIntSelector(qs, "c", "ancestryID", ancestryID);
           AttributeSelector.addStringSelector(qs, "c", "ancestry", ancestry, p);
           AttributeSelector.addStringSelector(qs, "c", "gender", gender, p);
           AttributeSelector.addStringSelector(qs, "c", "allianceName", allianceName, p);
