@@ -42,6 +42,7 @@ public class Capsuleer extends CachedData {
   private long                assetListExpiry              = -1;
   private long                calendarEventAttendeesExpiry = -1;
   private long                characterSheetExpiry         = -1;
+  private long                partialCharacterSheetExpiry  = -1;
   private long                chatChannelsExpiry           = -1;
   private long                contactListExpiry            = -1;
   private long                contactNotificationsExpiry   = -1;
@@ -65,6 +66,7 @@ public class Capsuleer extends CachedData {
   private long                researchExpiry               = -1;
   private long                skillInTrainingExpiry        = -1;
   private long                skillQueueExpiry             = -1;
+  private long                skillsExpiry                 = -1;
   private long                standingsExpiry              = -1;
   private long                upcomingCalendarEventsExpiry = -1;
   private long                walletJournalExpiry          = -1;
@@ -131,6 +133,15 @@ public class Capsuleer extends CachedData {
   public void setCharacterSheetExpiry(
                                       long characterSheetExpiry) {
     this.characterSheetExpiry = characterSheetExpiry;
+  }
+
+  public long getPartialCharacterSheetExpiry() {
+    return partialCharacterSheetExpiry;
+  }
+
+  public void setPartialCharacterSheetExpiry(
+                                             long partialCharacterSheetExpiry) {
+    this.partialCharacterSheetExpiry = partialCharacterSheetExpiry;
   }
 
   public long getChatChannelsExpiry() {
@@ -338,6 +349,15 @@ public class Capsuleer extends CachedData {
   public void setSkillQueueExpiry(
                                   long skillQueueExpiry) {
     this.skillQueueExpiry = skillQueueExpiry;
+  }
+
+  public long getSkillsExpiry() {
+    return skillsExpiry;
+  }
+
+  public void setSkillsExpiry(
+                              long skillsExpiry) {
+    this.skillsExpiry = skillsExpiry;
   }
 
   public long getStandingsExpiry() {

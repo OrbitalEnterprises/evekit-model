@@ -128,6 +128,95 @@ public class CharacterSheet extends CachedData {
   }
 
   /**
+   * A specialized version of the equivalence check used when processing a Clones synchronization event which can only change certain fields of the character
+   * sheet.
+   * 
+   * @param sup
+   *          the cached data object to check
+   * @return true if the argument is equivalent to this object, false otherwise.
+   */
+  public boolean equivalentClonesCheck(
+                                       CachedData sup) {
+    if (!(sup instanceof CharacterSheet)) return false;
+    CharacterSheet other = (CharacterSheet) sup;
+    return nullSafeObjectCompare(race, other.race) && doB == other.doB && bloodlineID == other.bloodlineID && nullSafeObjectCompare(bloodline, other.bloodline)
+        && ancestryID == other.ancestryID && nullSafeObjectCompare(ancestry, other.ancestry) && nullSafeObjectCompare(gender, other.gender)
+        && intelligence == other.intelligence && memory == other.memory && charisma == other.charisma && perception == other.perception
+        && willpower == other.willpower && lastRespecDate == other.lastRespecDate && lastTimedRespec == other.lastTimedRespec
+        && freeRespecs == other.freeRespecs && remoteStationDate == other.remoteStationDate;
+  }
+
+  /**
+   * A specialized version of the equivalence check used when processing a Skills synchronization event which can only change the free skill points of a
+   * character sheet.
+   * 
+   * @param sup
+   *          the cached data object to check
+   * @return true if the argument is equivalent to this object, false otherwise.
+   */
+  public boolean equivalentSkillsCheck(
+                                       CachedData sup) {
+    if (!(sup instanceof CharacterSheet)) return false;
+    CharacterSheet other = (CharacterSheet) sup;
+    return freeSkillPoints == other.freeSkillPoints;
+  }
+
+  /**
+   * Copy all fields from src except for those fields which can be changed by a Clones synchronization event.
+   * 
+   * @param src
+   *          the source from which to copy
+   */
+  public void copyForClones(
+                            CharacterSheet src) {
+    characterID = src.getCharacterID();
+    name = src.getName();
+    corporationID = src.getCorporationID();
+    corporationName = src.getCorporationName();
+    allianceName = src.getAllianceName();
+    allianceID = src.getAllianceID();
+    factionName = src.getFactionName();
+    factionID = src.getFactionID();
+    homeStationID = src.getHomeStationID();
+    freeSkillPoints = src.getFreeSkillPoints();
+  }
+
+  /**
+   * Copy all fields from src except for those fields which can be changed by a Skills synchronization event.
+   * 
+   * @param src
+   *          the source from which to copy
+   */
+  public void copyForSkills(
+                            CharacterSheet src) {
+    characterID = src.getCharacterID();
+    name = src.getName();
+    corporationID = src.getCorporationID();
+    corporationName = src.getCorporationName();
+    race = src.getRace();
+    doB = src.getDoB();
+    bloodlineID = src.getBloodlineID();
+    bloodline = src.getBloodline();
+    ancestryID = src.getAncestryID();
+    ancestry = src.getAncestry();
+    gender = src.getGender();
+    allianceName = src.getAllianceName();
+    allianceID = src.getAllianceID();
+    factionName = src.getFactionName();
+    factionID = src.getFactionID();
+    intelligence = src.getIntelligence();
+    memory = src.getMemory();
+    charisma = src.getCharisma();
+    perception = src.getPerception();
+    willpower = src.getWillpower();
+    homeStationID = src.getHomeStationID();
+    lastRespecDate = src.getLastRespecDate();
+    lastTimedRespec = src.getLastTimedRespec();
+    freeRespecs = src.getFreeRespecs();
+    remoteStationDate = src.getRemoteStationDate();
+  }
+
+  /**
    * {@inheritDoc}
    */
   @Override
