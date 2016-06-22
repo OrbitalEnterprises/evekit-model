@@ -34,7 +34,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "accountKeyIndex",
             columnList = "accountKey",
             unique = false)
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "AccountBalance.getByAccountID",
@@ -235,6 +235,7 @@ public class AccountBalance extends CachedData {
                                                  final SynchronizedEveAccount owner,
                                                  final long contid,
                                                  final int maxresults,
+                                                 final boolean reverse,
                                                  final AttributeSelector at,
                                                  final AttributeSelector accountID,
                                                  final AttributeSelector accountKey) {
@@ -251,10 +252,14 @@ public class AccountBalance extends CachedData {
           // Constrain attributes
           AttributeSelector.addIntSelector(qs, "c", "accountID", accountID);
           AttributeSelector.addIntSelector(qs, "c", "accountKey", accountKey);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<AccountBalance> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), AccountBalance.class);
           query.setParameter("owner", owner);

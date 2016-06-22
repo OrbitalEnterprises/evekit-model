@@ -35,7 +35,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "retrievedIndex",
             columnList = "retrieved",
             unique = false)
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "CharacterMailMessageBody.getByMessageID",
@@ -180,6 +180,7 @@ public class CharacterMailMessageBody extends CachedData {
                                                            final SynchronizedEveAccount owner,
                                                            final long contid,
                                                            final int maxresults,
+                                                           final boolean reverse,
                                                            final AttributeSelector at,
                                                            final AttributeSelector messageID,
                                                            final AttributeSelector retrieved,
@@ -199,10 +200,14 @@ public class CharacterMailMessageBody extends CachedData {
           AttributeSelector.addLongSelector(qs, "c", "messageID", messageID);
           AttributeSelector.addBooleanSelector(qs, "c", "retrieved", retrieved);
           AttributeSelector.addStringSelector(qs, "c", "body", body, p);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<CharacterMailMessageBody> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(),
                                                                                                                              CharacterMailMessageBody.class);

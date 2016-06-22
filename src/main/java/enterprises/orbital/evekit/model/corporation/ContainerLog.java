@@ -31,7 +31,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "logTimeIndex",
             columnList = "logTime",
             unique = false),
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "ContainerLog.getByLogTime",
@@ -300,6 +300,7 @@ public class ContainerLog extends CachedData {
                                                final SynchronizedEveAccount owner,
                                                final long contid,
                                                final int maxresults,
+                                               final boolean reverse,
                                                final AttributeSelector at,
                                                final AttributeSelector logTime,
                                                final AttributeSelector action,
@@ -339,10 +340,14 @@ public class ContainerLog extends CachedData {
           AttributeSelector.addStringSelector(qs, "c", "passwordType", passwordType, p);
           AttributeSelector.addIntSelector(qs, "c", "quantity", quantity);
           AttributeSelector.addLongSelector(qs, "c", "typeID", typeID);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<ContainerLog> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), ContainerLog.class);
           query.setParameter("owner", owner);

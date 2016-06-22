@@ -35,7 +35,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "characterIDIndex",
             columnList = "characterID",
             unique = false),
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "MemberSecurity.getByCharacterID",
@@ -288,6 +288,7 @@ public class MemberSecurity extends CachedData {
                                                  final SynchronizedEveAccount owner,
                                                  final long contid,
                                                  final int maxresults,
+                                                 final boolean reverse,
                                                  final AttributeSelector at,
                                                  final AttributeSelector characterID,
                                                  final AttributeSelector name,
@@ -323,10 +324,14 @@ public class MemberSecurity extends CachedData {
           AttributeSelector.addSetLongSelector(qs, "c", "rolesAtHQ", rolesAtHQ);
           AttributeSelector.addSetLongSelector(qs, "c", "rolesAtOther", rolesAtOther);
           AttributeSelector.addSetLongSelector(qs, "c", "titles", titles);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<MemberSecurity> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), MemberSecurity.class);
           query.setParameter("owner", owner);

@@ -33,7 +33,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "labelIDIndex",
             columnList = "labelID",
             unique = false),
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "ContactLabel.getByListAndLabelID",
@@ -201,6 +201,7 @@ public class ContactLabel extends CachedData {
                                                final SynchronizedEveAccount owner,
                                                final long contid,
                                                final int maxresults,
+                                               final boolean reverse,
                                                final AttributeSelector at,
                                                final AttributeSelector list,
                                                final AttributeSelector labelID,
@@ -220,10 +221,14 @@ public class ContactLabel extends CachedData {
           AttributeSelector.addStringSelector(qs, "c", "list", list, p);
           AttributeSelector.addLongSelector(qs, "c", "labelID", labelID);
           AttributeSelector.addStringSelector(qs, "c", "name", name, p);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<ContactLabel> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), ContactLabel.class);
           query.setParameter("owner", owner);

@@ -125,6 +125,7 @@ public class CharacterSheetBalance extends CachedData {
                                                         final SynchronizedEveAccount owner,
                                                         final long contid,
                                                         final int maxresults,
+                                                        final boolean reverse,
                                                         final AttributeSelector at,
                                                         final AttributeSelector balance) {
     try {
@@ -139,10 +140,14 @@ public class CharacterSheetBalance extends CachedData {
           AttributeSelector.addLifelineSelector(qs, "c", at);
           // Constrain attributes
           AttributeSelector.addDoubleSelector(qs, "c", "balance", balance);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<CharacterSheetBalance> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(),
                                                                                                                           CharacterSheetBalance.class);

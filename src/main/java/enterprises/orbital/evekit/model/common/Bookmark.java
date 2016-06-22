@@ -33,7 +33,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "bookmarkIDIndex",
             columnList = "bookmarkID",
             unique = false)
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "Bookmark.getByFolderAndBookmarkID",
@@ -300,6 +300,7 @@ public class Bookmark extends CachedData {
                                            final SynchronizedEveAccount owner,
                                            final long contid,
                                            final int maxresults,
+                                           final boolean reverse,
                                            final AttributeSelector at,
                                            final AttributeSelector folderID,
                                            final AttributeSelector folderName,
@@ -341,10 +342,14 @@ public class Bookmark extends CachedData {
           AttributeSelector.addDoubleSelector(qs, "c", "z", z);
           AttributeSelector.addStringSelector(qs, "c", "memo", memo, p);
           AttributeSelector.addStringSelector(qs, "c", "note", note, p);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<Bookmark> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), Bookmark.class);
           query.setParameter("owner", owner);

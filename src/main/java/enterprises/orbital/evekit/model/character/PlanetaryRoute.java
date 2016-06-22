@@ -33,7 +33,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "routeIDIndex",
             columnList = "routeID",
             unique = false)
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "PlanetaryRoute.getByPlanetAndRouteID",
@@ -277,6 +277,7 @@ public class PlanetaryRoute extends CachedData {
                                                  final SynchronizedEveAccount owner,
                                                  final long contid,
                                                  final int maxresults,
+                                                 final boolean reverse,
                                                  final AttributeSelector at,
                                                  final AttributeSelector planetID,
                                                  final AttributeSelector routeID,
@@ -314,10 +315,14 @@ public class PlanetaryRoute extends CachedData {
           AttributeSelector.addLongSelector(qs, "c", "waypoint3", waypoint3);
           AttributeSelector.addLongSelector(qs, "c", "waypoint4", waypoint4);
           AttributeSelector.addLongSelector(qs, "c", "waypoint5", waypoint5);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<PlanetaryRoute> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), PlanetaryRoute.class);
           query.setParameter("owner", owner);

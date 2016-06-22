@@ -34,7 +34,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "containerIndex",
             columnList = "container",
             unique = false)
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "Asset.getByItemID",
@@ -291,6 +291,7 @@ public class Asset extends CachedData {
                                         final SynchronizedEveAccount owner,
                                         final long contid,
                                         final int maxresults,
+                                        final boolean reverse,
                                         final AttributeSelector at,
                                         final AttributeSelector itemID,
                                         final AttributeSelector locationID,
@@ -319,10 +320,14 @@ public class Asset extends CachedData {
           AttributeSelector.addBooleanSelector(qs, "c", "singleton", singleton);
           AttributeSelector.addIntSelector(qs, "c", "rawQuantity", rawQuantity);
           AttributeSelector.addLongSelector(qs, "c", "container", container);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<Asset> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), Asset.class);
           query.setParameter("owner", owner);

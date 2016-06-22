@@ -35,7 +35,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "sentDateIndex",
             columnList = "sentDate",
             unique = false)
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "CharacterContactNotification.getByNotificationID",
@@ -223,6 +223,7 @@ public class CharacterContactNotification extends CachedData {
                                                                final SynchronizedEveAccount owner,
                                                                final long contid,
                                                                final int maxresults,
+                                                               final boolean reverse,
                                                                final AttributeSelector at,
                                                                final AttributeSelector notificationID,
                                                                final AttributeSelector senderID,
@@ -246,10 +247,14 @@ public class CharacterContactNotification extends CachedData {
           AttributeSelector.addStringSelector(qs, "c", "senderName", senderName, p);
           AttributeSelector.addLongSelector(qs, "c", "sentDate", sentDate);
           AttributeSelector.addStringSelector(qs, "c", "messageData", messageData, p);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<CharacterContactNotification> query = EveKitUserAccountProvider.getFactory().getEntityManager()
               .createQuery(qs.toString(), CharacterContactNotification.class);

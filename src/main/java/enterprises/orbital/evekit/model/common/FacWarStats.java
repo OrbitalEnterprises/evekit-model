@@ -223,6 +223,7 @@ public class FacWarStats extends CachedData {
                                               final SynchronizedEveAccount owner,
                                               final long contid,
                                               final int maxresults,
+                                              final boolean reverse,
                                               final AttributeSelector at,
                                               final AttributeSelector currentRank,
                                               final AttributeSelector enlisted,
@@ -260,10 +261,14 @@ public class FacWarStats extends CachedData {
           AttributeSelector.addIntSelector(qs, "c", "victoryPointsLastWeek", victoryPointsLastWeek);
           AttributeSelector.addIntSelector(qs, "c", "victoryPointsTotal", victoryPointsTotal);
           AttributeSelector.addIntSelector(qs, "c", "victoryPointsYesterday", victoryPointsYesterday);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<FacWarStats> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), FacWarStats.class);
           query.setParameter("owner", owner);

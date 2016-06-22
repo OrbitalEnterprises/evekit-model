@@ -33,7 +33,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "issuedIndex",
             columnList = "issued",
             unique = false)
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "CharacterMedal.getbyMedalIDAndIssued",
@@ -223,6 +223,7 @@ public class CharacterMedal extends CachedData {
                                                  final SynchronizedEveAccount owner,
                                                  final long contid,
                                                  final int maxresults,
+                                                 final boolean reverse,
                                                  final AttributeSelector at,
                                                  final AttributeSelector description,
                                                  final AttributeSelector medalID,
@@ -252,10 +253,14 @@ public class CharacterMedal extends CachedData {
           AttributeSelector.addLongSelector(qs, "c", "issuerID", issuerID);
           AttributeSelector.addStringSelector(qs, "c", "reason", reason, p);
           AttributeSelector.addStringSelector(qs, "c", "status", status, p);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<CharacterMedal> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), CharacterMedal.class);
           query.setParameter("owner", owner);

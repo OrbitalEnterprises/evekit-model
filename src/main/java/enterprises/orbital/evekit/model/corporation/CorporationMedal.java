@@ -31,7 +31,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "medalIDIndex",
             columnList = "medalID",
             unique = false),
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "CorporationMedal.getByMedalID",
@@ -192,6 +192,7 @@ public class CorporationMedal extends CachedData {
                                                    final SynchronizedEveAccount owner,
                                                    final long contid,
                                                    final int maxresults,
+                                                   final boolean reverse,
                                                    final AttributeSelector at,
                                                    final AttributeSelector medalID,
                                                    final AttributeSelector description,
@@ -215,10 +216,14 @@ public class CorporationMedal extends CachedData {
           AttributeSelector.addStringSelector(qs, "c", "title", title, p);
           AttributeSelector.addLongSelector(qs, "c", "created", created);
           AttributeSelector.addLongSelector(qs, "c", "creatorID", creatorID);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<CorporationMedal> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), CorporationMedal.class);
           query.setParameter("owner", owner);

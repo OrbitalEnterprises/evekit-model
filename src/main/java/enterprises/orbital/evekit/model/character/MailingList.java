@@ -29,7 +29,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "listIDIndex",
             columnList = "listID",
             unique = false),
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "MailingList.getByListID",
@@ -180,6 +180,7 @@ public class MailingList extends CachedData {
                                               final SynchronizedEveAccount owner,
                                               final long contid,
                                               final int maxresults,
+                                              final boolean reverse,
                                               final AttributeSelector at,
                                               final AttributeSelector displayName,
                                               final AttributeSelector listID) {
@@ -197,10 +198,14 @@ public class MailingList extends CachedData {
           AttributeParameters p = new AttributeParameters("att");
           AttributeSelector.addStringSelector(qs, "c", "displayName", displayName, p);
           AttributeSelector.addLongSelector(qs, "c", "listID", listID);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<MailingList> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), MailingList.class);
           query.setParameter("owner", owner);

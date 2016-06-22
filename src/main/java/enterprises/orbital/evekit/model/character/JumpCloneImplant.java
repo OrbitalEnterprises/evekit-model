@@ -33,7 +33,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "typeIDIndex",
             columnList = "typeID",
             unique = false),
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "JumpCloneImplant.getByCloneAndTypeID",
@@ -174,6 +174,7 @@ public class JumpCloneImplant extends CachedData {
                                                    final SynchronizedEveAccount owner,
                                                    final long contid,
                                                    final int maxresults,
+                                                   final boolean reverse,
                                                    final AttributeSelector at,
                                                    final AttributeSelector jumpCloneID,
                                                    final AttributeSelector typeID,
@@ -193,10 +194,14 @@ public class JumpCloneImplant extends CachedData {
           AttributeSelector.addIntSelector(qs, "c", "jumpCloneID", jumpCloneID);
           AttributeSelector.addIntSelector(qs, "c", "typeID", typeID);
           AttributeSelector.addStringSelector(qs, "c", "typeName", typeName, p);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<JumpCloneImplant> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), JumpCloneImplant.class);
           query.setParameter("owner", owner);

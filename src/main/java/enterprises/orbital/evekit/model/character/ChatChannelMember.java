@@ -37,7 +37,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "accessorIDIndex",
             columnList = "accessorID",
             unique = false)
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "ChatChannelMember.getByID",
@@ -264,6 +264,7 @@ public class ChatChannelMember extends CachedData {
                                                     final SynchronizedEveAccount owner,
                                                     final long contid,
                                                     final int maxresults,
+                                                    final boolean reverse,
                                                     final AttributeSelector at,
                                                     final AttributeSelector channelID,
                                                     final AttributeSelector category,
@@ -289,10 +290,14 @@ public class ChatChannelMember extends CachedData {
           AttributeSelector.addStringSelector(qs, "c", "accessorName", accessorName, p);
           AttributeSelector.addLongSelector(qs, "c", "untilWhen", untilWhen);
           AttributeSelector.addStringSelector(qs, "c", "reason", reason, p);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<ChatChannelMember> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), ChatChannelMember.class);
           query.setParameter("owner", owner);

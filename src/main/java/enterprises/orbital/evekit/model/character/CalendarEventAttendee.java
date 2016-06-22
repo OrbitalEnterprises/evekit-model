@@ -33,7 +33,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "characterIDIndex",
             columnList = "characterID",
             unique = false),
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "CalendarEventAttendee.getByEventAndCharacterID",
@@ -210,6 +210,7 @@ public class CalendarEventAttendee extends CachedData {
                                                         final SynchronizedEveAccount owner,
                                                         final long contid,
                                                         final int maxresults,
+                                                        final boolean reverse,
                                                         final AttributeSelector at,
                                                         final AttributeSelector eventID,
                                                         final AttributeSelector characterID,
@@ -231,10 +232,14 @@ public class CalendarEventAttendee extends CachedData {
           AttributeSelector.addLongSelector(qs, "c", "characterID", characterID);
           AttributeSelector.addStringSelector(qs, "c", "characterName", characterName, p);
           AttributeSelector.addStringSelector(qs, "c", "response", response, p);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<CalendarEventAttendee> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(),
                                                                                                                           CalendarEventAttendee.class);

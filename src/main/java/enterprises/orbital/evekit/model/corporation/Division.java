@@ -33,7 +33,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "accountKeyIndex",
             columnList = "accountKey",
             unique = false),
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "Division.getByWalletAndAccountKey",
@@ -175,6 +175,7 @@ public class Division extends CachedData {
                                            final SynchronizedEveAccount owner,
                                            final long contid,
                                            final int maxresults,
+                                           final boolean reverse,
                                            final AttributeSelector at,
                                            final AttributeSelector wallet,
                                            final AttributeSelector accountKey,
@@ -194,10 +195,14 @@ public class Division extends CachedData {
           AttributeSelector.addBooleanSelector(qs, "c", "wallet", wallet);
           AttributeSelector.addIntSelector(qs, "c", "accountKey", accountKey);
           AttributeSelector.addStringSelector(qs, "c", "description", description, p);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<Division> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), Division.class);
           query.setParameter("owner", owner);

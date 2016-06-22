@@ -34,7 +34,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "recordIDIndex",
             columnList = "recordID",
             unique = false),
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "ContractItem.getByContractAndRecordID",
@@ -243,6 +243,7 @@ public class ContractItem extends CachedData {
                                                final SynchronizedEveAccount owner,
                                                final long contid,
                                                final int maxresults,
+                                               final boolean reverse,
                                                final AttributeSelector at,
                                                final AttributeSelector contractID,
                                                final AttributeSelector recordID,
@@ -269,10 +270,14 @@ public class ContractItem extends CachedData {
           AttributeSelector.addIntSelector(qs, "c", "rawQuantity", rawQuantity);
           AttributeSelector.addBooleanSelector(qs, "c", "singleton", singleton);
           AttributeSelector.addBooleanSelector(qs, "c", "included", included);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<ContractItem> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), ContractItem.class);
           query.setParameter("owner", owner);

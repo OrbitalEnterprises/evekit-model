@@ -178,6 +178,7 @@ public class CharacterSkillInTraining extends CachedData {
                                                            final SynchronizedEveAccount owner,
                                                            final long contid,
                                                            final int maxresults,
+                                                           final boolean reverse,
                                                            final AttributeSelector at,
                                                            final AttributeSelector skillInTraining,
                                                            final AttributeSelector currentTrainingQueueTime,
@@ -206,10 +207,14 @@ public class CharacterSkillInTraining extends CachedData {
           AttributeSelector.addIntSelector(qs, "c", "trainingDestinationSP", trainingDestinationSP);
           AttributeSelector.addIntSelector(qs, "c", "trainingToLevel", trainingToLevel);
           AttributeSelector.addIntSelector(qs, "c", "skillTypeID", skillTypeID);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<CharacterSkillInTraining> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(),
                                                                                                                              CharacterSkillInTraining.class);

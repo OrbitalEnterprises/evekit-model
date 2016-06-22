@@ -29,7 +29,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "typeIDIndex",
             columnList = "typeID",
             unique = false),
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "Implant.getByTypeID",
@@ -157,6 +157,7 @@ public class Implant extends CachedData {
                                           final SynchronizedEveAccount owner,
                                           final long contid,
                                           final int maxresults,
+                                          final boolean reverse,
                                           final AttributeSelector at,
                                           final AttributeSelector typeID,
                                           final AttributeSelector typeName) {
@@ -174,10 +175,14 @@ public class Implant extends CachedData {
           AttributeParameters p = new AttributeParameters("att");
           AttributeSelector.addIntSelector(qs, "c", "typeID", typeID);
           AttributeSelector.addStringSelector(qs, "c", "typeName", typeName, p);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<Implant> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), Implant.class);
           query.setParameter("owner", owner);

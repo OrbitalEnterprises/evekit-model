@@ -456,6 +456,7 @@ public class CharacterSheet extends CachedData {
                                                  final SynchronizedEveAccount owner,
                                                  final long contid,
                                                  final int maxresults,
+                                                 final boolean reverse,
                                                  final AttributeSelector at,
                                                  final AttributeSelector characterID,
                                                  final AttributeSelector name,
@@ -522,10 +523,14 @@ public class CharacterSheet extends CachedData {
           AttributeSelector.addIntSelector(qs, "c", "freeRespecs", freeRespecs);
           AttributeSelector.addIntSelector(qs, "c", "freeSkillPoints", freeSkillPoints);
           AttributeSelector.addLongSelector(qs, "c", "remoteStationDate", remoteStationDate);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<CharacterSheet> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), CharacterSheet.class);
           query.setParameter("owner", owner);

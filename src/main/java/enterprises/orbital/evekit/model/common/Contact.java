@@ -35,7 +35,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "contactIDIndex",
             columnList = "contactID",
             unique = false),
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "Contact.getByContactID",
@@ -301,6 +301,7 @@ public class Contact extends CachedData {
                                           final SynchronizedEveAccount owner,
                                           final long contid,
                                           final int maxresults,
+                                          final boolean reverse,
                                           final AttributeSelector at,
                                           final AttributeSelector list,
                                           final AttributeSelector contactID,
@@ -328,10 +329,14 @@ public class Contact extends CachedData {
           AttributeSelector.addIntSelector(qs, "c", "contactTypeID", contactTypeID);
           AttributeSelector.addBooleanSelector(qs, "c", "inWatchlist", inWatchlist);
           AttributeSelector.addLongSelector(qs, "c", "labelMask", labelMask);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<Contact> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), Contact.class);
           query.setParameter("owner", owner);

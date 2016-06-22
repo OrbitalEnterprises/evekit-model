@@ -35,7 +35,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "attackerCharacterIDIndex",
             columnList = "attackerCharacterID",
             unique = false),
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "KillAttacker.getByKillAndAttackerCharacterID",
@@ -317,6 +317,7 @@ public class KillAttacker extends CachedData {
                                                final SynchronizedEveAccount owner,
                                                final long contid,
                                                final int maxresults,
+                                               final boolean reverse,
                                                final AttributeSelector at,
                                                final AttributeSelector killID,
                                                final AttributeSelector attackerCharacterID,
@@ -358,10 +359,14 @@ public class KillAttacker extends CachedData {
           AttributeSelector.addIntSelector(qs, "c", "shipTypeID", shipTypeID);
           AttributeSelector.addIntSelector(qs, "c", "weaponTypeID", weaponTypeID);
           AttributeSelector.addBooleanSelector(qs, "c", "finalBlow", finalBlow);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<KillAttacker> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), KillAttacker.class);
           query.setParameter("owner", owner);

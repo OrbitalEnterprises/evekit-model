@@ -31,7 +31,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "eventIDIndex",
             columnList = "eventID",
             unique = false),
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "UpcomingCalendarEvent.getByEventID",
@@ -231,6 +231,7 @@ public class UpcomingCalendarEvent extends CachedData {
                                                         final SynchronizedEveAccount owner,
                                                         final long contid,
                                                         final int maxresults,
+                                                        final boolean reverse,
                                                         final AttributeSelector at,
                                                         final AttributeSelector duration,
                                                         final AttributeSelector eventDate,
@@ -262,10 +263,14 @@ public class UpcomingCalendarEvent extends CachedData {
           AttributeSelector.addStringSelector(qs, "c", "ownerName", ownerName, p);
           AttributeSelector.addStringSelector(qs, "c", "response", response, p);
           AttributeSelector.addBooleanSelector(qs, "c", "important", important);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<UpcomingCalendarEvent> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(),
                                                                                                                           UpcomingCalendarEvent.class);

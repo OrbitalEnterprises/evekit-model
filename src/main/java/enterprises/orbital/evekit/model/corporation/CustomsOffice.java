@@ -29,7 +29,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "itemIDIndex",
             columnList = "itemID",
             unique = false),
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "CustomsOffice.getByItemID",
@@ -275,6 +275,7 @@ public class CustomsOffice extends CachedData {
                                                 final SynchronizedEveAccount owner,
                                                 final long contid,
                                                 final int maxresults,
+                                                final boolean reverse,
                                                 final AttributeSelector at,
                                                 final AttributeSelector itemID,
                                                 final AttributeSelector solarSystemID,
@@ -316,10 +317,14 @@ public class CustomsOffice extends CachedData {
           AttributeSelector.addDoubleSelector(qs, "c", "taxRateStandingNeutral", taxRateStandingNeutral);
           AttributeSelector.addDoubleSelector(qs, "c", "taxRateStandingBad", taxRateStandingBad);
           AttributeSelector.addDoubleSelector(qs, "c", "taxRateStandingHorrible", taxRateStandingHorrible);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<CustomsOffice> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), CustomsOffice.class);
           query.setParameter("owner", owner);

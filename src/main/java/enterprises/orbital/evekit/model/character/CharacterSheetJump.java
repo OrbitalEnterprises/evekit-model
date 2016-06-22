@@ -135,6 +135,7 @@ public class CharacterSheetJump extends CachedData {
                                                      final SynchronizedEveAccount owner,
                                                      final long contid,
                                                      final int maxresults,
+                                                     final boolean reverse,
                                                      final AttributeSelector at,
                                                      final AttributeSelector jumpActivation,
                                                      final AttributeSelector jumpFatigue,
@@ -153,10 +154,14 @@ public class CharacterSheetJump extends CachedData {
           AttributeSelector.addLongSelector(qs, "c", "jumpActivation", jumpActivation);
           AttributeSelector.addLongSelector(qs, "c", "jumpFatigue", jumpFatigue);
           AttributeSelector.addLongSelector(qs, "c", "jumpLastUpdate", jumpLastUpdate);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<CharacterSheetJump> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), CharacterSheetJump.class);
           query.setParameter("owner", owner);

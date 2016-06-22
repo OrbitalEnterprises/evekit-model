@@ -29,7 +29,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "titleIDIndex",
             columnList = "titleID",
             unique = false),
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "CharacterTitle.getByTitleID",
@@ -159,6 +159,7 @@ public class CharacterTitle extends CachedData {
                                                  final SynchronizedEveAccount owner,
                                                  final long contid,
                                                  final int maxresults,
+                                                 final boolean reverse,
                                                  final AttributeSelector at,
                                                  final AttributeSelector titleID,
                                                  final AttributeSelector titleName) {
@@ -176,10 +177,14 @@ public class CharacterTitle extends CachedData {
           AttributeParameters p = new AttributeParameters("att");
           AttributeSelector.addLongSelector(qs, "c", "titleID", titleID);
           AttributeSelector.addStringSelector(qs, "c", "titleName", titleName, p);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<CharacterTitle> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), CharacterTitle.class);
           query.setParameter("owner", owner);

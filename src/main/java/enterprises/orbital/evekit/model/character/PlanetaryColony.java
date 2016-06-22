@@ -29,7 +29,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "planetIDIndex",
             columnList = "planetID",
             unique = false),
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "PlanetaryColony.getByPlanetID",
@@ -264,6 +264,7 @@ public class PlanetaryColony extends CachedData {
                                                   final SynchronizedEveAccount owner,
                                                   final long contid,
                                                   final int maxresults,
+                                                  final boolean reverse,
                                                   final AttributeSelector at,
                                                   final AttributeSelector planetID,
                                                   final AttributeSelector solarSystemID,
@@ -299,10 +300,14 @@ public class PlanetaryColony extends CachedData {
           AttributeSelector.addLongSelector(qs, "c", "lastUpdate", lastUpdate);
           AttributeSelector.addIntSelector(qs, "c", "upgradeLevel", upgradeLevel);
           AttributeSelector.addIntSelector(qs, "c", "numberOfPins", numberOfPins);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<PlanetaryColony> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), PlanetaryColony.class);
           query.setParameter("owner", owner);

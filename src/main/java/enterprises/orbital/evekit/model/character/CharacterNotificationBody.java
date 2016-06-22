@@ -35,7 +35,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "retrievedIndex",
             columnList = "retrieved",
             unique = false)
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "CharacterNotificationBody.getByNotificationID",
@@ -188,6 +188,7 @@ public class CharacterNotificationBody extends CachedData {
                                                             final SynchronizedEveAccount owner,
                                                             final long contid,
                                                             final int maxresults,
+                                                            final boolean reverse,
                                                             final AttributeSelector at,
                                                             final AttributeSelector notificationID,
                                                             final AttributeSelector retrieved,
@@ -209,10 +210,14 @@ public class CharacterNotificationBody extends CachedData {
           AttributeSelector.addBooleanSelector(qs, "c", "retrieved", retrieved);
           AttributeSelector.addStringSelector(qs, "c", "text", text, p);
           AttributeSelector.addBooleanSelector(qs, "c", "missing", missing);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<CharacterNotificationBody> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(),
                                                                                                                               CharacterNotificationBody.class);

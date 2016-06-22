@@ -28,7 +28,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "queuePositionIndex",
             columnList = "queuePosition",
             unique = false),
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "SkillInQueue.getByQueuePosition",
@@ -200,6 +200,7 @@ public class SkillInQueue extends CachedData {
                                                final SynchronizedEveAccount owner,
                                                final long contid,
                                                final int maxresults,
+                                               final boolean reverse,
                                                final AttributeSelector at,
                                                final AttributeSelector endSP,
                                                final AttributeSelector endTime,
@@ -226,10 +227,14 @@ public class SkillInQueue extends CachedData {
           AttributeSelector.addIntSelector(qs, "c", "startSP", startSP);
           AttributeSelector.addLongSelector(qs, "c", "startTime", startTime);
           AttributeSelector.addIntSelector(qs, "c", "typeID", typeID);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<SkillInQueue> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), SkillInQueue.class);
           query.setParameter("owner", owner);

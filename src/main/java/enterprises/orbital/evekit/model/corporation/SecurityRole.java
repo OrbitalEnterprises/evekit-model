@@ -29,7 +29,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "roleIDIndex",
             columnList = "roleID",
             unique = false),
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "SecurityRole.getByRoleID",
@@ -159,6 +159,7 @@ public class SecurityRole extends CachedData {
                                                final SynchronizedEveAccount owner,
                                                final long contid,
                                                final int maxresults,
+                                               final boolean reverse,
                                                final AttributeSelector at,
                                                final AttributeSelector roleID,
                                                final AttributeSelector roleName) {
@@ -176,10 +177,14 @@ public class SecurityRole extends CachedData {
           AttributeParameters p = new AttributeParameters("att");
           AttributeSelector.addLongSelector(qs, "c", "roleID", roleID);
           AttributeSelector.addStringSelector(qs, "c", "roleName", roleName, p);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<SecurityRole> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), SecurityRole.class);
           query.setParameter("owner", owner);

@@ -40,7 +40,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "orderStateIndex",
             columnList = "orderState",
             unique = false),
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "MarketOrder.getByOrderID",
@@ -412,6 +412,7 @@ public class MarketOrder extends CachedData {
                                               final SynchronizedEveAccount owner,
                                               final long contid,
                                               final int maxresults,
+                                              final boolean reverse,
                                               final AttributeSelector at,
                                               final AttributeSelector orderID,
                                               final AttributeSelector accountKey,
@@ -454,10 +455,14 @@ public class MarketOrder extends CachedData {
           AttributeSelector.addIntSelector(qs, "c", "typeID", typeID);
           AttributeSelector.addIntSelector(qs, "c", "volEntered", volEntered);
           AttributeSelector.addIntSelector(qs, "c", "volRemaining", volRemaining);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<MarketOrder> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), MarketOrder.class);
           query.setParameter("owner", owner);

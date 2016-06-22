@@ -33,7 +33,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "titleIDIndex",
             columnList = "titleID",
             unique = false),
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "CorporationTitle.getByTitleID",
@@ -267,6 +267,7 @@ public class CorporationTitle extends CachedData {
                                                    final SynchronizedEveAccount owner,
                                                    final long contid,
                                                    final int maxresults,
+                                                   final boolean reverse,
                                                    final AttributeSelector at,
                                                    final AttributeSelector titleID,
                                                    final AttributeSelector titleName,
@@ -300,10 +301,14 @@ public class CorporationTitle extends CachedData {
           AttributeSelector.addSetLongSelector(qs, "c", "rolesAtBase", rolesAtBase);
           AttributeSelector.addSetLongSelector(qs, "c", "rolesAtHQ", rolesAtHQ);
           AttributeSelector.addSetLongSelector(qs, "c", "rolesAtOther", rolesAtOther);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<CorporationTitle> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), CorporationTitle.class);
           query.setParameter("owner", owner);

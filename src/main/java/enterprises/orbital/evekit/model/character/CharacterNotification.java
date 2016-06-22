@@ -38,7 +38,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "msgReadIndex",
             columnList = "msgRead",
             unique = false),
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "CharacterNotification.getByNotificationID",
@@ -202,6 +202,7 @@ public class CharacterNotification extends CachedData {
                                                         final SynchronizedEveAccount owner,
                                                         final long contid,
                                                         final int maxresults,
+                                                        final boolean reverse,
                                                         final AttributeSelector at,
                                                         final AttributeSelector notificationID,
                                                         final AttributeSelector typeID,
@@ -224,10 +225,14 @@ public class CharacterNotification extends CachedData {
           AttributeSelector.addLongSelector(qs, "c", "senderID", senderID);
           AttributeSelector.addLongSelector(qs, "c", "sentDate", sentDate);
           AttributeSelector.addBooleanSelector(qs, "c", "msgRead", msgRead);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<CharacterNotification> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(),
                                                                                                                           CharacterNotification.class);

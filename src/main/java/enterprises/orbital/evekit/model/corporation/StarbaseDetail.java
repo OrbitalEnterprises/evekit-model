@@ -28,7 +28,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "itemIDIndex",
             columnList = "itemID",
             unique = false),
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "StarbaseDetail.getByItemID",
@@ -291,6 +291,7 @@ public class StarbaseDetail extends CachedData {
                                                  final SynchronizedEveAccount owner,
                                                  final long contid,
                                                  final int maxresults,
+                                                 final boolean reverse,
                                                  final AttributeSelector at,
                                                  final AttributeSelector itemID,
                                                  final AttributeSelector state,
@@ -337,10 +338,14 @@ public class StarbaseDetail extends CachedData {
           AttributeSelector.addIntSelector(qs, "c", "onStandingDropStanding", onStandingDropStanding);
           AttributeSelector.addBooleanSelector(qs, "c", "onStatusDropEnabled", onStatusDropEnabled);
           AttributeSelector.addIntSelector(qs, "c", "onStatusDropStanding", onStatusDropStanding);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<StarbaseDetail> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), StarbaseDetail.class);
           query.setParameter("owner", owner);

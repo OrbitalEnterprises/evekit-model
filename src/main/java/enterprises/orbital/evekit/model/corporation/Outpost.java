@@ -31,7 +31,7 @@ import enterprises.orbital.evekit.model.CachedData;
             name = "stationIDIndex",
             columnList = "stationID",
             unique = false),
-})
+    })
 @NamedQueries({
     @NamedQuery(
         name = "Outpost.getByStationID",
@@ -268,6 +268,7 @@ public class Outpost extends CachedData {
                                           final SynchronizedEveAccount owner,
                                           final long contid,
                                           final int maxresults,
+                                          final boolean reverse,
                                           final AttributeSelector at,
                                           final AttributeSelector stationID,
                                           final AttributeSelector ownerID,
@@ -307,10 +308,14 @@ public class Outpost extends CachedData {
           AttributeSelector.addLongSelector(qs, "c", "x", x);
           AttributeSelector.addLongSelector(qs, "c", "y", y);
           AttributeSelector.addLongSelector(qs, "c", "z", z);
-          // Set CID constraint
-          qs.append(" and c.cid > ").append(contid);
-          // Order by CID (asc)
-          qs.append(" order by cid asc");
+          // Set CID constraint and ordering
+          if (reverse) {
+            qs.append(" and c.cid < ").append(contid);
+            qs.append(" order by cid desc");
+          } else {
+            qs.append(" and c.cid > ").append(contid);
+            qs.append(" order by cid asc");
+          }
           // Return result
           TypedQuery<Outpost> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), Outpost.class);
           query.setParameter("owner", owner);
