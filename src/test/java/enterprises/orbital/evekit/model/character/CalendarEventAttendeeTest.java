@@ -12,10 +12,9 @@ import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AbstractModelTester;
 import enterprises.orbital.evekit.model.CachedData;
-import enterprises.orbital.evekit.model.character.CalendarEventAttendee;
 
 public class CalendarEventAttendeeTest extends AbstractModelTester<CalendarEventAttendee> {
-  final int                                              eventID       = TestBase.getRandomInt();
+  final long                                             eventID       = TestBase.getRandomInt();
   final long                                             characterID   = TestBase.getRandomLong();
   final String                                           characterName = "test character";
   final String                                           response      = "test response";
@@ -63,7 +62,9 @@ public class CalendarEventAttendeeTest extends AbstractModelTester<CalendarEvent
     runGetLifelineTest(eol, live, new ModelRetriever<CalendarEventAttendee>() {
 
       @Override
-      public CalendarEventAttendee getModel(SynchronizedEveAccount account, long time) {
+      public CalendarEventAttendee getModel(
+                                            SynchronizedEveAccount account,
+                                            long time) {
         return CalendarEventAttendee.get(account, time, eventID, characterID);
       }
 

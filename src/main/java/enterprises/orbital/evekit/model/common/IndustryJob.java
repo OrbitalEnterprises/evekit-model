@@ -65,12 +65,12 @@ public class IndustryJob extends CachedData {
   private long                installerID;
   private String              installerName;
   private long                facilityID;
-  private long                solarSystemID;
+  private int                 solarSystemID;
   private String              solarSystemName;
   private long                stationID;
-  private long                activityID;
+  private int                 activityID;
   private long                blueprintID;
-  private long                blueprintTypeID;
+  private int                 blueprintTypeID;
   private String              blueprintTypeName;
   private long                blueprintLocationID;
   private long                outputLocationID;
@@ -82,10 +82,10 @@ public class IndustryJob extends CachedData {
   private long                teamID;
   private int                 licensedRuns;
   private double              probability;
-  private long                productTypeID;
+  private int                 productTypeID;
   private String              productTypeName;
   private int                 status;
-  private long                timeInSeconds;
+  private int                 timeInSeconds;
   private long                startDate           = -1;
   private long                endDate             = -1;
   private long                pauseDate           = -1;
@@ -96,10 +96,10 @@ public class IndustryJob extends CachedData {
   @SuppressWarnings("unused")
   private IndustryJob() {}
 
-  public IndustryJob(long jobID, long installerID, String installerName, long facilityID, long solarSystemID, String solarSystemName, long stationID,
-                     long activityID, long blueprintID, long blueprintTypeID, String blueprintTypeName, long blueprintLocationID, long outputLocationID,
-                     int runs, BigDecimal cost, long teamID, int licensedRuns, double probability, long productTypeID, String productTypeName, int status,
-                     long timeInSeconds, long startDate, long endDate, long pauseDate, long completedDate, long completedCharacterID, int successfulRuns) {
+  public IndustryJob(long jobID, long installerID, String installerName, long facilityID, int solarSystemID, String solarSystemName, long stationID,
+                     int activityID, long blueprintID, int blueprintTypeID, String blueprintTypeName, long blueprintLocationID, long outputLocationID, int runs,
+                     BigDecimal cost, long teamID, int licensedRuns, double probability, int productTypeID, String productTypeName, int status,
+                     int timeInSeconds, long startDate, long endDate, long pauseDate, long completedDate, long completedCharacterID, int successfulRuns) {
     super();
     this.jobID = jobID;
     this.installerID = installerID;
@@ -174,7 +174,7 @@ public class IndustryJob extends CachedData {
     return facilityID;
   }
 
-  public long getSolarSystemID() {
+  public int getSolarSystemID() {
     return solarSystemID;
   }
 
@@ -186,7 +186,7 @@ public class IndustryJob extends CachedData {
     return stationID;
   }
 
-  public long getActivityID() {
+  public int getActivityID() {
     return activityID;
   }
 
@@ -194,7 +194,7 @@ public class IndustryJob extends CachedData {
     return blueprintID;
   }
 
-  public long getBlueprintTypeID() {
+  public int getBlueprintTypeID() {
     return blueprintTypeID;
   }
 
@@ -230,7 +230,7 @@ public class IndustryJob extends CachedData {
     return probability;
   }
 
-  public long getProductTypeID() {
+  public int getProductTypeID() {
     return productTypeID;
   }
 
@@ -242,7 +242,7 @@ public class IndustryJob extends CachedData {
     return status;
   }
 
-  public long getTimeInSeconds() {
+  public int getTimeInSeconds() {
     return timeInSeconds;
   }
 
@@ -274,10 +274,10 @@ public class IndustryJob extends CachedData {
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + (int) (activityID ^ (activityID >>> 32));
+    result = prime * result + activityID;
     result = prime * result + (int) (blueprintID ^ (blueprintID >>> 32));
     result = prime * result + (int) (blueprintLocationID ^ (blueprintLocationID >>> 32));
-    result = prime * result + (int) (blueprintTypeID ^ (blueprintTypeID >>> 32));
+    result = prime * result + blueprintTypeID;
     result = prime * result + ((blueprintTypeName == null) ? 0 : blueprintTypeName.hashCode());
     result = prime * result + (int) (completedCharacterID ^ (completedCharacterID >>> 32));
     result = prime * result + (int) (completedDate ^ (completedDate >>> 32));
@@ -293,17 +293,17 @@ public class IndustryJob extends CachedData {
     long temp;
     temp = Double.doubleToLongBits(probability);
     result = prime * result + (int) (temp ^ (temp >>> 32));
-    result = prime * result + (int) (productTypeID ^ (productTypeID >>> 32));
+    result = prime * result + productTypeID;
     result = prime * result + ((productTypeName == null) ? 0 : productTypeName.hashCode());
     result = prime * result + runs;
-    result = prime * result + (int) (solarSystemID ^ (solarSystemID >>> 32));
+    result = prime * result + solarSystemID;
     result = prime * result + ((solarSystemName == null) ? 0 : solarSystemName.hashCode());
     result = prime * result + (int) (startDate ^ (startDate >>> 32));
     result = prime * result + (int) (stationID ^ (stationID >>> 32));
     result = prime * result + status;
     result = prime * result + successfulRuns;
     result = prime * result + (int) (teamID ^ (teamID >>> 32));
-    result = prime * result + (int) (timeInSeconds ^ (timeInSeconds >>> 32));
+    result = prime * result + timeInSeconds;
     return result;
   }
 
@@ -571,12 +571,12 @@ public class IndustryJob extends CachedData {
           AttributeSelector.addLongSelector(qs, "c", "installerID", installerID);
           AttributeSelector.addStringSelector(qs, "c", "installerName", installerName, p);
           AttributeSelector.addLongSelector(qs, "c", "facilityID", facilityID);
-          AttributeSelector.addLongSelector(qs, "c", "solarSystemID", solarSystemID);
+          AttributeSelector.addIntSelector(qs, "c", "solarSystemID", solarSystemID);
           AttributeSelector.addStringSelector(qs, "c", "solarSystemName", solarSystemName, p);
           AttributeSelector.addLongSelector(qs, "c", "stationID", stationID);
-          AttributeSelector.addLongSelector(qs, "c", "activityID", activityID);
+          AttributeSelector.addIntSelector(qs, "c", "activityID", activityID);
           AttributeSelector.addLongSelector(qs, "c", "blueprintID", blueprintID);
-          AttributeSelector.addLongSelector(qs, "c", "blueprintTypeID", blueprintTypeID);
+          AttributeSelector.addIntSelector(qs, "c", "blueprintTypeID", blueprintTypeID);
           AttributeSelector.addStringSelector(qs, "c", "blueprintTypeName", blueprintTypeName, p);
           AttributeSelector.addLongSelector(qs, "c", "blueprintLocationID", blueprintLocationID);
           AttributeSelector.addLongSelector(qs, "c", "outputLocationID", outputLocationID);
@@ -585,10 +585,10 @@ public class IndustryJob extends CachedData {
           AttributeSelector.addLongSelector(qs, "c", "teamID", teamID);
           AttributeSelector.addIntSelector(qs, "c", "licensedRuns", licensedRuns);
           AttributeSelector.addDoubleSelector(qs, "c", "probability", probability);
-          AttributeSelector.addLongSelector(qs, "c", "productTypeID", productTypeID);
+          AttributeSelector.addIntSelector(qs, "c", "productTypeID", productTypeID);
           AttributeSelector.addStringSelector(qs, "c", "productTypeName", productTypeName, p);
           AttributeSelector.addIntSelector(qs, "c", "status", status);
-          AttributeSelector.addLongSelector(qs, "c", "timeInSeconds", timeInSeconds);
+          AttributeSelector.addIntSelector(qs, "c", "timeInSeconds", timeInSeconds);
           AttributeSelector.addLongSelector(qs, "c", "startDate", startDate);
           AttributeSelector.addLongSelector(qs, "c", "endDate", endDate);
           AttributeSelector.addLongSelector(qs, "c", "pauseDate", pauseDate);

@@ -52,14 +52,14 @@ public class ContractItem extends CachedData {
   private long                recordID;
   private int                 typeID;
   private long                quantity;
-  private int                 rawQuantity;
+  private long                rawQuantity;
   private boolean             singleton;
   private boolean             included;
 
   @SuppressWarnings("unused")
   private ContractItem() {}
 
-  public ContractItem(long contractID, long recordID, int typeID, long quantity, int rawQuantity, boolean singleton, boolean included) {
+  public ContractItem(long contractID, long recordID, int typeID, long quantity, long rawQuantity, boolean singleton, boolean included) {
     super();
     this.contractID = contractID;
     this.recordID = recordID;
@@ -106,7 +106,7 @@ public class ContractItem extends CachedData {
     return quantity;
   }
 
-  public int getRawQuantity() {
+  public long getRawQuantity() {
     return rawQuantity;
   }
 
@@ -125,7 +125,7 @@ public class ContractItem extends CachedData {
     result = prime * result + (int) (contractID ^ (contractID >>> 32));
     result = prime * result + (included ? 1231 : 1237);
     result = prime * result + (int) (quantity ^ (quantity >>> 32));
-    result = prime * result + rawQuantity;
+    result = prime * result + (int) (rawQuantity ^ (rawQuantity >>> 32));
     result = prime * result + (int) (recordID ^ (recordID >>> 32));
     result = prime * result + (singleton ? 1231 : 1237);
     result = prime * result + typeID;
@@ -267,7 +267,7 @@ public class ContractItem extends CachedData {
           AttributeSelector.addLongSelector(qs, "c", "recordID", recordID);
           AttributeSelector.addIntSelector(qs, "c", "typeID", typeID);
           AttributeSelector.addLongSelector(qs, "c", "quantity", quantity);
-          AttributeSelector.addIntSelector(qs, "c", "rawQuantity", rawQuantity);
+          AttributeSelector.addLongSelector(qs, "c", "rawQuantity", rawQuantity);
           AttributeSelector.addBooleanSelector(qs, "c", "singleton", singleton);
           AttributeSelector.addBooleanSelector(qs, "c", "included", included);
           // Set CID constraint and ordering

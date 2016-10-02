@@ -12,7 +12,6 @@ import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AbstractModelTester;
 import enterprises.orbital.evekit.model.CachedData;
-import enterprises.orbital.evekit.model.common.ContractItem;
 
 public class ContractItemTest extends AbstractModelTester<ContractItem> {
 
@@ -20,7 +19,7 @@ public class ContractItemTest extends AbstractModelTester<ContractItem> {
   final long                                    recordID    = TestBase.getRandomInt(100000000);
   final int                                     typeID      = TestBase.getRandomInt(100000000);
   final long                                    quantity    = TestBase.getRandomInt(100000000);
-  final int                                     rawQuantity = TestBase.getRandomInt(100000000);
+  final long                                    rawQuantity = TestBase.getRandomInt(100000000);
   final boolean                                 singleton   = true;
   final boolean                                 included    = false;
 
@@ -70,7 +69,9 @@ public class ContractItemTest extends AbstractModelTester<ContractItem> {
     runGetLifelineTest(eol, live, new ModelRetriever<ContractItem>() {
 
       @Override
-      public ContractItem getModel(SynchronizedEveAccount account, long time) {
+      public ContractItem getModel(
+                                   SynchronizedEveAccount account,
+                                   long time) {
         return ContractItem.get(account, time, contractID, recordID);
       }
 

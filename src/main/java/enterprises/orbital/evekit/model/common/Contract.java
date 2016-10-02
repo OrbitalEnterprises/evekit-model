@@ -59,8 +59,8 @@ public class Contract extends CachedData {
   private long                issuerCorpID;
   private long                assigneeID;
   private long                acceptorID;
-  private int                 startStationID;
-  private int                 endStationID;
+  private long                startStationID;
+  private long                endStationID;
   private String              type;
   private String              status;
   private String              title;
@@ -87,14 +87,14 @@ public class Contract extends CachedData {
       precision = 19,
       scale = 2)
   private BigDecimal          buyout;
-  private long                volume;
+  private double              volume;
 
   @SuppressWarnings("unused")
   private Contract() {}
 
-  public Contract(long contractID, long issuerID, long issuerCorpID, long assigneeID, long acceptorID, int startStationID, int endStationID, String type,
+  public Contract(long contractID, long issuerID, long issuerCorpID, long assigneeID, long acceptorID, long startStationID, long endStationID, String type,
                   String status, String title, boolean forCorp, String availability, long dateIssued, long dateExpired, long dateAccepted, int numDays,
-                  long dateCompleted, BigDecimal price, BigDecimal reward, BigDecimal collateral, BigDecimal buyout, long volume) {
+                  long dateCompleted, BigDecimal price, BigDecimal reward, BigDecimal collateral, BigDecimal buyout, double volume) {
     super();
     this.contractID = contractID;
     this.issuerID = issuerID;
@@ -165,11 +165,11 @@ public class Contract extends CachedData {
     return acceptorID;
   }
 
-  public int getStartStationID() {
+  public long getStartStationID() {
     return startStationID;
   }
 
-  public int getEndStationID() {
+  public long getEndStationID() {
     return endStationID;
   }
 
@@ -229,7 +229,7 @@ public class Contract extends CachedData {
     return buyout;
   }
 
-  public long getVolume() {
+  public double getVolume() {
     return volume;
   }
 
@@ -247,18 +247,20 @@ public class Contract extends CachedData {
     result = prime * result + (int) (dateCompleted ^ (dateCompleted >>> 32));
     result = prime * result + (int) (dateExpired ^ (dateExpired >>> 32));
     result = prime * result + (int) (dateIssued ^ (dateIssued >>> 32));
-    result = prime * result + endStationID;
+    result = prime * result + (int) (endStationID ^ (endStationID >>> 32));
     result = prime * result + (forCorp ? 1231 : 1237);
     result = prime * result + (int) (issuerCorpID ^ (issuerCorpID >>> 32));
     result = prime * result + (int) (issuerID ^ (issuerID >>> 32));
     result = prime * result + numDays;
     result = prime * result + ((price == null) ? 0 : price.hashCode());
     result = prime * result + ((reward == null) ? 0 : reward.hashCode());
-    result = prime * result + startStationID;
+    result = prime * result + (int) (startStationID ^ (startStationID >>> 32));
     result = prime * result + ((status == null) ? 0 : status.hashCode());
     result = prime * result + ((title == null) ? 0 : title.hashCode());
     result = prime * result + ((type == null) ? 0 : type.hashCode());
-    result = prime * result + (int) (volume ^ (volume >>> 32));
+    long temp;
+    temp = Double.doubleToLongBits(volume);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
     return result;
   }
 
@@ -306,7 +308,7 @@ public class Contract extends CachedData {
     if (type == null) {
       if (other.type != null) return false;
     } else if (!type.equals(other.type)) return false;
-    if (volume != other.volume) return false;
+    if (Double.doubleToLongBits(volume) != Double.doubleToLongBits(other.volume)) return false;
     return true;
   }
 
@@ -490,8 +492,8 @@ public class Contract extends CachedData {
           AttributeSelector.addLongSelector(qs, "c", "issuerCorpID", issuerCorpID);
           AttributeSelector.addLongSelector(qs, "c", "assigneeID", assigneeID);
           AttributeSelector.addLongSelector(qs, "c", "acceptorID", acceptorID);
-          AttributeSelector.addIntSelector(qs, "c", "startStationID", startStationID);
-          AttributeSelector.addIntSelector(qs, "c", "endStationID", endStationID);
+          AttributeSelector.addLongSelector(qs, "c", "startStationID", startStationID);
+          AttributeSelector.addLongSelector(qs, "c", "endStationID", endStationID);
           AttributeSelector.addStringSelector(qs, "c", "type", type, p);
           AttributeSelector.addStringSelector(qs, "c", "status", status, p);
           AttributeSelector.addStringSelector(qs, "c", "title", title, p);
@@ -506,7 +508,7 @@ public class Contract extends CachedData {
           AttributeSelector.addDoubleSelector(qs, "c", "reward", reward);
           AttributeSelector.addDoubleSelector(qs, "c", "collateral", collateral);
           AttributeSelector.addDoubleSelector(qs, "c", "buyout", buyout);
-          AttributeSelector.addLongSelector(qs, "c", "volume", volume);
+          AttributeSelector.addDoubleSelector(qs, "c", "volume", volume);
           // Set CID constraint and ordering
           if (reverse) {
             qs.append(" and c.cid < ").append(contid);

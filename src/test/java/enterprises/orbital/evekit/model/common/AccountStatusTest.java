@@ -9,14 +9,13 @@ import enterprises.orbital.evekit.TestBase;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AbstractModelTester;
-import enterprises.orbital.evekit.model.common.AccountStatus;
 
 public class AccountStatusTest extends AbstractModelTester<AccountStatus> {
 
   final long       paidUntil              = TestBase.getRandomInt(100000000);
   final long       createDate             = TestBase.getRandomInt(100000000);
-  final int        logonCount             = TestBase.getRandomInt(100000000);
-  final int        logonMinutes           = TestBase.getRandomInt(100000000);
+  final long       logonCount             = TestBase.getRandomInt(100000000);
+  final long       logonMinutes           = TestBase.getRandomInt(100000000);
   final List<Long> multiCharacterTraining = new ArrayList<Long>();
 
   public AccountStatusTest() {
@@ -77,7 +76,9 @@ public class AccountStatusTest extends AbstractModelTester<AccountStatus> {
     runGetLifelineTest(eol, live, new ModelRetriever<AccountStatus>() {
 
       @Override
-      public AccountStatus getModel(SynchronizedEveAccount account, long time) {
+      public AccountStatus getModel(
+                                    SynchronizedEveAccount account,
+                                    long time) {
         return AccountStatus.get(account, time);
       }
 

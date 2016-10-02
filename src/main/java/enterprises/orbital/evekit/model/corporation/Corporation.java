@@ -17,9 +17,12 @@ import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.CachedData;
 
 @Entity
-@Table(name = "evekit_data_corporation")
+@Table(
+    name = "evekit_data_corporation")
 @NamedQueries({
-    @NamedQuery(name = "Corporation.get", query = "SELECT c FROM Corporation c where c.owner = :owner"),
+    @NamedQuery(
+        name = "Corporation.get",
+        query = "SELECT c FROM Corporation c where c.owner = :owner"),
 })
 public class Corporation extends CachedData {
   private static final Logger log                        = Logger.getLogger(Corporation.class.getName());
@@ -44,6 +47,7 @@ public class Corporation extends CachedData {
   private long                industryJobsExpiry         = -1;
   private long                industryJobsHistoryExpiry  = -1;
   private long                killlogExpiry              = -1;
+  private long                locationsExpiry            = -1;
   private long                marketOrdersExpiry         = -1;
   private long                medalsExpiry               = -1;
   private long                memberMedalsExpiry         = -1;
@@ -64,7 +68,8 @@ public class Corporation extends CachedData {
     return corporationName;
   }
 
-  public void setCorporationName(String corporationName) {
+  public void setCorporationName(
+                                 String corporationName) {
     this.corporationName = corporationName;
   }
 
@@ -72,7 +77,8 @@ public class Corporation extends CachedData {
     return corporationID;
   }
 
-  public void setCorporationID(long corporationID) {
+  public void setCorporationID(
+                               long corporationID) {
     this.corporationID = corporationID;
   }
 
@@ -80,7 +86,8 @@ public class Corporation extends CachedData {
     return accountBalanceExpiry;
   }
 
-  public void setAccountBalanceExpiry(long accountBalanceExpiry) {
+  public void setAccountBalanceExpiry(
+                                      long accountBalanceExpiry) {
     this.accountBalanceExpiry = accountBalanceExpiry;
   }
 
@@ -88,7 +95,8 @@ public class Corporation extends CachedData {
     return assetListExpiry;
   }
 
-  public void setAssetListExpiry(long assetListExpiry) {
+  public void setAssetListExpiry(
+                                 long assetListExpiry) {
     this.assetListExpiry = assetListExpiry;
   }
 
@@ -96,7 +104,8 @@ public class Corporation extends CachedData {
     return contactListExpiry;
   }
 
-  public void setContactListExpiry(long contactListExpiry) {
+  public void setContactListExpiry(
+                                   long contactListExpiry) {
     this.contactListExpiry = contactListExpiry;
   }
 
@@ -104,7 +113,8 @@ public class Corporation extends CachedData {
     return containerLogExpiry;
   }
 
-  public void setContainerLogExpiry(long containerLogExpiry) {
+  public void setContainerLogExpiry(
+                                    long containerLogExpiry) {
     this.containerLogExpiry = containerLogExpiry;
   }
 
@@ -112,7 +122,8 @@ public class Corporation extends CachedData {
     return corporationSheetExpiry;
   }
 
-  public void setCorporationSheetExpiry(long corporationSheetExpiry) {
+  public void setCorporationSheetExpiry(
+                                        long corporationSheetExpiry) {
     this.corporationSheetExpiry = corporationSheetExpiry;
   }
 
@@ -120,7 +131,8 @@ public class Corporation extends CachedData {
     return customsOfficeExpiry;
   }
 
-  public void setCustomsOfficeExpiry(long customsOfficeExpiry) {
+  public void setCustomsOfficeExpiry(
+                                     long customsOfficeExpiry) {
     this.customsOfficeExpiry = customsOfficeExpiry;
   }
 
@@ -128,7 +140,8 @@ public class Corporation extends CachedData {
     return blueprintsExpiry;
   }
 
-  public void setBlueprintsExpiry(long blueprintsExpiry) {
+  public void setBlueprintsExpiry(
+                                  long blueprintsExpiry) {
     this.blueprintsExpiry = blueprintsExpiry;
   }
 
@@ -136,7 +149,8 @@ public class Corporation extends CachedData {
     return bookmarksExpiry;
   }
 
-  public void setBookmarksExpiry(long bookmarksExpiry) {
+  public void setBookmarksExpiry(
+                                 long bookmarksExpiry) {
     this.bookmarksExpiry = bookmarksExpiry;
   }
 
@@ -144,7 +158,8 @@ public class Corporation extends CachedData {
     return contractsExpiry;
   }
 
-  public void setContractsExpiry(long contractsExpiry) {
+  public void setContractsExpiry(
+                                 long contractsExpiry) {
     this.contractsExpiry = contractsExpiry;
   }
 
@@ -152,7 +167,8 @@ public class Corporation extends CachedData {
     return contractItemsExpiry;
   }
 
-  public void setContractItemsExpiry(long contractItemsExpiry) {
+  public void setContractItemsExpiry(
+                                     long contractItemsExpiry) {
     this.contractItemsExpiry = contractItemsExpiry;
   }
 
@@ -160,7 +176,8 @@ public class Corporation extends CachedData {
     return contractBidsExpiry;
   }
 
-  public void setContractBidsExpiry(long contractBidsExpiry) {
+  public void setContractBidsExpiry(
+                                    long contractBidsExpiry) {
     this.contractBidsExpiry = contractBidsExpiry;
   }
 
@@ -168,7 +185,8 @@ public class Corporation extends CachedData {
     return facilitiesExpiry;
   }
 
-  public void setFacilitiesExpiry(long facilitiesExpiry) {
+  public void setFacilitiesExpiry(
+                                  long facilitiesExpiry) {
     this.facilitiesExpiry = facilitiesExpiry;
   }
 
@@ -176,7 +194,8 @@ public class Corporation extends CachedData {
     return facWarStatsExpiry;
   }
 
-  public void setFacWarStatsExpiry(long facWarStatsExpiry) {
+  public void setFacWarStatsExpiry(
+                                   long facWarStatsExpiry) {
     this.facWarStatsExpiry = facWarStatsExpiry;
   }
 
@@ -184,7 +203,8 @@ public class Corporation extends CachedData {
     return industryJobsExpiry;
   }
 
-  public void setIndustryJobsExpiry(long industryJobsExpiry) {
+  public void setIndustryJobsExpiry(
+                                    long industryJobsExpiry) {
     this.industryJobsExpiry = industryJobsExpiry;
   }
 
@@ -192,7 +212,8 @@ public class Corporation extends CachedData {
     return industryJobsHistoryExpiry;
   }
 
-  public void setIndustryJobsHistoryExpiry(long industryJobsHistoryExpiry) {
+  public void setIndustryJobsHistoryExpiry(
+                                           long industryJobsHistoryExpiry) {
     this.industryJobsHistoryExpiry = industryJobsHistoryExpiry;
   }
 
@@ -200,15 +221,26 @@ public class Corporation extends CachedData {
     return killlogExpiry;
   }
 
-  public void setKilllogExpiry(long killlogExpiry) {
+  public void setKilllogExpiry(
+                               long killlogExpiry) {
     this.killlogExpiry = killlogExpiry;
+  }
+
+  public long getLocationsExpiry() {
+    return locationsExpiry;
+  }
+
+  public void setLocationsExpiry(
+                                 long locationsExpiry) {
+    this.locationsExpiry = locationsExpiry;
   }
 
   public long getMarketOrdersExpiry() {
     return marketOrdersExpiry;
   }
 
-  public void setMarketOrdersExpiry(long marketOrdersExpiry) {
+  public void setMarketOrdersExpiry(
+                                    long marketOrdersExpiry) {
     this.marketOrdersExpiry = marketOrdersExpiry;
   }
 
@@ -216,7 +248,8 @@ public class Corporation extends CachedData {
     return medalsExpiry;
   }
 
-  public void setMedalsExpiry(long medalsExpiry) {
+  public void setMedalsExpiry(
+                              long medalsExpiry) {
     this.medalsExpiry = medalsExpiry;
   }
 
@@ -224,7 +257,8 @@ public class Corporation extends CachedData {
     return memberMedalsExpiry;
   }
 
-  public void setMemberMedalsExpiry(long memberMedalsExpiry) {
+  public void setMemberMedalsExpiry(
+                                    long memberMedalsExpiry) {
     this.memberMedalsExpiry = memberMedalsExpiry;
   }
 
@@ -232,7 +266,8 @@ public class Corporation extends CachedData {
     return memberSecurityExpiry;
   }
 
-  public void setMemberSecurityExpiry(long memberSecurityExpiry) {
+  public void setMemberSecurityExpiry(
+                                      long memberSecurityExpiry) {
     this.memberSecurityExpiry = memberSecurityExpiry;
   }
 
@@ -240,7 +275,8 @@ public class Corporation extends CachedData {
     return memberSecurityLogExpiry;
   }
 
-  public void setMemberSecurityLogExpiry(long memberSecurityLogExpiry) {
+  public void setMemberSecurityLogExpiry(
+                                         long memberSecurityLogExpiry) {
     this.memberSecurityLogExpiry = memberSecurityLogExpiry;
   }
 
@@ -248,7 +284,8 @@ public class Corporation extends CachedData {
     return memberTrackingExpiry;
   }
 
-  public void setMemberTrackingExpiry(long memberTrackingExpiry) {
+  public void setMemberTrackingExpiry(
+                                      long memberTrackingExpiry) {
     this.memberTrackingExpiry = memberTrackingExpiry;
   }
 
@@ -256,7 +293,8 @@ public class Corporation extends CachedData {
     return outpostListExpiry;
   }
 
-  public void setOutpostListExpiry(long outpostListExpiry) {
+  public void setOutpostListExpiry(
+                                   long outpostListExpiry) {
     this.outpostListExpiry = outpostListExpiry;
   }
 
@@ -264,7 +302,8 @@ public class Corporation extends CachedData {
     return outpostServiceDetailExpiry;
   }
 
-  public void setOutpostServiceDetailExpiry(long outpostServiceDetailExpiry) {
+  public void setOutpostServiceDetailExpiry(
+                                            long outpostServiceDetailExpiry) {
     this.outpostServiceDetailExpiry = outpostServiceDetailExpiry;
   }
 
@@ -272,7 +311,8 @@ public class Corporation extends CachedData {
     return shareholdersExpiry;
   }
 
-  public void setShareholdersExpiry(long shareholdersExpiry) {
+  public void setShareholdersExpiry(
+                                    long shareholdersExpiry) {
     this.shareholdersExpiry = shareholdersExpiry;
   }
 
@@ -280,7 +320,8 @@ public class Corporation extends CachedData {
     return standingsExpiry;
   }
 
-  public void setStandingsExpiry(long standingsExpiry) {
+  public void setStandingsExpiry(
+                                 long standingsExpiry) {
     this.standingsExpiry = standingsExpiry;
   }
 
@@ -288,7 +329,8 @@ public class Corporation extends CachedData {
     return starbaseDetailExpiry;
   }
 
-  public void setStarbaseDetailExpiry(long starbaseDetailExpiry) {
+  public void setStarbaseDetailExpiry(
+                                      long starbaseDetailExpiry) {
     this.starbaseDetailExpiry = starbaseDetailExpiry;
   }
 
@@ -296,7 +338,8 @@ public class Corporation extends CachedData {
     return starbaseListExpiry;
   }
 
-  public void setStarbaseListExpiry(long starbaseListExpiry) {
+  public void setStarbaseListExpiry(
+                                    long starbaseListExpiry) {
     this.starbaseListExpiry = starbaseListExpiry;
   }
 
@@ -304,7 +347,8 @@ public class Corporation extends CachedData {
     return titlesExpiry;
   }
 
-  public void setTitlesExpiry(long titlesExpiry) {
+  public void setTitlesExpiry(
+                              long titlesExpiry) {
     this.titlesExpiry = titlesExpiry;
   }
 
@@ -312,7 +356,8 @@ public class Corporation extends CachedData {
     return walletJournalExpiry;
   }
 
-  public void setWalletJournalExpiry(long walletJournalExpiry) {
+  public void setWalletJournalExpiry(
+                                     long walletJournalExpiry) {
     this.walletJournalExpiry = walletJournalExpiry;
   }
 
@@ -320,7 +365,8 @@ public class Corporation extends CachedData {
     return walletTransactionsExpiry;
   }
 
-  public void setWalletTransactionsExpiry(long walletTransactionsExpiry) {
+  public void setWalletTransactionsExpiry(
+                                          long walletTransactionsExpiry) {
     this.walletTransactionsExpiry = walletTransactionsExpiry;
   }
 
@@ -346,6 +392,7 @@ public class Corporation extends CachedData {
     result = prime * result + (int) (industryJobsExpiry ^ (industryJobsExpiry >>> 32));
     result = prime * result + (int) (industryJobsHistoryExpiry ^ (industryJobsHistoryExpiry >>> 32));
     result = prime * result + (int) (killlogExpiry ^ (killlogExpiry >>> 32));
+    result = prime * result + (int) (locationsExpiry ^ (locationsExpiry >>> 32));
     result = prime * result + (int) (marketOrdersExpiry ^ (marketOrdersExpiry >>> 32));
     result = prime * result + (int) (medalsExpiry ^ (medalsExpiry >>> 32));
     result = prime * result + (int) (memberMedalsExpiry ^ (memberMedalsExpiry >>> 32));
@@ -365,7 +412,8 @@ public class Corporation extends CachedData {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(
+                        Object obj) {
     if (this == obj) return true;
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
@@ -390,6 +438,7 @@ public class Corporation extends CachedData {
     if (industryJobsExpiry != other.industryJobsExpiry) return false;
     if (industryJobsHistoryExpiry != other.industryJobsHistoryExpiry) return false;
     if (killlogExpiry != other.killlogExpiry) return false;
+    if (locationsExpiry != other.locationsExpiry) return false;
     if (marketOrdersExpiry != other.marketOrdersExpiry) return false;
     if (medalsExpiry != other.medalsExpiry) return false;
     if (memberMedalsExpiry != other.memberMedalsExpiry) return false;
@@ -416,19 +465,20 @@ public class Corporation extends CachedData {
         + ", contractsExpiry=" + contractsExpiry + ", contractItemsExpiry=" + contractItemsExpiry + ", contractBidsExpiry=" + contractBidsExpiry
         + ", customsOfficeExpiry=" + customsOfficeExpiry + ", facilitiesExpiry=" + facilitiesExpiry + ", facWarStatsExpiry=" + facWarStatsExpiry
         + ", industryJobsExpiry=" + industryJobsExpiry + ", industryJobsHistoryExpiry=" + industryJobsHistoryExpiry + ", killlogExpiry=" + killlogExpiry
-        + ", marketOrdersExpiry=" + marketOrdersExpiry + ", medalsExpiry=" + medalsExpiry + ", memberMedalsExpiry=" + memberMedalsExpiry
-        + ", memberSecurityExpiry=" + memberSecurityExpiry + ", memberSecurityLogExpiry=" + memberSecurityLogExpiry + ", memberTrackingExpiry="
-        + memberTrackingExpiry + ", outpostListExpiry=" + outpostListExpiry + ", outpostServiceDetailExpiry=" + outpostServiceDetailExpiry
-        + ", shareholdersExpiry=" + shareholdersExpiry + ", standingsExpiry=" + standingsExpiry + ", starbaseDetailExpiry=" + starbaseDetailExpiry
-        + ", starbaseListExpiry=" + starbaseListExpiry + ", titlesExpiry=" + titlesExpiry + ", walletJournalExpiry=" + walletJournalExpiry
-        + ", walletTransactionsExpiry=" + walletTransactionsExpiry + ", owner=" + owner + ", lifeStart=" + lifeStart + ", lifeEnd=" + lifeEnd + "]";
+        + ", locationsExpiry=" + locationsExpiry + ", marketOrdersExpiry=" + marketOrdersExpiry + ", medalsExpiry=" + medalsExpiry + ", memberMedalsExpiry="
+        + memberMedalsExpiry + ", memberSecurityExpiry=" + memberSecurityExpiry + ", memberSecurityLogExpiry=" + memberSecurityLogExpiry
+        + ", memberTrackingExpiry=" + memberTrackingExpiry + ", outpostListExpiry=" + outpostListExpiry + ", outpostServiceDetailExpiry="
+        + outpostServiceDetailExpiry + ", shareholdersExpiry=" + shareholdersExpiry + ", standingsExpiry=" + standingsExpiry + ", starbaseDetailExpiry="
+        + starbaseDetailExpiry + ", starbaseListExpiry=" + starbaseListExpiry + ", titlesExpiry=" + titlesExpiry + ", walletJournalExpiry="
+        + walletJournalExpiry + ", walletTransactionsExpiry=" + walletTransactionsExpiry + "]";
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public boolean equivalent(CachedData sup) {
+  public boolean equivalent(
+                            CachedData sup) {
     throw new UnsupportedOperationException();
   }
 
@@ -440,7 +490,8 @@ public class Corporation extends CachedData {
     return null;
   }
 
-  public static Corporation getCorporation(final SynchronizedEveAccount parent) {
+  public static Corporation getCorporation(
+                                           final SynchronizedEveAccount parent) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<Corporation>() {
         @Override
@@ -460,7 +511,8 @@ public class Corporation extends CachedData {
     return null;
   }
 
-  public static Corporation getOrCreateCorporation(final SynchronizedEveAccount owner) {
+  public static Corporation getOrCreateCorporation(
+                                                   final SynchronizedEveAccount owner) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<Corporation>() {
         @Override

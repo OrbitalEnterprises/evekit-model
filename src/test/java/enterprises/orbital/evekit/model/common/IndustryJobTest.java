@@ -13,7 +13,6 @@ import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AbstractModelTester;
 import enterprises.orbital.evekit.model.CachedData;
-import enterprises.orbital.evekit.model.common.IndustryJob;
 
 public class IndustryJobTest extends AbstractModelTester<IndustryJob> {
 
@@ -21,12 +20,12 @@ public class IndustryJobTest extends AbstractModelTester<IndustryJob> {
   private final long                           installerID          = TestBase.getRandomInt(100000000);
   private final String                         installerName        = "test installer name";
   private final long                           facilityID           = TestBase.getRandomInt(100000000);
-  private final long                           solarSystemID        = TestBase.getRandomInt(100000000);
+  private final int                            solarSystemID        = TestBase.getRandomInt(100000000);
   private final String                         solarSystemName      = "test solar system name";
   private final long                           stationID            = TestBase.getRandomInt(100000000);
-  private final long                           activityID           = TestBase.getRandomInt(100000000);
+  private final int                            activityID           = TestBase.getRandomInt(100000000);
   private final long                           blueprintID          = TestBase.getRandomInt(100000000);
-  private final long                           blueprintTypeID      = TestBase.getRandomInt(100000000);
+  private final int                            blueprintTypeID      = TestBase.getRandomInt(100000000);
   private final String                         blueprintTypeName    = "test blueprint type name";
   private final long                           blueprintLocationID  = TestBase.getRandomInt(100000000);
   private final long                           outputLocationID     = TestBase.getRandomInt(100000000);
@@ -35,10 +34,10 @@ public class IndustryJobTest extends AbstractModelTester<IndustryJob> {
   private final long                           teamID               = TestBase.getRandomInt(100000000);
   private final int                            licensedRuns         = TestBase.getRandomInt(100000000);
   private final double                         probability          = TestBase.getRandomDouble(1000);
-  private final long                           productTypeID        = TestBase.getRandomInt(100000000);
+  private final int                            productTypeID        = TestBase.getRandomInt(100000000);
   private final String                         productTypeName      = "test product type name";
   private final int                            status               = TestBase.getRandomInt(100000000);
-  private final long                           timeInSeconds        = TestBase.getRandomInt(100000000);
+  private final int                            timeInSeconds        = TestBase.getRandomInt(100000000);
   private final long                           startDate            = TestBase.getRandomInt(100000000);
   private final long                           endDate              = TestBase.getRandomInt(100000000);
   private final long                           pauseDate            = TestBase.getRandomInt(100000000);
@@ -205,7 +204,9 @@ public class IndustryJobTest extends AbstractModelTester<IndustryJob> {
     runGetLifelineTest(eol, live, new ModelRetriever<IndustryJob>() {
 
       @Override
-      public IndustryJob getModel(SynchronizedEveAccount account, long time) {
+      public IndustryJob getModel(
+                                  SynchronizedEveAccount account,
+                                  long time) {
         return IndustryJob.get(account, time, jobID);
       }
 

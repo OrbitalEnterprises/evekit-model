@@ -21,13 +21,13 @@ public class ContainerLogTest extends AbstractModelTester<ContainerLog> {
   final String                                  actorName        = "test actor name";
   final int                                     flag             = TestBase.getRandomInt(100000000);
   final long                                    itemID           = TestBase.getRandomInt(100000000);
-  final long                                    itemTypeID       = TestBase.getRandomInt(100000000);
-  final int                                     locationID       = TestBase.getRandomInt(100000000);
+  final int                                     itemTypeID       = TestBase.getRandomInt(100000000);
+  final long                                    locationID       = TestBase.getRandomInt(100000000);
   final String                                  newConfiguration = "new test config";
   final String                                  oldConfiguration = "old test config";
   final String                                  passwordType     = "test password type";
-  final int                                     quantity         = TestBase.getRandomInt(100000000);
-  final long                                    typeID           = TestBase.getRandomInt(100000000);
+  final long                                    quantity         = TestBase.getRandomInt(100000000);
+  final int                                     typeID           = TestBase.getRandomInt(100000000);
 
   final ClassUnderTestConstructor<ContainerLog> eol              = new ClassUnderTestConstructor<ContainerLog>() {
 
@@ -109,7 +109,9 @@ public class ContainerLogTest extends AbstractModelTester<ContainerLog> {
     runGetLifelineTest(eol, live, new ModelRetriever<ContainerLog>() {
 
       @Override
-      public ContainerLog getModel(SynchronizedEveAccount account, long time) {
+      public ContainerLog getModel(
+                                   SynchronizedEveAccount account,
+                                   long time) {
         return ContainerLog.get(account, time, logTime);
       }
 

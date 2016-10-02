@@ -73,12 +73,17 @@ public class WalletTransaction extends CachedData {
   private String              transactionType;
   private String              transactionFor;
   private long                journalTransactionID;
+  private int                 clientTypeID;
+  private long                characterID;
+  private String              characterName;
 
   @SuppressWarnings("unused")
   private WalletTransaction() {}
 
   public WalletTransaction(int accountKey, long transactionID, long date, int quantity, String typeName, int typeID, BigDecimal price, long clientID,
-                           String clientName, int stationID, String stationName, String transactionType, String transactionFor, long journalTransactionID) {
+                           String clientName, int stationID, String stationName, String transactionType, String transactionFor, long journalTransactionID,
+                           int clientTypeID, long characterID, String characterName) {
+    super();
     this.accountKey = accountKey;
     this.transactionID = transactionID;
     this.date = date;
@@ -93,6 +98,9 @@ public class WalletTransaction extends CachedData {
     this.transactionType = transactionType;
     this.transactionFor = transactionFor;
     this.journalTransactionID = journalTransactionID;
+    this.clientTypeID = clientTypeID;
+    this.characterID = characterID;
+    this.characterName = characterName;
   }
 
   /**
@@ -108,7 +116,8 @@ public class WalletTransaction extends CachedData {
         && nullSafeObjectCompare(typeName, other.typeName) && typeID == other.typeID && nullSafeObjectCompare(price, other.price) && clientID == other.clientID
         && nullSafeObjectCompare(clientName, other.clientName) && stationID == other.stationID && nullSafeObjectCompare(stationName, other.stationName)
         && nullSafeObjectCompare(transactionType, other.transactionType) && nullSafeObjectCompare(transactionFor, other.transactionFor)
-        && journalTransactionID == other.journalTransactionID;
+        && journalTransactionID == other.journalTransactionID && clientTypeID == other.clientTypeID && characterID == other.characterID
+        && nullSafeObjectCompare(characterName, other.characterName);
   }
 
   /**
@@ -175,13 +184,28 @@ public class WalletTransaction extends CachedData {
     return journalTransactionID;
   }
 
+  public int getClientTypeID() {
+    return clientTypeID;
+  }
+
+  public long getCharacterID() {
+    return characterID;
+  }
+
+  public String getCharacterName() {
+    return characterName;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
     result = prime * result + accountKey;
+    result = prime * result + (int) (characterID ^ (characterID >>> 32));
+    result = prime * result + ((characterName == null) ? 0 : characterName.hashCode());
     result = prime * result + (int) (clientID ^ (clientID >>> 32));
     result = prime * result + ((clientName == null) ? 0 : clientName.hashCode());
+    result = prime * result + clientTypeID;
     result = prime * result + (int) (date ^ (date >>> 32));
     result = prime * result + (int) (journalTransactionID ^ (journalTransactionID >>> 32));
     result = prime * result + ((price == null) ? 0 : price.hashCode());
@@ -204,10 +228,15 @@ public class WalletTransaction extends CachedData {
     if (getClass() != obj.getClass()) return false;
     WalletTransaction other = (WalletTransaction) obj;
     if (accountKey != other.accountKey) return false;
+    if (characterID != other.characterID) return false;
+    if (characterName == null) {
+      if (other.characterName != null) return false;
+    } else if (!characterName.equals(other.characterName)) return false;
     if (clientID != other.clientID) return false;
     if (clientName == null) {
       if (other.clientName != null) return false;
     } else if (!clientName.equals(other.clientName)) return false;
+    if (clientTypeID != other.clientTypeID) return false;
     if (date != other.date) return false;
     if (journalTransactionID != other.journalTransactionID) return false;
     if (price == null) {
@@ -237,7 +266,7 @@ public class WalletTransaction extends CachedData {
     return "WalletTransaction [accountKey=" + accountKey + ", transactionID=" + transactionID + ", date=" + date + ", quantity=" + quantity + ", typeName="
         + typeName + ", typeID=" + typeID + ", price=" + price + ", clientID=" + clientID + ", clientName=" + clientName + ", stationID=" + stationID
         + ", stationName=" + stationName + ", transactionType=" + transactionType + ", transactionFor=" + transactionFor + ", journalTransactionID="
-        + journalTransactionID + ", owner=" + owner + ", lifeStart=" + lifeStart + ", lifeEnd=" + lifeEnd + "]";
+        + journalTransactionID + ", clientTypeID=" + clientTypeID + ", characterID=" + characterID + ", characterName=" + characterName + "]";
   }
 
   /**
@@ -421,7 +450,10 @@ public class WalletTransaction extends CachedData {
                                                     final AttributeSelector stationName,
                                                     final AttributeSelector transactionType,
                                                     final AttributeSelector transactionFor,
-                                                    final AttributeSelector journalTransactionID) {
+                                                    final AttributeSelector journalTransactionID,
+                                                    final AttributeSelector clientTypeID,
+                                                    final AttributeSelector characterID,
+                                                    final AttributeSelector characterName) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<WalletTransaction>>() {
         @Override
@@ -448,6 +480,9 @@ public class WalletTransaction extends CachedData {
           AttributeSelector.addStringSelector(qs, "c", "transactionType", transactionType, p);
           AttributeSelector.addStringSelector(qs, "c", "transactionFor", transactionFor, p);
           AttributeSelector.addLongSelector(qs, "c", "journalTransactionID", journalTransactionID);
+          AttributeSelector.addIntSelector(qs, "c", "clientTypeID", clientTypeID);
+          AttributeSelector.addLongSelector(qs, "c", "characterID", characterID);
+          AttributeSelector.addStringSelector(qs, "c", "characterName", characterName, p);
           // Set CID constraint and ordering
           if (reverse) {
             qs.append(" and c.cid < ").append(contid);

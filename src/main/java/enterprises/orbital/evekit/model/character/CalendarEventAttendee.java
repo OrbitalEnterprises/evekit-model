@@ -46,7 +46,7 @@ import enterprises.orbital.evekit.model.CachedData;
 public class CalendarEventAttendee extends CachedData {
   private static final Logger log  = Logger.getLogger(CalendarEventAttendee.class.getName());
   private static final byte[] MASK = AccountAccessMask.createMask(AccountAccessMask.ACCESS_CALENDAR_EVENT_ATTENDEES);
-  private int                 eventID;
+  private long                eventID;
   private long                characterID;
   private String              characterName;
   private String              response;
@@ -54,7 +54,7 @@ public class CalendarEventAttendee extends CachedData {
   @SuppressWarnings("unused")
   private CalendarEventAttendee() {}
 
-  public CalendarEventAttendee(int eventID, long characterID, String characterName, String response) {
+  public CalendarEventAttendee(long eventID, long characterID, String characterName, String response) {
     this.eventID = eventID;
     this.characterID = characterID;
     this.characterName = characterName;
@@ -81,7 +81,7 @@ public class CalendarEventAttendee extends CachedData {
     return MASK;
   }
 
-  public int getEventID() {
+  public long getEventID() {
     return eventID;
   }
 
@@ -103,7 +103,7 @@ public class CalendarEventAttendee extends CachedData {
     int result = super.hashCode();
     result = prime * result + (int) (characterID ^ (characterID >>> 32));
     result = prime * result + ((characterName == null) ? 0 : characterName.hashCode());
-    result = prime * result + eventID;
+    result = prime * result + (int) (eventID ^ (eventID >>> 32));
     result = prime * result + ((response == null) ? 0 : response.hashCode());
     return result;
   }
@@ -148,7 +148,7 @@ public class CalendarEventAttendee extends CachedData {
   public static CalendarEventAttendee get(
                                           final SynchronizedEveAccount owner,
                                           final long time,
-                                          final int eID,
+                                          final long eID,
                                           final long cID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<CalendarEventAttendee>() {
@@ -187,7 +187,7 @@ public class CalendarEventAttendee extends CachedData {
   public static List<CalendarEventAttendee> getByEventID(
                                                          final SynchronizedEveAccount owner,
                                                          final long time,
-                                                         final int eID) {
+                                                         final long eID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<CalendarEventAttendee>>() {
         @Override
@@ -228,7 +228,7 @@ public class CalendarEventAttendee extends CachedData {
           AttributeSelector.addLifelineSelector(qs, "c", at);
           // Constrain attributes
           AttributeParameters p = new AttributeParameters("att");
-          AttributeSelector.addIntSelector(qs, "c", "eventID", eventID);
+          AttributeSelector.addLongSelector(qs, "c", "eventID", eventID);
           AttributeSelector.addLongSelector(qs, "c", "characterID", characterID);
           AttributeSelector.addStringSelector(qs, "c", "characterName", characterName, p);
           AttributeSelector.addStringSelector(qs, "c", "response", response, p);

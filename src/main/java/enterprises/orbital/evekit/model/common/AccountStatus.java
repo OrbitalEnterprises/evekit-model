@@ -38,8 +38,8 @@ public class AccountStatus extends CachedData {
   private static final byte[] MASK                   = AccountAccessMask.createMask(AccountAccessMask.ACCESS_ACCOUNT_STATUS);
   private long                paidUntil;
   private long                createDate;
-  private int                 logonCount;
-  private int                 logonMinutes;
+  private long                logonCount;
+  private long                logonMinutes;
   @ElementCollection(
       fetch = FetchType.EAGER)
   private List<Long>          multiCharacterTraining = new ArrayList<Long>();
@@ -47,7 +47,7 @@ public class AccountStatus extends CachedData {
   @SuppressWarnings("unused")
   private AccountStatus() {}
 
-  public AccountStatus(long paidUntil, long createDate, int logonCount, int logonMinutes) {
+  public AccountStatus(long paidUntil, long createDate, long logonCount, long logonMinutes) {
     this.paidUntil = paidUntil;
     this.createDate = createDate;
     this.logonCount = logonCount;
@@ -89,11 +89,11 @@ public class AccountStatus extends CachedData {
     return createDate;
   }
 
-  public int getLogonCount() {
+  public long getLogonCount() {
     return logonCount;
   }
 
-  public int getLogonMinutes() {
+  public long getLogonMinutes() {
     return logonMinutes;
   }
 
@@ -106,8 +106,8 @@ public class AccountStatus extends CachedData {
     final int prime = 31;
     int result = super.hashCode();
     result = prime * result + (int) (createDate ^ (createDate >>> 32));
-    result = prime * result + logonCount;
-    result = prime * result + logonMinutes;
+    result = prime * result + (int) (logonCount ^ (logonCount >>> 32));
+    result = prime * result + (int) (logonMinutes ^ (logonMinutes >>> 32));
     result = prime * result + ((multiCharacterTraining == null) ? 0 : multiCharacterTraining.hashCode());
     result = prime * result + (int) (paidUntil ^ (paidUntil >>> 32));
     return result;
@@ -193,8 +193,8 @@ public class AccountStatus extends CachedData {
           // Constrain attributes
           AttributeSelector.addLongSelector(qs, "c", "paidUntil", paidUntil);
           AttributeSelector.addLongSelector(qs, "c", "createDate", createDate);
-          AttributeSelector.addIntSelector(qs, "c", "logonCount", logonCount);
-          AttributeSelector.addIntSelector(qs, "c", "logonMinutes", logonMinutes);
+          AttributeSelector.addLongSelector(qs, "c", "logonCount", logonCount);
+          AttributeSelector.addLongSelector(qs, "c", "logonMinutes", logonMinutes);
           AttributeSelector.addSetLongSelector(qs, "c", "multiCharacterTraining", multiCharacterTraining);
           // Set CID constraint and ordering
           if (reverse) {

@@ -18,10 +18,10 @@ public class AssetTest extends AbstractModelTester<Asset> {
   final long                             itemID      = TestBase.getRandomInt(100000000);
   final long                             locationID  = TestBase.getRandomInt(100000000);
   final int                              typeID      = TestBase.getRandomInt(100000000);
-  final int                              quantity    = TestBase.getRandomInt(100000000);
+  final long                             quantity    = TestBase.getRandomInt(100000000);
   final int                              flag        = TestBase.getRandomInt(100000000);
   final boolean                          singleton   = false;
-  final int                              rawQuantity = TestBase.getRandomInt(100000000);
+  final long                             rawQuantity = TestBase.getRandomInt(100000000);
   final long                             container   = TestBase.getRandomInt(100000000);
 
   final ClassUnderTestConstructor<Asset> eol         = new ClassUnderTestConstructor<Asset>() {
@@ -69,7 +69,9 @@ public class AssetTest extends AbstractModelTester<Asset> {
     runGetLifelineTest(eol, live, new ModelRetriever<Asset>() {
 
       @Override
-      public Asset getModel(SynchronizedEveAccount account, long time) {
+      public Asset getModel(
+                            SynchronizedEveAccount account,
+                            long time) {
         return Asset.get(account, time, itemID);
       }
 

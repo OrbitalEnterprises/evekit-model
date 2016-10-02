@@ -55,6 +55,7 @@ public class Capsuleer extends CachedData {
   private long                industryJobsExpiry           = -1;
   private long                industryJobsHistoryExpiry    = -1;
   private long                killlogExpiry                = -1;
+  private long                locationsExpiry              = -1;
   private long                mailBodiesExpiry             = -1;
   private long                mailingListsExpiry           = -1;
   private long                mailMessagesExpiry           = -1;
@@ -252,6 +253,15 @@ public class Capsuleer extends CachedData {
     this.killlogExpiry = killlogExpiry;
   }
 
+  public long getLocationsExpiry() {
+    return locationsExpiry;
+  }
+
+  public void setLocationsExpiry(
+                                 long locationsExpiry) {
+    this.locationsExpiry = locationsExpiry;
+  }
+
   public long getMailBodiesExpiry() {
     return mailBodiesExpiry;
   }
@@ -419,6 +429,7 @@ public class Capsuleer extends CachedData {
     result = prime * result + (int) (industryJobsExpiry ^ (industryJobsExpiry >>> 32));
     result = prime * result + (int) (industryJobsHistoryExpiry ^ (industryJobsHistoryExpiry >>> 32));
     result = prime * result + (int) (killlogExpiry ^ (killlogExpiry >>> 32));
+    result = prime * result + (int) (locationsExpiry ^ (locationsExpiry >>> 32));
     result = prime * result + (int) (mailBodiesExpiry ^ (mailBodiesExpiry >>> 32));
     result = prime * result + (int) (mailMessagesExpiry ^ (mailMessagesExpiry >>> 32));
     result = prime * result + (int) (mailingListsExpiry ^ (mailingListsExpiry >>> 32));
@@ -426,10 +437,12 @@ public class Capsuleer extends CachedData {
     result = prime * result + (int) (medalsExpiry ^ (medalsExpiry >>> 32));
     result = prime * result + (int) (notificationTextsExpiry ^ (notificationTextsExpiry >>> 32));
     result = prime * result + (int) (notificationsExpiry ^ (notificationsExpiry >>> 32));
+    result = prime * result + (int) (partialCharacterSheetExpiry ^ (partialCharacterSheetExpiry >>> 32));
     result = prime * result + (int) (planetaryColoniesExpiry ^ (planetaryColoniesExpiry >>> 32));
     result = prime * result + (int) (researchExpiry ^ (researchExpiry >>> 32));
     result = prime * result + (int) (skillInTrainingExpiry ^ (skillInTrainingExpiry >>> 32));
     result = prime * result + (int) (skillQueueExpiry ^ (skillQueueExpiry >>> 32));
+    result = prime * result + (int) (skillsExpiry ^ (skillsExpiry >>> 32));
     result = prime * result + (int) (standingsExpiry ^ (standingsExpiry >>> 32));
     result = prime * result + (int) (upcomingCalendarEventsExpiry ^ (upcomingCalendarEventsExpiry >>> 32));
     result = prime * result + (int) (walletJournalExpiry ^ (walletJournalExpiry >>> 32));
@@ -465,6 +478,7 @@ public class Capsuleer extends CachedData {
     if (industryJobsExpiry != other.industryJobsExpiry) return false;
     if (industryJobsHistoryExpiry != other.industryJobsHistoryExpiry) return false;
     if (killlogExpiry != other.killlogExpiry) return false;
+    if (locationsExpiry != other.locationsExpiry) return false;
     if (mailBodiesExpiry != other.mailBodiesExpiry) return false;
     if (mailMessagesExpiry != other.mailMessagesExpiry) return false;
     if (mailingListsExpiry != other.mailingListsExpiry) return false;
@@ -472,10 +486,12 @@ public class Capsuleer extends CachedData {
     if (medalsExpiry != other.medalsExpiry) return false;
     if (notificationTextsExpiry != other.notificationTextsExpiry) return false;
     if (notificationsExpiry != other.notificationsExpiry) return false;
+    if (partialCharacterSheetExpiry != other.partialCharacterSheetExpiry) return false;
     if (planetaryColoniesExpiry != other.planetaryColoniesExpiry) return false;
     if (researchExpiry != other.researchExpiry) return false;
     if (skillInTrainingExpiry != other.skillInTrainingExpiry) return false;
     if (skillQueueExpiry != other.skillQueueExpiry) return false;
+    if (skillsExpiry != other.skillsExpiry) return false;
     if (standingsExpiry != other.standingsExpiry) return false;
     if (upcomingCalendarEventsExpiry != other.upcomingCalendarEventsExpiry) return false;
     if (walletJournalExpiry != other.walletJournalExpiry) return false;
@@ -487,16 +503,17 @@ public class Capsuleer extends CachedData {
   public String toString() {
     return "Capsuleer [characterName=" + characterName + ", characterID=" + characterID + ", accountStatusExpiry=" + accountStatusExpiry
         + ", accountBalanceExpiry=" + accountBalanceExpiry + ", assetListExpiry=" + assetListExpiry + ", calendarEventAttendeesExpiry="
-        + calendarEventAttendeesExpiry + ", characterSheetExpiry=" + characterSheetExpiry + ", chatChannelsExpiry=" + chatChannelsExpiry
-        + ", contactListExpiry=" + contactListExpiry + ", contactNotificationsExpiry=" + contactNotificationsExpiry + ", blueprintsExpiry=" + blueprintsExpiry
-        + ", bookmarksExpiry=" + bookmarksExpiry + ", contractsExpiry=" + contractsExpiry + ", contractItemsExpiry=" + contractItemsExpiry
-        + ", contractBidsExpiry=" + contractBidsExpiry + ", facWarStatsExpiry=" + facWarStatsExpiry + ", industryJobsExpiry=" + industryJobsExpiry
-        + ", industryJobsHistoryExpiry=" + industryJobsHistoryExpiry + ", killlogExpiry=" + killlogExpiry + ", mailBodiesExpiry=" + mailBodiesExpiry
-        + ", mailingListsExpiry=" + mailingListsExpiry + ", mailMessagesExpiry=" + mailMessagesExpiry + ", marketOrdersExpiry=" + marketOrdersExpiry
-        + ", medalsExpiry=" + medalsExpiry + ", notificationsExpiry=" + notificationsExpiry + ", notificationTextsExpiry=" + notificationTextsExpiry
-        + ", planetaryColoniesExpiry=" + planetaryColoniesExpiry + ", researchExpiry=" + researchExpiry + ", skillInTrainingExpiry=" + skillInTrainingExpiry
-        + ", skillQueueExpiry=" + skillQueueExpiry + ", standingsExpiry=" + standingsExpiry + ", upcomingCalendarEventsExpiry=" + upcomingCalendarEventsExpiry
-        + ", walletJournalExpiry=" + walletJournalExpiry + ", walletTransactionsExpiry=" + walletTransactionsExpiry + "]";
+        + calendarEventAttendeesExpiry + ", characterSheetExpiry=" + characterSheetExpiry + ", partialCharacterSheetExpiry=" + partialCharacterSheetExpiry
+        + ", chatChannelsExpiry=" + chatChannelsExpiry + ", contactListExpiry=" + contactListExpiry + ", contactNotificationsExpiry="
+        + contactNotificationsExpiry + ", blueprintsExpiry=" + blueprintsExpiry + ", bookmarksExpiry=" + bookmarksExpiry + ", contractsExpiry="
+        + contractsExpiry + ", contractItemsExpiry=" + contractItemsExpiry + ", contractBidsExpiry=" + contractBidsExpiry + ", facWarStatsExpiry="
+        + facWarStatsExpiry + ", industryJobsExpiry=" + industryJobsExpiry + ", industryJobsHistoryExpiry=" + industryJobsHistoryExpiry + ", killlogExpiry="
+        + killlogExpiry + ", locationsExpiry=" + locationsExpiry + ", mailBodiesExpiry=" + mailBodiesExpiry + ", mailingListsExpiry=" + mailingListsExpiry
+        + ", mailMessagesExpiry=" + mailMessagesExpiry + ", marketOrdersExpiry=" + marketOrdersExpiry + ", medalsExpiry=" + medalsExpiry
+        + ", notificationsExpiry=" + notificationsExpiry + ", notificationTextsExpiry=" + notificationTextsExpiry + ", planetaryColoniesExpiry="
+        + planetaryColoniesExpiry + ", researchExpiry=" + researchExpiry + ", skillInTrainingExpiry=" + skillInTrainingExpiry + ", skillQueueExpiry="
+        + skillQueueExpiry + ", skillsExpiry=" + skillsExpiry + ", standingsExpiry=" + standingsExpiry + ", upcomingCalendarEventsExpiry="
+        + upcomingCalendarEventsExpiry + ", walletJournalExpiry=" + walletJournalExpiry + ", walletTransactionsExpiry=" + walletTransactionsExpiry + "]";
   }
 
   /**
