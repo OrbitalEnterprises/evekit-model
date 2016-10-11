@@ -13,7 +13,6 @@ import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AbstractModelTester;
 import enterprises.orbital.evekit.model.CachedData;
-import enterprises.orbital.evekit.model.common.WalletJournal;
 
 public class WalletJournalTest extends AbstractModelTester<WalletJournal> {
 
@@ -119,8 +118,10 @@ public class WalletJournalTest extends AbstractModelTester<WalletJournal> {
     runGetLifelineTest(eol, live, new ModelRetriever<WalletJournal>() {
 
       @Override
-      public WalletJournal getModel(SynchronizedEveAccount account, long time) {
-        return WalletJournal.get(account, time, refID);
+      public WalletJournal getModel(
+                                    SynchronizedEveAccount account,
+                                    long time) {
+        return WalletJournal.get(account, time, accountKey, refID);
       }
 
     });
