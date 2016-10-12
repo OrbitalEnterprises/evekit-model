@@ -32,7 +32,7 @@ public class CharacterSheetTest extends AbstractModelTester<CharacterSheet> {
   final long                                      lastRespecDate    = TestBase.getRandomInt(100000000);
   final long                                      lastTimedRespec   = TestBase.getRandomInt(100000000);
   final int                                       freeRespecs       = TestBase.getRandomInt(100000000);
-  final int                                       freeSkillPoints   = TestBase.getRandomInt(100000000);
+  final long                                      freeSkillPoints   = TestBase.getRandomInt(100000000);
   final long                                      remoteStationDate = TestBase.getRandomInt(100000000);
 
   final ClassUnderTestConstructor<CharacterSheet> eol               = new ClassUnderTestConstructor<CharacterSheet>() {

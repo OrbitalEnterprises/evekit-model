@@ -69,7 +69,7 @@ public class CharacterSheet extends CachedData {
   private long                  lastRespecDate    = -1;
   private long                  lastTimedRespec   = -1;
   private int                   freeRespecs;
-  private int                   freeSkillPoints;
+  private long                  freeSkillPoints;
   private long                  remoteStationDate = -1;
 
   @SuppressWarnings("unused")
@@ -78,7 +78,7 @@ public class CharacterSheet extends CachedData {
   public CharacterSheet(long characterID, String name, long corporationID, String corporationName, String race, long doB, int bloodlineID, String bloodline,
                         int ancestryID, String ancestry, String gender, String allianceName, long allianceID, String factionName, long factionID,
                         int intelligence, int memory, int charisma, int perception, int willpower, long homeStationID, long lastRespecDate,
-                        long lastTimedRespec, int freeRespecs, int freeSkillPoints, long remoteStationDate) {
+                        long lastTimedRespec, int freeRespecs, long freeSkillPoints, long remoteStationDate) {
     super();
     this.characterID = characterID;
     this.name = name;
@@ -256,7 +256,7 @@ public class CharacterSheet extends CachedData {
     return freeRespecs;
   }
 
-  public int getFreeSkillPoints() {
+  public long getFreeSkillPoints() {
     return freeSkillPoints;
   }
 
@@ -351,7 +351,7 @@ public class CharacterSheet extends CachedData {
     result = prime * result + (int) (factionID ^ (factionID >>> 32));
     result = prime * result + ((factionName == null) ? 0 : factionName.hashCode());
     result = prime * result + freeRespecs;
-    result = prime * result + freeSkillPoints;
+    result = prime * result + (int) (freeSkillPoints ^ (freeSkillPoints >>> 32));
     result = prime * result + ((gender == null) ? 0 : gender.hashCode());
     result = prime * result + (int) (homeStationID ^ (homeStationID >>> 32));
     result = prime * result + intelligence;
@@ -521,7 +521,7 @@ public class CharacterSheet extends CachedData {
           AttributeSelector.addLongSelector(qs, "c", "lastRespecDate", lastRespecDate);
           AttributeSelector.addLongSelector(qs, "c", "lastTimedRespec", lastTimedRespec);
           AttributeSelector.addIntSelector(qs, "c", "freeRespecs", freeRespecs);
-          AttributeSelector.addIntSelector(qs, "c", "freeSkillPoints", freeSkillPoints);
+          AttributeSelector.addLongSelector(qs, "c", "freeSkillPoints", freeSkillPoints);
           AttributeSelector.addLongSelector(qs, "c", "remoteStationDate", remoteStationDate);
           // Set CID constraint and ordering
           if (reverse) {

@@ -43,7 +43,7 @@ public class Starbase extends CachedData {
   private static final Logger log             = Logger.getLogger(Starbase.class.getName());
   private static final byte[] MASK            = AccountAccessMask.createMask(AccountAccessMask.ACCESS_STARBASE_LIST);
   private long                itemID;
-  private int                 locationID;
+  private long                locationID;
   private int                 moonID;
   private long                onlineTimestamp = -1;
   private int                 state;
@@ -54,7 +54,7 @@ public class Starbase extends CachedData {
   @SuppressWarnings("unused")
   private Starbase() {}
 
-  public Starbase(long itemID, int locationID, int moonID, long onlineTimestamp, int state, long stateTimestamp, int typeID, long standingOwnerID) {
+  public Starbase(long itemID, long locationID, int moonID, long onlineTimestamp, int state, long stateTimestamp, int typeID, long standingOwnerID) {
     super();
     this.itemID = itemID;
     this.locationID = locationID;
@@ -90,7 +90,7 @@ public class Starbase extends CachedData {
     return itemID;
   }
 
-  public int getLocationID() {
+  public long getLocationID() {
     return locationID;
   }
 
@@ -123,7 +123,7 @@ public class Starbase extends CachedData {
     final int prime = 31;
     int result = super.hashCode();
     result = prime * result + (int) (itemID ^ (itemID >>> 32));
-    result = prime * result + locationID;
+    result = prime * result + (int) (locationID ^ (locationID >>> 32));
     result = prime * result + moonID;
     result = prime * result + (int) (onlineTimestamp ^ (onlineTimestamp >>> 32));
     result = prime * result + (int) (standingOwnerID ^ (standingOwnerID >>> 32));
@@ -228,7 +228,7 @@ public class Starbase extends CachedData {
           AttributeSelector.addLifelineSelector(qs, "c", at);
           // Constrain attributes
           AttributeSelector.addLongSelector(qs, "c", "itemID", itemID);
-          AttributeSelector.addIntSelector(qs, "c", "locationID", locationID);
+          AttributeSelector.addLongSelector(qs, "c", "locationID", locationID);
           AttributeSelector.addIntSelector(qs, "c", "moonID", moonID);
           AttributeSelector.addLongSelector(qs, "c", "onlineTimestamp", onlineTimestamp);
           AttributeSelector.addIntSelector(qs, "c", "state", state);

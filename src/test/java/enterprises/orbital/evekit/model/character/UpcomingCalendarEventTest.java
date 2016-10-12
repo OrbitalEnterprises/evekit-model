@@ -12,12 +12,11 @@ import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AbstractModelTester;
 import enterprises.orbital.evekit.model.CachedData;
-import enterprises.orbital.evekit.model.character.UpcomingCalendarEvent;
 
 public class UpcomingCalendarEventTest extends AbstractModelTester<UpcomingCalendarEvent> {
   final int                                              duration   = TestBase.getRandomInt(100000000);
   final long                                             eventDate  = TestBase.getRandomInt(100000000);
-  final int                                              eventID    = TestBase.getRandomInt(100000000);
+  final long                                             eventID    = TestBase.getRandomInt(100000000);
   final String                                           eventText  = "test event text";
   final String                                           eventTitle = "test event title";
   final long                                             ownerID    = TestBase.getRandomInt(100000000);
@@ -76,7 +75,9 @@ public class UpcomingCalendarEventTest extends AbstractModelTester<UpcomingCalen
     runGetLifelineTest(eol, live, new ModelRetriever<UpcomingCalendarEvent>() {
 
       @Override
-      public UpcomingCalendarEvent getModel(SynchronizedEveAccount account, long time) {
+      public UpcomingCalendarEvent getModel(
+                                            SynchronizedEveAccount account,
+                                            long time) {
         return UpcomingCalendarEvent.get(account, time, eventID);
       }
 
@@ -89,7 +90,7 @@ public class UpcomingCalendarEventTest extends AbstractModelTester<UpcomingCalen
     // - events for a different account
     // - events not live at the given time
     UpcomingCalendarEvent existing;
-    Map<Integer, UpcomingCalendarEvent> listCheck = new HashMap<Integer, UpcomingCalendarEvent>();
+    Map<Long, UpcomingCalendarEvent> listCheck = new HashMap<Long, UpcomingCalendarEvent>();
 
     existing = new UpcomingCalendarEvent(duration, eventDate, eventID, eventText, eventTitle, ownerID, ownerName, response, important);
     existing.setup(testAccount, 7777L);
@@ -120,7 +121,7 @@ public class UpcomingCalendarEventTest extends AbstractModelTester<UpcomingCalen
     List<UpcomingCalendarEvent> result = UpcomingCalendarEvent.getAllUpcomingCalendarEvents(testAccount, 8888L);
     Assert.assertEquals(listCheck.size(), result.size());
     for (UpcomingCalendarEvent next : result) {
-      int eventID = next.getEventID();
+      long eventID = next.getEventID();
       Assert.assertTrue(listCheck.containsKey(eventID));
       Assert.assertEquals(listCheck.get(eventID), next);
     }

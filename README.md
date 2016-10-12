@@ -1,2 +1,2 @@
 # evekit-model
-(ALPHA) Rebooted EveKit Synchronized Data Model
+EveKit Synchronized Data Model

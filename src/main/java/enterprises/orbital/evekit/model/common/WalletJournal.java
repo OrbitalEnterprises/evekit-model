@@ -44,8 +44,8 @@ import enterprises.orbital.evekit.model.CachedData;
     })
 @NamedQueries({
     @NamedQuery(
-        name = "WalletJournal.getByRefID",
-        query = "SELECT c FROM WalletJournal c where c.owner = :owner and c.refID = :refid and c.lifeStart <= :point and c.lifeEnd > :point"),
+        name = "WalletJournal.getByRefIDAndAccountKey",
+        query = "SELECT c FROM WalletJournal c where c.owner = :owner and c.accountKey = :accountkey and c.refID = :refid and c.lifeStart <= :point and c.lifeEnd > :point"),
     @NamedQuery(
         name = "WalletJournal.getAllForward",
         query = "SELECT c FROM WalletJournal c where c.owner = :owner and c.date > :contid and c.lifeStart <= :point and c.lifeEnd > :point order by c.date asc"),
@@ -271,6 +271,8 @@ public class WalletJournal extends CachedData {
    *          journal entry owner
    * @param time
    *          time at which journal entry must be live
+   * @param accountKey
+   *          key of account in which journal entry is recorded
    * @param refID
    *          journal entry refID
    * @return an existing journal entry, or null if a live entry with the given attributes can not be found
@@ -278,14 +280,16 @@ public class WalletJournal extends CachedData {
   public static WalletJournal get(
                                   final SynchronizedEveAccount owner,
                                   final long time,
+                                  final int accountKey,
                                   final long refID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<WalletJournal>() {
         @Override
         public WalletJournal run() throws Exception {
-          TypedQuery<WalletJournal> getter = EveKitUserAccountProvider.getFactory().getEntityManager().createNamedQuery("WalletJournal.getByRefID",
+          TypedQuery<WalletJournal> getter = EveKitUserAccountProvider.getFactory().getEntityManager().createNamedQuery("WalletJournal.getByRefIDAndAccountKey",
                                                                                                                         WalletJournal.class);
           getter.setParameter("owner", owner);
+          getter.setParameter("accountkey", accountKey);
           getter.setParameter("refid", refID);
           getter.setParameter("point", time);
           try {

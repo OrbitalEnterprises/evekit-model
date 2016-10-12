@@ -47,7 +47,7 @@ public class Outpost extends CachedData {
   private long                stationID;
   private long                ownerID;
   private String              stationName;
-  private long                solarSystemID;
+  private int                 solarSystemID;
   @Column(
       precision = 19,
       scale = 2)
@@ -67,7 +67,7 @@ public class Outpost extends CachedData {
   @SuppressWarnings("unused")
   private Outpost() {}
 
-  public Outpost(long stationID, long ownerID, String stationName, long solarSystemID, BigDecimal dockingCostPerShipVolume, BigDecimal officeRentalCost,
+  public Outpost(long stationID, long ownerID, String stationName, int solarSystemID, BigDecimal dockingCostPerShipVolume, BigDecimal officeRentalCost,
                  int stationTypeID, double reprocessingEfficiency, double reprocessingStationTake, long standingOwnerID, long x, long y, long z) {
     super();
     this.stationID = stationID;
@@ -120,7 +120,7 @@ public class Outpost extends CachedData {
     return stationName;
   }
 
-  public long getSolarSystemID() {
+  public int getSolarSystemID() {
     return solarSystemID;
   }
 
@@ -172,7 +172,7 @@ public class Outpost extends CachedData {
     result = prime * result + (int) (temp ^ (temp >>> 32));
     temp = Double.doubleToLongBits(reprocessingStationTake);
     result = prime * result + (int) (temp ^ (temp >>> 32));
-    result = prime * result + (int) (solarSystemID ^ (solarSystemID >>> 32));
+    result = prime * result + solarSystemID;
     result = prime * result + (int) (standingOwnerID ^ (standingOwnerID >>> 32));
     result = prime * result + (int) (stationID ^ (stationID >>> 32));
     result = prime * result + ((stationName == null) ? 0 : stationName.hashCode());
@@ -298,7 +298,7 @@ public class Outpost extends CachedData {
           AttributeSelector.addLongSelector(qs, "c", "stationID", stationID);
           AttributeSelector.addLongSelector(qs, "c", "ownerID", ownerID);
           AttributeSelector.addStringSelector(qs, "c", "stationName", stationName, p);
-          AttributeSelector.addLongSelector(qs, "c", "solarSystemID", solarSystemID);
+          AttributeSelector.addIntSelector(qs, "c", "solarSystemID", solarSystemID);
           AttributeSelector.addDoubleSelector(qs, "c", "dockingCostPerShipVolume", dockingCostPerShipVolume);
           AttributeSelector.addDoubleSelector(qs, "c", "officeRentalCost", officeRentalCost);
           AttributeSelector.addIntSelector(qs, "c", "stationTypeID", stationTypeID);

@@ -16,7 +16,7 @@ import enterprises.orbital.evekit.model.CachedData;
 public class StarbaseTest extends AbstractModelTester<Starbase> {
 
   final long                                itemID          = TestBase.getRandomInt(100000000);
-  final int                                 locationID      = TestBase.getRandomInt(100000000);
+  final long                                locationID      = TestBase.getRandomInt(100000000);
   final int                                 moonID          = TestBase.getRandomInt(100000000);
   final long                                onlineTimestamp = TestBase.getRandomInt(100000000);
   final int                                 state           = TestBase.getRandomInt(100000000);
@@ -73,7 +73,9 @@ public class StarbaseTest extends AbstractModelTester<Starbase> {
     runGetLifelineTest(eol, live, new ModelRetriever<Starbase>() {
 
       @Override
-      public Starbase getModel(SynchronizedEveAccount account, long time) {
+      public Starbase getModel(
+                               SynchronizedEveAccount account,
+                               long time) {
         return Starbase.get(account, time, itemID);
       }
 

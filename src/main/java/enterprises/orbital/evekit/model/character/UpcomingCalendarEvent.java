@@ -46,7 +46,7 @@ public class UpcomingCalendarEvent extends CachedData {
   private static final byte[] MASK      = AccountAccessMask.createMask(AccountAccessMask.ACCESS_UPCOMING_CALENDAR_EVENTS);
   private int                 duration;
   private long                eventDate = -1;
-  private int                 eventID;
+  private long                eventID;
   @Lob
   @Column(
       length = 102400)
@@ -60,7 +60,7 @@ public class UpcomingCalendarEvent extends CachedData {
   @SuppressWarnings("unused")
   private UpcomingCalendarEvent() {}
 
-  public UpcomingCalendarEvent(int duration, long eventDate, int eventID, String eventText, String eventTitle, long ownerID, String ownerName, String response,
+  public UpcomingCalendarEvent(int duration, long eventDate, long eventID, String eventText, String eventTitle, long ownerID, String ownerName, String response,
                                boolean important) {
     super();
     this.duration = duration;
@@ -103,7 +103,7 @@ public class UpcomingCalendarEvent extends CachedData {
     return eventDate;
   }
 
-  public int getEventID() {
+  public long getEventID() {
     return eventID;
   }
 
@@ -137,7 +137,7 @@ public class UpcomingCalendarEvent extends CachedData {
     int result = super.hashCode();
     result = prime * result + duration;
     result = prime * result + (int) (eventDate ^ (eventDate >>> 32));
-    result = prime * result + eventID;
+    result = prime * result + (int) (eventID ^ (eventID >>> 32));
     result = prime * result + ((eventText == null) ? 0 : eventText.hashCode());
     result = prime * result + ((eventTitle == null) ? 0 : eventTitle.hashCode());
     result = prime * result + (important ? 1231 : 1237);
@@ -184,7 +184,7 @@ public class UpcomingCalendarEvent extends CachedData {
   public static UpcomingCalendarEvent get(
                                           final SynchronizedEveAccount owner,
                                           final long time,
-                                          final int eventID) {
+                                          final long eventID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<UpcomingCalendarEvent>() {
         @Override
@@ -256,7 +256,7 @@ public class UpcomingCalendarEvent extends CachedData {
           AttributeParameters p = new AttributeParameters("att");
           AttributeSelector.addIntSelector(qs, "c", "duration", duration);
           AttributeSelector.addLongSelector(qs, "c", "eventDate", eventDate);
-          AttributeSelector.addIntSelector(qs, "c", "eventID", eventID);
+          AttributeSelector.addLongSelector(qs, "c", "eventID", eventID);
           AttributeSelector.addStringSelector(qs, "c", "eventText", eventText, p);
           AttributeSelector.addStringSelector(qs, "c", "eventTitle", eventTitle, p);
           AttributeSelector.addLongSelector(qs, "c", "ownerID", ownerID);

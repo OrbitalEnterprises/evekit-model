@@ -54,19 +54,19 @@ public class ContainerLog extends CachedData {
   private String              actorName;
   private int                 flag;
   private long                itemID;
-  private long                itemTypeID;
-  private int                 locationID;
+  private int                 itemTypeID;
+  private long                locationID;
   private String              newConfiguration;
   private String              oldConfiguration;
   private String              passwordType;
-  private int                 quantity;
-  private long                typeID;
+  private long                quantity;
+  private int                 typeID;
 
   @SuppressWarnings("unused")
   private ContainerLog() {}
 
-  public ContainerLog(long logTime, String action, long actorID, String actorName, int flag, long itemID, long itemTypeID, int locationID,
-                      String newConfiguration, String oldConfiguration, String passwordType, int quantity, long typeID) {
+  public ContainerLog(long logTime, String action, long actorID, String actorName, int flag, long itemID, int itemTypeID, long locationID,
+                      String newConfiguration, String oldConfiguration, String passwordType, long quantity, int typeID) {
     super();
     this.logTime = logTime;
     this.action = action;
@@ -129,11 +129,11 @@ public class ContainerLog extends CachedData {
     return itemID;
   }
 
-  public long getItemTypeID() {
+  public int getItemTypeID() {
     return itemTypeID;
   }
 
-  public int getLocationID() {
+  public long getLocationID() {
     return locationID;
   }
 
@@ -149,11 +149,11 @@ public class ContainerLog extends CachedData {
     return passwordType;
   }
 
-  public int getQuantity() {
+  public long getQuantity() {
     return quantity;
   }
 
-  public long getTypeID() {
+  public int getTypeID() {
     return typeID;
   }
 
@@ -166,14 +166,14 @@ public class ContainerLog extends CachedData {
     result = prime * result + ((actorName == null) ? 0 : actorName.hashCode());
     result = prime * result + flag;
     result = prime * result + (int) (itemID ^ (itemID >>> 32));
-    result = prime * result + (int) (itemTypeID ^ (itemTypeID >>> 32));
-    result = prime * result + locationID;
+    result = prime * result + itemTypeID;
+    result = prime * result + (int) (locationID ^ (locationID >>> 32));
     result = prime * result + (int) (logTime ^ (logTime >>> 32));
     result = prime * result + ((newConfiguration == null) ? 0 : newConfiguration.hashCode());
     result = prime * result + ((oldConfiguration == null) ? 0 : oldConfiguration.hashCode());
     result = prime * result + ((passwordType == null) ? 0 : passwordType.hashCode());
-    result = prime * result + quantity;
-    result = prime * result + (int) (typeID ^ (typeID >>> 32));
+    result = prime * result + (int) (quantity ^ (quantity >>> 32));
+    result = prime * result + typeID;
     return result;
   }
 
@@ -333,13 +333,13 @@ public class ContainerLog extends CachedData {
           AttributeSelector.addStringSelector(qs, "c", "actorName", actorName, p);
           AttributeSelector.addIntSelector(qs, "c", "flag", flag);
           AttributeSelector.addLongSelector(qs, "c", "itemID", itemID);
-          AttributeSelector.addLongSelector(qs, "c", "itemTypeID", itemTypeID);
-          AttributeSelector.addIntSelector(qs, "c", "locationID", locationID);
+          AttributeSelector.addIntSelector(qs, "c", "itemTypeID", itemTypeID);
+          AttributeSelector.addLongSelector(qs, "c", "locationID", locationID);
           AttributeSelector.addStringSelector(qs, "c", "newConfiguration", newConfiguration, p);
           AttributeSelector.addStringSelector(qs, "c", "oldConfiguration", oldConfiguration, p);
           AttributeSelector.addStringSelector(qs, "c", "passwordType", passwordType, p);
-          AttributeSelector.addIntSelector(qs, "c", "quantity", quantity);
-          AttributeSelector.addLongSelector(qs, "c", "typeID", typeID);
+          AttributeSelector.addLongSelector(qs, "c", "quantity", quantity);
+          AttributeSelector.addIntSelector(qs, "c", "typeID", typeID);
           // Set CID constraint and ordering
           if (reverse) {
             qs.append(" and c.cid < ").append(contid);

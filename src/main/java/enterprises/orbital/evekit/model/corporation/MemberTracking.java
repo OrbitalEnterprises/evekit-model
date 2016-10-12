@@ -47,10 +47,10 @@ public class MemberTracking extends CachedData {
   private static final int    DEFAULT_MAX_RESULTS = 1000;
   private long                characterID;
   private String              base;
-  private int                 baseID;
+  private long                baseID;
   private long                grantableRoles;                                                                              // bit mask?
   private String              location;
-  private int                 locationID;
+  private long                locationID;
   private long                logoffDateTime      = -1;
   private long                logonDateTime       = -1;
   private String              name;
@@ -63,7 +63,7 @@ public class MemberTracking extends CachedData {
   @SuppressWarnings("unused")
   private MemberTracking() {}
 
-  public MemberTracking(long characterID, String base, int baseID, long grantableRoles, String location, int locationID, long logoffDateTime,
+  public MemberTracking(long characterID, String base, long baseID, long grantableRoles, String location, long locationID, long logoffDateTime,
                         long logonDateTime, String name, long roles, String shipType, int shipTypeID, long startDateTime, String title) {
     super();
     this.characterID = characterID;
@@ -113,7 +113,7 @@ public class MemberTracking extends CachedData {
     return base;
   }
 
-  public int getBaseID() {
+  public long getBaseID() {
     return baseID;
   }
 
@@ -125,7 +125,7 @@ public class MemberTracking extends CachedData {
     return location;
   }
 
-  public int getLocationID() {
+  public long getLocationID() {
     return locationID;
   }
 
@@ -166,11 +166,11 @@ public class MemberTracking extends CachedData {
     final int prime = 31;
     int result = super.hashCode();
     result = prime * result + ((base == null) ? 0 : base.hashCode());
-    result = prime * result + baseID;
+    result = prime * result + (int) (baseID ^ (baseID >>> 32));
     result = prime * result + (int) (characterID ^ (characterID >>> 32));
     result = prime * result + (int) (grantableRoles ^ (grantableRoles >>> 32));
     result = prime * result + ((location == null) ? 0 : location.hashCode());
-    result = prime * result + locationID;
+    result = prime * result + (int) (locationID ^ (locationID >>> 32));
     result = prime * result + (int) (logoffDateTime ^ (logoffDateTime >>> 32));
     result = prime * result + (int) (logonDateTime ^ (logonDateTime >>> 32));
     result = prime * result + ((name == null) ? 0 : name.hashCode());
@@ -310,10 +310,10 @@ public class MemberTracking extends CachedData {
           AttributeParameters p = new AttributeParameters("att");
           AttributeSelector.addLongSelector(qs, "c", "characterID", characterID);
           AttributeSelector.addStringSelector(qs, "c", "base", base, p);
-          AttributeSelector.addIntSelector(qs, "c", "baseID", baseID);
+          AttributeSelector.addLongSelector(qs, "c", "baseID", baseID);
           AttributeSelector.addLongSelector(qs, "c", "grantableRoles", grantableRoles);
           AttributeSelector.addStringSelector(qs, "c", "location", location, p);
-          AttributeSelector.addIntSelector(qs, "c", "locationID", locationID);
+          AttributeSelector.addLongSelector(qs, "c", "locationID", locationID);
           AttributeSelector.addLongSelector(qs, "c", "logoffDateTime", logoffDateTime);
           AttributeSelector.addLongSelector(qs, "c", "logonDateTime", logonDateTime);
           AttributeSelector.addStringSelector(qs, "c", "name", name, p);

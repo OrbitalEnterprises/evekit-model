@@ -19,7 +19,7 @@ public class OutpostTest extends AbstractModelTester<Outpost> {
   final long                               stationID                = TestBase.getRandomInt(100000000);
   final long                               ownerID                  = TestBase.getRandomInt(100000000);
   final String                             stationName              = "station name";
-  final long                               solarSystemID            = TestBase.getRandomInt(100000000);
+  final int                                solarSystemID            = TestBase.getRandomInt(100000000);
   final BigDecimal                         dockingCostPerShipVolume = TestBase.getRandomBigDecimal(100000000);
   final BigDecimal                         officeRentalCost         = TestBase.getRandomBigDecimal(100000000);
   final int                                stationTypeID            = TestBase.getRandomInt(100000000);
@@ -112,7 +112,9 @@ public class OutpostTest extends AbstractModelTester<Outpost> {
     runGetLifelineTest(eol, live, new ModelRetriever<Outpost>() {
 
       @Override
-      public Outpost getModel(SynchronizedEveAccount account, long time) {
+      public Outpost getModel(
+                              SynchronizedEveAccount account,
+                              long time) {
         return Outpost.get(account, time, stationID);
       }
 

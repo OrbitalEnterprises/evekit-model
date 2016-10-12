@@ -56,17 +56,17 @@ public class Asset extends CachedData {
   private long                itemID;
   private long                locationID;
   private int                 typeID;
-  private int                 quantity;
+  private long                quantity;
   private int                 flag;
   private boolean             singleton;
-  private int                 rawQuantity;
+  private long                rawQuantity;
   // Stores the itemID of the container which contains this asset or -1 if this is a top-level asset.
   private long                container           = TOP_LEVEL;
 
   @SuppressWarnings("unused")
   private Asset() {}
 
-  public Asset(long itemID, long locationID, int typeID, int quantity, int flag, boolean singleton, int rawQuantity, long container) {
+  public Asset(long itemID, long locationID, int typeID, long quantity, int flag, boolean singleton, long rawQuantity, long container) {
     this.itemID = itemID;
     this.locationID = locationID;
     this.typeID = typeID;
@@ -109,7 +109,7 @@ public class Asset extends CachedData {
     return typeID;
   }
 
-  public int getQuantity() {
+  public long getQuantity() {
     return quantity;
   }
 
@@ -121,7 +121,7 @@ public class Asset extends CachedData {
     return singleton;
   }
 
-  public int getRawQuantity() {
+  public long getRawQuantity() {
     return rawQuantity;
   }
 
@@ -137,8 +137,8 @@ public class Asset extends CachedData {
     result = prime * result + flag;
     result = prime * result + (int) (itemID ^ (itemID >>> 32));
     result = prime * result + (int) (locationID ^ (locationID >>> 32));
-    result = prime * result + quantity;
-    result = prime * result + rawQuantity;
+    result = prime * result + (int) (quantity ^ (quantity >>> 32));
+    result = prime * result + (int) (rawQuantity ^ (rawQuantity >>> 32));
     result = prime * result + (singleton ? 1231 : 1237);
     result = prime * result + typeID;
     return result;
@@ -315,10 +315,10 @@ public class Asset extends CachedData {
           AttributeSelector.addLongSelector(qs, "c", "itemID", itemID);
           AttributeSelector.addLongSelector(qs, "c", "locationID", locationID);
           AttributeSelector.addIntSelector(qs, "c", "typeID", typeID);
-          AttributeSelector.addIntSelector(qs, "c", "quantity", quantity);
+          AttributeSelector.addLongSelector(qs, "c", "quantity", quantity);
           AttributeSelector.addIntSelector(qs, "c", "flag", flag);
           AttributeSelector.addBooleanSelector(qs, "c", "singleton", singleton);
-          AttributeSelector.addIntSelector(qs, "c", "rawQuantity", rawQuantity);
+          AttributeSelector.addLongSelector(qs, "c", "rawQuantity", rawQuantity);
           AttributeSelector.addLongSelector(qs, "c", "container", container);
           // Set CID constraint and ordering
           if (reverse) {

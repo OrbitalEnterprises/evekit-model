@@ -13,7 +13,6 @@ import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AbstractModelTester;
 import enterprises.orbital.evekit.model.CachedData;
-import enterprises.orbital.evekit.model.common.Contract;
 
 public class ContractTest extends AbstractModelTester<Contract> {
 
@@ -22,8 +21,8 @@ public class ContractTest extends AbstractModelTester<Contract> {
   final long                                issuerCorpID   = TestBase.getRandomInt(100000000);
   final long                                assigneeID     = TestBase.getRandomInt(100000000);
   final long                                acceptorID     = TestBase.getRandomInt(100000000);
-  final int                                 startStationID = TestBase.getRandomInt(100000000);
-  final int                                 endStationID   = TestBase.getRandomInt(100000000);
+  final long                                startStationID = TestBase.getRandomInt(100000000);
+  final long                                endStationID   = TestBase.getRandomInt(100000000);
   final String                              type           = "test type";
   final String                              status         = "test status";
   final String                              title          = "test title";
@@ -38,7 +37,7 @@ public class ContractTest extends AbstractModelTester<Contract> {
   final BigDecimal                          reward         = TestBase.getRandomBigDecimal(100000000);
   final BigDecimal                          collateral     = TestBase.getRandomBigDecimal(100000000);
   final BigDecimal                          buyout         = TestBase.getRandomBigDecimal(100000000);
-  final long                                volume         = TestBase.getRandomInt(100000000);
+  final double                              volume         = TestBase.getRandomDouble(100000000);
 
   final ClassUnderTestConstructor<Contract> eol            = new ClassUnderTestConstructor<Contract>() {
 
@@ -149,7 +148,9 @@ public class ContractTest extends AbstractModelTester<Contract> {
     runGetLifelineTest(eol, live, new ModelRetriever<Contract>() {
 
       @Override
-      public Contract getModel(SynchronizedEveAccount account, long time) {
+      public Contract getModel(
+                               SynchronizedEveAccount account,
+                               long time) {
         return Contract.get(account, time, contractID);
       }
 

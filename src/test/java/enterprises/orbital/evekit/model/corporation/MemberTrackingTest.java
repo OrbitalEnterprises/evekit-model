@@ -17,11 +17,11 @@ public class MemberTrackingTest extends AbstractModelTester<MemberTracking> {
 
   final long                                      characterID    = TestBase.getRandomInt(100000000);
   final String                                    base           = "test base";
-  final int                                       baseID         = TestBase.getRandomInt(100000000);
+  final long                                      baseID         = TestBase.getRandomInt(100000000);
   final long                                      grantableRoles = TestBase.getRandomInt(100000000);                                                         // bit
                                                                                                                                                              // mask?
   final String                                    location       = "test location";
-  final int                                       locationID     = TestBase.getRandomInt(100000000);
+  final long                                      locationID     = TestBase.getRandomInt(100000000);
   final long                                      logoffDateTime = TestBase.getRandomInt(100000000);
   final long                                      logonDateTime  = TestBase.getRandomInt(100000000);
   final String                                    name           = "test name";
@@ -115,7 +115,9 @@ public class MemberTrackingTest extends AbstractModelTester<MemberTracking> {
     runGetLifelineTest(eol, live, new ModelRetriever<MemberTracking>() {
 
       @Override
-      public MemberTracking getModel(SynchronizedEveAccount account, long time) {
+      public MemberTracking getModel(
+                                     SynchronizedEveAccount account,
+                                     long time) {
         return MemberTracking.get(account, time, characterID);
       }
 
