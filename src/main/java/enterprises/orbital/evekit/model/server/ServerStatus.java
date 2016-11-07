@@ -14,7 +14,6 @@ import javax.persistence.TypedQuery;
 
 import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.EveKitRefDataProvider;
-import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.RefCachedData;
 
@@ -107,7 +106,6 @@ public class ServerStatus extends RefCachedData {
   }
 
   public static List<ServerStatus> accessQuery(
-                                               final SynchronizedEveAccount owner,
                                                final long contid,
                                                final int maxresults,
                                                final boolean reverse,
@@ -119,7 +117,7 @@ public class ServerStatus extends RefCachedData {
         @Override
         public List<ServerStatus> run() throws Exception {
           StringBuilder qs = new StringBuilder();
-          qs.append("SELECT c FROM ServerStatus c WHERE ");
+          qs.append("SELECT c FROM ServerStatus c WHERE 1=1");
           // Constrain lifeline
           AttributeSelector.addLifelineSelector(qs, "c", at);
           // Constrain attributes
