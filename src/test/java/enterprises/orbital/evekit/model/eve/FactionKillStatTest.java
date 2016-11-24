@@ -9,6 +9,7 @@ import enterprises.orbital.evekit.model.RefCachedData;
 
 public class FactionKillStatTest extends AbstractRefModelTester<FactionKillStat> {
 
+  final StatAttribute                              attribute   = StatAttribute.LAST_WEEK;
   final long                                       factionID   = TestBase.getRandomInt(100000000);
   final String                                     factionName = TestBase.getRandomText(50);
   final int                                        kills       = TestBase.getRandomInt(100000000);
@@ -17,7 +18,7 @@ public class FactionKillStatTest extends AbstractRefModelTester<FactionKillStat>
 
                                                                  @Override
                                                                  public FactionKillStat getCUT() {
-                                                                   return new FactionKillStat(factionID, factionName, kills);
+                                                                   return new FactionKillStat(attribute, kills, factionID, factionName);
                                                                  }
 
                                                                };
@@ -25,7 +26,7 @@ public class FactionKillStatTest extends AbstractRefModelTester<FactionKillStat>
   final ClassUnderTestConstructor<FactionKillStat> live        = new ClassUnderTestConstructor<FactionKillStat>() {
                                                                  @Override
                                                                  public FactionKillStat getCUT() {
-                                                                   return new FactionKillStat(factionID, factionName, kills + 1);
+                                                                   return new FactionKillStat(attribute, kills + 1, factionID, factionName);
                                                                  }
 
                                                                };
@@ -38,8 +39,8 @@ public class FactionKillStatTest extends AbstractRefModelTester<FactionKillStat>
       @Override
       public FactionKillStat[] getVariants() {
         return new FactionKillStat[] {
-            new FactionKillStat(factionID + 1, factionName, kills), new FactionKillStat(factionID, factionName + "1", kills),
-            new FactionKillStat(factionID, factionName, kills + 1)
+            new FactionKillStat(StatAttribute.YESTERDAY, kills, factionID, factionName), new FactionKillStat(attribute, kills + 1, factionID, factionName),
+            new FactionKillStat(attribute, kills, factionID + 1, factionName), new FactionKillStat(attribute, kills, factionID, factionName + "1")
         };
       }
 
@@ -54,7 +55,7 @@ public class FactionKillStatTest extends AbstractRefModelTester<FactionKillStat>
       @Override
       public FactionKillStat getModel(
                                       long time) {
-        return FactionKillStat.get(time, factionID);
+        return FactionKillStat.get(time, attribute, factionID);
       }
 
     });
@@ -64,30 +65,36 @@ public class FactionKillStatTest extends AbstractRefModelTester<FactionKillStat>
   public void testGetByKey() throws Exception {
     // Should exclude:
     // - objects with different faction ID
+    // - objects with different attribute
     // - objects not live at the given time
     FactionKillStat existing, keyed;
 
-    keyed = new FactionKillStat(factionID, factionName, kills);
+    keyed = new FactionKillStat(attribute, kills, factionID, factionName);
     keyed.setup(8888L);
     keyed = RefCachedData.updateData(keyed);
 
     // Different faction ID
-    existing = new FactionKillStat(factionID + 1, factionName, kills);
+    existing = new FactionKillStat(attribute, kills, factionID + 1, factionName);
+    existing.setup(8888L);
+    RefCachedData.updateData(existing);
+
+    // Different attribute
+    existing = new FactionKillStat(StatAttribute.YESTERDAY, kills, factionID, factionName);
     existing.setup(8888L);
     RefCachedData.updateData(existing);
 
     // Not live at the given time
-    existing = new FactionKillStat(factionID, factionName, kills + 1);
+    existing = new FactionKillStat(attribute, kills + 1, factionID, factionName);
     existing.setup(9999L);
     RefCachedData.updateData(existing);
 
     // EOL before the given time
-    existing = new FactionKillStat(factionID, factionName, kills + 2);
+    existing = new FactionKillStat(attribute, kills + 2, factionID, factionName);
     existing.setup(7777L);
     existing.evolve(null, 7977L);
     RefCachedData.updateData(existing);
 
-    FactionKillStat result = FactionKillStat.get(8889L, factionID);
+    FactionKillStat result = FactionKillStat.get(8889L, attribute, factionID);
     Assert.assertEquals(keyed, result);
   }
 

@@ -9,7 +9,6 @@ import enterprises.orbital.evekit.model.RefCachedData;
 
 public class SkillBonusTest extends AbstractRefModelTester<SkillBonus> {
 
-  final int                                   groupID    = TestBase.getRandomInt(100000000);
   final int                                   typeID     = TestBase.getRandomInt(100000000);
   final String                                bonusType  = TestBase.getRandomText(50);
   final String                                bonusValue = TestBase.getRandomText(50);
@@ -18,7 +17,7 @@ public class SkillBonusTest extends AbstractRefModelTester<SkillBonus> {
 
                                                            @Override
                                                            public SkillBonus getCUT() {
-                                                             return new SkillBonus(groupID, typeID, bonusType, bonusValue);
+                                                             return new SkillBonus(typeID, bonusType, bonusValue);
                                                            }
 
                                                          };
@@ -26,7 +25,7 @@ public class SkillBonusTest extends AbstractRefModelTester<SkillBonus> {
   final ClassUnderTestConstructor<SkillBonus> live       = new ClassUnderTestConstructor<SkillBonus>() {
                                                            @Override
                                                            public SkillBonus getCUT() {
-                                                             return new SkillBonus(groupID, typeID, bonusType, bonusValue + "1");
+                                                             return new SkillBonus(typeID, bonusType, bonusValue + "1");
                                                            }
 
                                                          };
@@ -39,8 +38,8 @@ public class SkillBonusTest extends AbstractRefModelTester<SkillBonus> {
       @Override
       public SkillBonus[] getVariants() {
         return new SkillBonus[] {
-            new SkillBonus(groupID + 1, typeID, bonusType, bonusValue), new SkillBonus(groupID, typeID + 1, bonusType, bonusValue),
-            new SkillBonus(groupID, typeID, bonusType + "1", bonusValue), new SkillBonus(groupID, typeID, bonusType, bonusValue + "1")
+            new SkillBonus(typeID + 1, bonusType, bonusValue), new SkillBonus(typeID, bonusType + "1", bonusValue),
+            new SkillBonus(typeID, bonusType, bonusValue + "1")
         };
       }
 
@@ -55,7 +54,7 @@ public class SkillBonusTest extends AbstractRefModelTester<SkillBonus> {
       @Override
       public SkillBonus getModel(
                                  long time) {
-        return SkillBonus.get(time, groupID, typeID, bonusType);
+        return SkillBonus.get(time, typeID, bonusType);
       }
 
     });
@@ -64,43 +63,37 @@ public class SkillBonusTest extends AbstractRefModelTester<SkillBonus> {
   @Test
   public void testGetByKey() throws Exception {
     // Should exclude:
-    // - objects with different group ID
     // - objects with different type ID
     // - objects with different bonus type
     // - objects not live at the given time
     SkillBonus existing, keyed;
 
-    keyed = new SkillBonus(groupID, typeID, bonusType, bonusValue);
+    keyed = new SkillBonus(typeID, bonusType, bonusValue);
     keyed.setup(8888L);
     keyed = RefCachedData.updateData(keyed);
 
-    // Different group ID
-    existing = new SkillBonus(groupID + 1, typeID, bonusType, bonusValue);
-    existing.setup(8888L);
-    RefCachedData.updateData(existing);
-
     // Different type ID
-    existing = new SkillBonus(groupID, typeID + 1, bonusType, bonusValue);
+    existing = new SkillBonus(typeID + 1, bonusType, bonusValue);
     existing.setup(8888L);
     RefCachedData.updateData(existing);
 
     // Different bonus type
-    existing = new SkillBonus(groupID, typeID, bonusType + "1", bonusValue);
+    existing = new SkillBonus(typeID, bonusType + "1", bonusValue);
     existing.setup(8888L);
     RefCachedData.updateData(existing);
 
     // Not live at the given time
-    existing = new SkillBonus(groupID, typeID, bonusType, bonusValue + "1");
+    existing = new SkillBonus(typeID, bonusType, bonusValue + "1");
     existing.setup(9999L);
     RefCachedData.updateData(existing);
 
     // EOL before the given time
-    existing = new SkillBonus(groupID, typeID, bonusType, bonusValue + "2");
+    existing = new SkillBonus(typeID, bonusType, bonusValue + "2");
     existing.setup(7777L);
     existing.evolve(null, 7977L);
     RefCachedData.updateData(existing);
 
-    SkillBonus result = SkillBonus.get(8889L, groupID, typeID, bonusType);
+    SkillBonus result = SkillBonus.get(8889L, typeID, bonusType);
     Assert.assertEquals(keyed, result);
   }
 

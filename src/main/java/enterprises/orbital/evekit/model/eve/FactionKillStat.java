@@ -16,6 +16,7 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.EveKitRefDataProvider;
 import enterprises.orbital.evekit.model.AttributeParameters;
 import enterprises.orbital.evekit.model.AttributeSelector;
+import enterprises.orbital.evekit.model.AttributeSelector.EnumMapper;
 import enterprises.orbital.evekit.model.RefCachedData;
 
 @Entity
@@ -24,22 +25,21 @@ import enterprises.orbital.evekit.model.RefCachedData;
 @NamedQueries({
     @NamedQuery(
         name = "FactionKillStat.get",
-        query = "SELECT c FROM FactionKillStat c WHERE c.factionID = :fid AND c.lifeStart <= :point AND c.lifeEnd > :point"),
+        query = "SELECT c FROM FactionKillStat c WHERE c.attribute = :attr AND c.factionID = :fid AND c.lifeStart <= :point AND c.lifeEnd > :point"),
 })
-public class FactionKillStat extends RefCachedData {
+public class FactionKillStat extends AbstractKillStat {
   private static final Logger log = Logger.getLogger(FactionKillStat.class.getName());
   private long                factionID;
   private String              factionName;
-  private int                 kills;
 
-  @SuppressWarnings("unused")
-  private FactionKillStat() {}
+  private FactionKillStat() {
+    super(StatAttribute.TOTAL, 0);
+  }
 
-  public FactionKillStat(long factionID, String factionName, int kills) {
-    super();
+  public FactionKillStat(StatAttribute attribute, int kills, long factionID, String factionName) {
+    super(attribute, kills);
     this.factionID = factionID;
     this.factionName = factionName;
-    this.kills = kills;
   }
 
   /**
@@ -49,8 +49,9 @@ public class FactionKillStat extends RefCachedData {
   public boolean equivalent(
                             RefCachedData sup) {
     if (!(sup instanceof FactionKillStat)) return false;
+    if (!super.equivalent(sup)) return false;
     FactionKillStat other = (FactionKillStat) sup;
-    return factionID == other.factionID && nullSafeObjectCompare(factionName, other.factionName) && kills == other.kills;
+    return factionID == other.factionID && nullSafeObjectCompare(factionName, other.factionName);
   }
 
   public long getFactionID() {
@@ -61,17 +62,12 @@ public class FactionKillStat extends RefCachedData {
     return factionName;
   }
 
-  public int getKills() {
-    return kills;
-  }
-
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
     result = prime * result + (int) (factionID ^ (factionID >>> 32));
     result = prime * result + ((factionName == null) ? 0 : factionName.hashCode());
-    result = prime * result + kills;
     return result;
   }
 
@@ -86,17 +82,17 @@ public class FactionKillStat extends RefCachedData {
     if (factionName == null) {
       if (other.factionName != null) return false;
     } else if (!factionName.equals(other.factionName)) return false;
-    if (kills != other.kills) return false;
     return true;
   }
 
   @Override
   public String toString() {
-    return "FactionKillStat [factionID=" + factionID + ", factionName=" + factionName + ", kills=" + kills + "]";
+    return "FactionKillStat [factionID=" + factionID + ", factionName=" + factionName + ", attribute=" + attribute + ", kills=" + kills + "]";
   }
 
   public static FactionKillStat get(
                                     final long time,
+                                    final StatAttribute attr,
                                     final long factionID) {
     try {
       return EveKitRefDataProvider.getFactory().runTransaction(new RunInTransaction<FactionKillStat>() {
@@ -105,6 +101,7 @@ public class FactionKillStat extends RefCachedData {
           TypedQuery<FactionKillStat> getter = EveKitRefDataProvider.getFactory().getEntityManager().createNamedQuery("FactionKillStat.get",
                                                                                                                       FactionKillStat.class);
           getter.setParameter("point", time);
+          getter.setParameter("attr", attr);
           getter.setParameter("fid", factionID);
           try {
             return getter.getSingleResult();
@@ -124,6 +121,7 @@ public class FactionKillStat extends RefCachedData {
                                                   final int maxresults,
                                                   final boolean reverse,
                                                   final AttributeSelector at,
+                                                  final AttributeSelector attribute,
                                                   final AttributeSelector factionID,
                                                   final AttributeSelector factionName,
                                                   final AttributeSelector kills) {
@@ -137,6 +135,14 @@ public class FactionKillStat extends RefCachedData {
           AttributeSelector.addLifelineSelector(qs, "c", at);
           // Constrain attributes
           AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addEnumSelector(qs, "c", "attribute", attribute, new EnumMapper<StatAttribute>() {
+
+            @Override
+            public StatAttribute mapEnumValue(
+                                              String value) {
+              return StatAttribute.valueOf(value);
+            }
+          }, p);
           AttributeSelector.addLongSelector(qs, "c", "factionID", factionID);
           AttributeSelector.addStringSelector(qs, "c", "factionName", factionName, p);
           AttributeSelector.addIntSelector(qs, "c", "kills", kills);

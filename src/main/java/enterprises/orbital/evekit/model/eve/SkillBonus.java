@@ -24,11 +24,10 @@ import enterprises.orbital.evekit.model.RefCachedData;
 @NamedQueries({
     @NamedQuery(
         name = "SkillBonus.get",
-        query = "SELECT c FROM SkillBonus c WHERE c.groupID = :gid AND c.typeID = :tid AND c.bonusType = :bt AND c.lifeStart <= :point AND c.lifeEnd > :point"),
+        query = "SELECT c FROM SkillBonus c WHERE c.typeID = :tid AND c.bonusType = :bt AND c.lifeStart <= :point AND c.lifeEnd > :point"),
 })
 public class SkillBonus extends RefCachedData {
   private static final Logger log = Logger.getLogger(SkillBonus.class.getName());
-  private int                 groupID;
   private int                 typeID;
   private String              bonusType;
   private String              bonusValue;
@@ -36,9 +35,8 @@ public class SkillBonus extends RefCachedData {
   @SuppressWarnings("unused")
   private SkillBonus() {}
 
-  public SkillBonus(int groupID, int typeID, String bonusType, String bonusValue) {
+  public SkillBonus(int typeID, String bonusType, String bonusValue) {
     super();
-    this.groupID = groupID;
     this.typeID = typeID;
     this.bonusType = bonusType;
     this.bonusValue = bonusValue;
@@ -52,12 +50,7 @@ public class SkillBonus extends RefCachedData {
                             RefCachedData sup) {
     if (!(sup instanceof SkillBonus)) return false;
     SkillBonus other = (SkillBonus) sup;
-    return groupID == other.groupID && typeID == other.typeID && nullSafeObjectCompare(bonusType, other.bonusType)
-        && nullSafeObjectCompare(bonusValue, other.bonusValue);
-  }
-
-  public int getGroupID() {
-    return groupID;
+    return typeID == other.typeID && nullSafeObjectCompare(bonusType, other.bonusType) && nullSafeObjectCompare(bonusValue, other.bonusValue);
   }
 
   public int getTypeID() {
@@ -78,7 +71,6 @@ public class SkillBonus extends RefCachedData {
     int result = super.hashCode();
     result = prime * result + ((bonusType == null) ? 0 : bonusType.hashCode());
     result = prime * result + ((bonusValue == null) ? 0 : bonusValue.hashCode());
-    result = prime * result + groupID;
     result = prime * result + typeID;
     return result;
   }
@@ -96,19 +88,17 @@ public class SkillBonus extends RefCachedData {
     if (bonusValue == null) {
       if (other.bonusValue != null) return false;
     } else if (!bonusValue.equals(other.bonusValue)) return false;
-    if (groupID != other.groupID) return false;
     if (typeID != other.typeID) return false;
     return true;
   }
 
   @Override
   public String toString() {
-    return "SkillBonus [groupID=" + groupID + ", typeID=" + typeID + ", bonusType=" + bonusType + ", bonusValue=" + bonusValue + "]";
+    return "SkillBonus [typeID=" + typeID + ", bonusType=" + bonusType + ", bonusValue=" + bonusValue + "]";
   }
 
   public static SkillBonus get(
                                final long time,
-                               final int groupID,
                                final int typeID,
                                final String bonusType) {
     try {
@@ -117,7 +107,6 @@ public class SkillBonus extends RefCachedData {
         public SkillBonus run() throws Exception {
           TypedQuery<SkillBonus> getter = EveKitRefDataProvider.getFactory().getEntityManager().createNamedQuery("SkillBonus.get", SkillBonus.class);
           getter.setParameter("point", time);
-          getter.setParameter("gid", groupID);
           getter.setParameter("tid", typeID);
           getter.setParameter("bt", bonusType);
           try {
@@ -138,7 +127,6 @@ public class SkillBonus extends RefCachedData {
                                              final int maxresults,
                                              final boolean reverse,
                                              final AttributeSelector at,
-                                             final AttributeSelector groupID,
                                              final AttributeSelector typeID,
                                              final AttributeSelector bonusType,
                                              final AttributeSelector bonusValue) {
@@ -152,7 +140,6 @@ public class SkillBonus extends RefCachedData {
           AttributeSelector.addLifelineSelector(qs, "c", at);
           // Constrain attributes
           AttributeParameters p = new AttributeParameters("att");
-          AttributeSelector.addIntSelector(qs, "c", "groupID", groupID);
           AttributeSelector.addIntSelector(qs, "c", "typeID", typeID);
           AttributeSelector.addStringSelector(qs, "c", "bonusType", bonusType, p);
           AttributeSelector.addStringSelector(qs, "c", "bonusValue", bonusValue, p);

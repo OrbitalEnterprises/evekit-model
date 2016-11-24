@@ -16,6 +16,7 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.EveKitRefDataProvider;
 import enterprises.orbital.evekit.model.AttributeParameters;
 import enterprises.orbital.evekit.model.AttributeSelector;
+import enterprises.orbital.evekit.model.AttributeSelector.EnumMapper;
 import enterprises.orbital.evekit.model.RefCachedData;
 
 @Entity
@@ -24,22 +25,21 @@ import enterprises.orbital.evekit.model.RefCachedData;
 @NamedQueries({
     @NamedQuery(
         name = "CharacterVictoryPointStat.get",
-        query = "SELECT c FROM CharacterVictoryPointStat c WHERE c.characterID = :charid AND c.lifeStart <= :point AND c.lifeEnd > :point"),
+        query = "SELECT c FROM CharacterVictoryPointStat c WHERE c.attribute = :attr AND c.characterID = :charid AND c.lifeStart <= :point AND c.lifeEnd > :point"),
 })
-public class CharacterVictoryPointStat extends RefCachedData {
+public class CharacterVictoryPointStat extends AbstractVictoryPointStat {
   private static final Logger log = Logger.getLogger(CharacterVictoryPointStat.class.getName());
   private long                characterID;
   private String              characterName;
-  private int                 victoryPoints;
 
-  @SuppressWarnings("unused")
-  private CharacterVictoryPointStat() {}
+  private CharacterVictoryPointStat() {
+    super(StatAttribute.TOTAL, 0);
+  }
 
-  public CharacterVictoryPointStat(long characterID, String characterName, int victoryPoints) {
-    super();
+  public CharacterVictoryPointStat(StatAttribute attribute, int victoryPoints, long characterID, String characterName) {
+    super(attribute, victoryPoints);
     this.characterID = characterID;
     this.characterName = characterName;
-    this.victoryPoints = victoryPoints;
   }
 
   /**
@@ -49,8 +49,9 @@ public class CharacterVictoryPointStat extends RefCachedData {
   public boolean equivalent(
                             RefCachedData sup) {
     if (!(sup instanceof CharacterVictoryPointStat)) return false;
+    if (!super.equivalent(sup)) return false;
     CharacterVictoryPointStat other = (CharacterVictoryPointStat) sup;
-    return characterID == other.characterID && nullSafeObjectCompare(characterName, other.characterName) && victoryPoints == other.victoryPoints;
+    return characterID == other.characterID && nullSafeObjectCompare(characterName, other.characterName);
   }
 
   public long getCharacterID() {
@@ -61,17 +62,12 @@ public class CharacterVictoryPointStat extends RefCachedData {
     return characterName;
   }
 
-  public int getVictoryPoints() {
-    return victoryPoints;
-  }
-
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
     result = prime * result + (int) (characterID ^ (characterID >>> 32));
     result = prime * result + ((characterName == null) ? 0 : characterName.hashCode());
-    result = prime * result + victoryPoints;
     return result;
   }
 
@@ -86,17 +82,18 @@ public class CharacterVictoryPointStat extends RefCachedData {
     if (characterName == null) {
       if (other.characterName != null) return false;
     } else if (!characterName.equals(other.characterName)) return false;
-    if (victoryPoints != other.victoryPoints) return false;
     return true;
   }
 
   @Override
   public String toString() {
-    return "CharacterVictoryPointStat [characterID=" + characterID + ", characterName=" + characterName + ", victoryPoints=" + victoryPoints + "]";
+    return "CharacterVictoryPointStat [characterID=" + characterID + ", characterName=" + characterName + ", attribute=" + attribute + ", victoryPoints="
+        + victoryPoints + "]";
   }
 
   public static CharacterVictoryPointStat get(
                                               final long time,
+                                              final StatAttribute attr,
                                               final long characterID) {
     try {
       return EveKitRefDataProvider.getFactory().runTransaction(new RunInTransaction<CharacterVictoryPointStat>() {
@@ -105,6 +102,7 @@ public class CharacterVictoryPointStat extends RefCachedData {
           TypedQuery<CharacterVictoryPointStat> getter = EveKitRefDataProvider.getFactory().getEntityManager()
               .createNamedQuery("CharacterVictoryPointStat.get", CharacterVictoryPointStat.class);
           getter.setParameter("point", time);
+          getter.setParameter("attr", attr);
           getter.setParameter("charid", characterID);
           try {
             return getter.getSingleResult();
@@ -124,6 +122,7 @@ public class CharacterVictoryPointStat extends RefCachedData {
                                                             final int maxresults,
                                                             final boolean reverse,
                                                             final AttributeSelector at,
+                                                            final AttributeSelector attribute,
                                                             final AttributeSelector characterID,
                                                             final AttributeSelector characterName,
                                                             final AttributeSelector victoryPoints) {
@@ -137,6 +136,14 @@ public class CharacterVictoryPointStat extends RefCachedData {
           AttributeSelector.addLifelineSelector(qs, "c", at);
           // Constrain attributes
           AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addEnumSelector(qs, "c", "attribute", attribute, new EnumMapper<StatAttribute>() {
+
+            @Override
+            public StatAttribute mapEnumValue(
+                                              String value) {
+              return StatAttribute.valueOf(value);
+            }
+          }, p);
           AttributeSelector.addLongSelector(qs, "c", "characterID", characterID);
           AttributeSelector.addStringSelector(qs, "c", "characterName", characterName, p);
           AttributeSelector.addLongSelector(qs, "c", "victoryPoints", victoryPoints);

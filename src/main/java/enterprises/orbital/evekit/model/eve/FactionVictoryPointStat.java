@@ -16,6 +16,7 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.EveKitRefDataProvider;
 import enterprises.orbital.evekit.model.AttributeParameters;
 import enterprises.orbital.evekit.model.AttributeSelector;
+import enterprises.orbital.evekit.model.AttributeSelector.EnumMapper;
 import enterprises.orbital.evekit.model.RefCachedData;
 
 @Entity
@@ -24,22 +25,21 @@ import enterprises.orbital.evekit.model.RefCachedData;
 @NamedQueries({
     @NamedQuery(
         name = "FactionVictoryPointStat.get",
-        query = "SELECT c FROM FactionVictoryPointStat c WHERE c.factionID = :fid AND c.lifeStart <= :point AND c.lifeEnd > :point"),
+        query = "SELECT c FROM FactionVictoryPointStat c WHERE c.attribute = :attr AND c.factionID = :fid AND c.lifeStart <= :point AND c.lifeEnd > :point"),
 })
-public class FactionVictoryPointStat extends RefCachedData {
+public class FactionVictoryPointStat extends AbstractVictoryPointStat {
   private static final Logger log = Logger.getLogger(FactionVictoryPointStat.class.getName());
   private long                factionID;
   private String              factionName;
-  private int                 victoryPoints;
 
-  @SuppressWarnings("unused")
-  private FactionVictoryPointStat() {}
+  private FactionVictoryPointStat() {
+    super(StatAttribute.TOTAL, 0);
+  }
 
-  public FactionVictoryPointStat(long factionID, String factionName, int victoryPoints) {
-    super();
+  public FactionVictoryPointStat(StatAttribute attribute, int victoryPoints, long factionID, String factionName) {
+    super(attribute, victoryPoints);
     this.factionID = factionID;
     this.factionName = factionName;
-    this.victoryPoints = victoryPoints;
   }
 
   /**
@@ -49,8 +49,9 @@ public class FactionVictoryPointStat extends RefCachedData {
   public boolean equivalent(
                             RefCachedData sup) {
     if (!(sup instanceof FactionVictoryPointStat)) return false;
+    if (!super.equivalent(sup)) return false;
     FactionVictoryPointStat other = (FactionVictoryPointStat) sup;
-    return factionID == other.factionID && nullSafeObjectCompare(factionName, other.factionName) && victoryPoints == other.victoryPoints;
+    return factionID == other.factionID && nullSafeObjectCompare(factionName, other.factionName);
   }
 
   public long getFactionID() {
@@ -61,17 +62,12 @@ public class FactionVictoryPointStat extends RefCachedData {
     return factionName;
   }
 
-  public int getVictoryPoints() {
-    return victoryPoints;
-  }
-
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
     result = prime * result + (int) (factionID ^ (factionID >>> 32));
     result = prime * result + ((factionName == null) ? 0 : factionName.hashCode());
-    result = prime * result + victoryPoints;
     return result;
   }
 
@@ -86,17 +82,18 @@ public class FactionVictoryPointStat extends RefCachedData {
     if (factionName == null) {
       if (other.factionName != null) return false;
     } else if (!factionName.equals(other.factionName)) return false;
-    if (victoryPoints != other.victoryPoints) return false;
     return true;
   }
 
   @Override
   public String toString() {
-    return "FactionVictoryPointStat [factionID=" + factionID + ", factionName=" + factionName + ", victoryPoints=" + victoryPoints + "]";
+    return "FactionVictoryPointStat [factionID=" + factionID + ", factionName=" + factionName + ", attribute=" + attribute + ", victoryPoints=" + victoryPoints
+        + "]";
   }
 
   public static FactionVictoryPointStat get(
                                             final long time,
+                                            final StatAttribute attr,
                                             final long factionID) {
     try {
       return EveKitRefDataProvider.getFactory().runTransaction(new RunInTransaction<FactionVictoryPointStat>() {
@@ -105,6 +102,7 @@ public class FactionVictoryPointStat extends RefCachedData {
           TypedQuery<FactionVictoryPointStat> getter = EveKitRefDataProvider.getFactory().getEntityManager().createNamedQuery("FactionVictoryPointStat.get",
                                                                                                                               FactionVictoryPointStat.class);
           getter.setParameter("point", time);
+          getter.setParameter("attr", attr);
           getter.setParameter("fid", factionID);
           try {
             return getter.getSingleResult();
@@ -124,6 +122,7 @@ public class FactionVictoryPointStat extends RefCachedData {
                                                           final int maxresults,
                                                           final boolean reverse,
                                                           final AttributeSelector at,
+                                                          final AttributeSelector attribute,
                                                           final AttributeSelector factionID,
                                                           final AttributeSelector factionName,
                                                           final AttributeSelector victoryPoints) {
@@ -137,6 +136,14 @@ public class FactionVictoryPointStat extends RefCachedData {
           AttributeSelector.addLifelineSelector(qs, "c", at);
           // Constrain attributes
           AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addEnumSelector(qs, "c", "attribute", attribute, new EnumMapper<StatAttribute>() {
+
+            @Override
+            public StatAttribute mapEnumValue(
+                                              String value) {
+              return StatAttribute.valueOf(value);
+            }
+          }, p);
           AttributeSelector.addLongSelector(qs, "c", "factionID", factionID);
           AttributeSelector.addStringSelector(qs, "c", "factionName", factionName, p);
           AttributeSelector.addIntSelector(qs, "c", "victoryPoints", victoryPoints);

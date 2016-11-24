@@ -16,6 +16,7 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.EveKitRefDataProvider;
 import enterprises.orbital.evekit.model.AttributeParameters;
 import enterprises.orbital.evekit.model.AttributeSelector;
+import enterprises.orbital.evekit.model.AttributeSelector.EnumMapper;
 import enterprises.orbital.evekit.model.RefCachedData;
 
 @Entity
@@ -24,22 +25,21 @@ import enterprises.orbital.evekit.model.RefCachedData;
 @NamedQueries({
     @NamedQuery(
         name = "CharacterKillStat.get",
-        query = "SELECT c FROM CharacterKillStat c WHERE c.characterID = :charid AND c.lifeStart <= :point AND c.lifeEnd > :point"),
+        query = "SELECT c FROM CharacterKillStat c WHERE c.attribute = :attr AND c.characterID = :charid AND c.lifeStart <= :point AND c.lifeEnd > :point"),
 })
-public class CharacterKillStat extends RefCachedData {
+public class CharacterKillStat extends AbstractKillStat {
   private static final Logger log = Logger.getLogger(CharacterKillStat.class.getName());
   private long                characterID;
   private String              characterName;
-  private int                 kills;
 
-  @SuppressWarnings("unused")
-  private CharacterKillStat() {}
+  private CharacterKillStat() {
+    super(StatAttribute.TOTAL, 0);
+  }
 
-  public CharacterKillStat(long characterID, String characterName, int kills) {
-    super();
+  public CharacterKillStat(StatAttribute attribute, int kills, long characterID, String characterName) {
+    super(attribute, kills);
     this.characterID = characterID;
     this.characterName = characterName;
-    this.kills = kills;
   }
 
   /**
@@ -49,8 +49,9 @@ public class CharacterKillStat extends RefCachedData {
   public boolean equivalent(
                             RefCachedData sup) {
     if (!(sup instanceof CharacterKillStat)) return false;
+    if (!super.equivalent(sup)) return false;
     CharacterKillStat other = (CharacterKillStat) sup;
-    return characterID == other.characterID && nullSafeObjectCompare(characterName, other.characterName) && kills == other.kills;
+    return characterID == other.characterID && nullSafeObjectCompare(characterName, other.characterName);
   }
 
   public long getCharacterID() {
@@ -61,17 +62,12 @@ public class CharacterKillStat extends RefCachedData {
     return characterName;
   }
 
-  public int getKills() {
-    return kills;
-  }
-
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
     result = prime * result + (int) (characterID ^ (characterID >>> 32));
     result = prime * result + ((characterName == null) ? 0 : characterName.hashCode());
-    result = prime * result + kills;
     return result;
   }
 
@@ -86,17 +82,17 @@ public class CharacterKillStat extends RefCachedData {
     if (characterName == null) {
       if (other.characterName != null) return false;
     } else if (!characterName.equals(other.characterName)) return false;
-    if (kills != other.kills) return false;
     return true;
   }
 
   @Override
   public String toString() {
-    return "CharacterKillStat [characterID=" + characterID + ", characterName=" + characterName + ", kills=" + kills + "]";
+    return "CharacterKillStat [characterID=" + characterID + ", characterName=" + characterName + ", attribute=" + attribute + ", kills=" + kills + "]";
   }
 
   public static CharacterKillStat get(
                                       final long time,
+                                      final StatAttribute attr,
                                       final long characterID) {
     try {
       return EveKitRefDataProvider.getFactory().runTransaction(new RunInTransaction<CharacterKillStat>() {
@@ -105,6 +101,7 @@ public class CharacterKillStat extends RefCachedData {
           TypedQuery<CharacterKillStat> getter = EveKitRefDataProvider.getFactory().getEntityManager().createNamedQuery("CharacterKillStat.get",
                                                                                                                         CharacterKillStat.class);
           getter.setParameter("point", time);
+          getter.setParameter("attr", attr);
           getter.setParameter("charid", characterID);
           try {
             return getter.getSingleResult();
@@ -124,6 +121,7 @@ public class CharacterKillStat extends RefCachedData {
                                                     final int maxresults,
                                                     final boolean reverse,
                                                     final AttributeSelector at,
+                                                    final AttributeSelector attribute,
                                                     final AttributeSelector characterID,
                                                     final AttributeSelector characterName,
                                                     final AttributeSelector kills) {
@@ -137,8 +135,16 @@ public class CharacterKillStat extends RefCachedData {
           AttributeSelector.addLifelineSelector(qs, "c", at);
           // Constrain attributes
           AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addEnumSelector(qs, "c", "attribute", attribute, new EnumMapper<StatAttribute>() {
+
+            @Override
+            public StatAttribute mapEnumValue(
+                                              String value) {
+              return StatAttribute.valueOf(value);
+            }
+          }, p);
           AttributeSelector.addLongSelector(qs, "c", "characterID", characterID);
-          AttributeSelector.addStringSelector(qs, "c", "charactrName", characterName, p);
+          AttributeSelector.addStringSelector(qs, "c", "characterName", characterName, p);
           AttributeSelector.addLongSelector(qs, "c", "kills", kills);
           // Set CID constraint and ordering
           if (reverse) {

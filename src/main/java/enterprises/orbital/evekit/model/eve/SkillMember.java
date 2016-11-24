@@ -24,7 +24,7 @@ import enterprises.orbital.evekit.model.RefCachedData;
 @NamedQueries({
     @NamedQuery(
         name = "SkillMember.get",
-        query = "SELECT c FROM SkillMember c WHERE c.groupID = :gid AND c.typeID = :tid AND c.lifeStart <= :point AND c.lifeEnd > :point"),
+        query = "SELECT c FROM SkillMember c WHERE c.typeID = :tid AND c.lifeStart <= :point AND c.lifeEnd > :point"),
 })
 public class SkillMember extends RefCachedData {
   private static final Logger log = Logger.getLogger(SkillMember.class.getName());
@@ -41,14 +41,15 @@ public class SkillMember extends RefCachedData {
   @SuppressWarnings("unused")
   private SkillMember() {}
 
-  public SkillMember(String description, int groupID, String requiredPrimaryAttribute, String requiredSecondaryAttribute, int typeID, String typeName,
+  public SkillMember(int groupID, int typeID, String description, int rank, String requiredPrimaryAttribute, String requiredSecondaryAttribute, String typeName,
                      boolean published) {
     super();
-    this.description = description;
     this.groupID = groupID;
+    this.typeID = typeID;
+    this.description = description;
+    this.rank = rank;
     this.requiredPrimaryAttribute = requiredPrimaryAttribute;
     this.requiredSecondaryAttribute = requiredSecondaryAttribute;
-    this.typeID = typeID;
     this.typeName = typeName;
     this.published = published;
   }
@@ -148,7 +149,6 @@ public class SkillMember extends RefCachedData {
 
   public static SkillMember get(
                                 final long time,
-                                final int groupID,
                                 final int typeID) {
     try {
       return EveKitRefDataProvider.getFactory().runTransaction(new RunInTransaction<SkillMember>() {
@@ -156,7 +156,6 @@ public class SkillMember extends RefCachedData {
         public SkillMember run() throws Exception {
           TypedQuery<SkillMember> getter = EveKitRefDataProvider.getFactory().getEntityManager().createNamedQuery("SkillMember.get", SkillMember.class);
           getter.setParameter("point", time);
-          getter.setParameter("gid", groupID);
           getter.setParameter("tid", typeID);
           try {
             return getter.getSingleResult();

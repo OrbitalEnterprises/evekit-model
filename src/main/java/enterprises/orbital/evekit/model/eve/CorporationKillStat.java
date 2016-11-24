@@ -16,6 +16,7 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.EveKitRefDataProvider;
 import enterprises.orbital.evekit.model.AttributeParameters;
 import enterprises.orbital.evekit.model.AttributeSelector;
+import enterprises.orbital.evekit.model.AttributeSelector.EnumMapper;
 import enterprises.orbital.evekit.model.RefCachedData;
 
 @Entity
@@ -24,22 +25,21 @@ import enterprises.orbital.evekit.model.RefCachedData;
 @NamedQueries({
     @NamedQuery(
         name = "CorporationKillStat.get",
-        query = "SELECT c FROM CorporationKillStat c WHERE c.corporationID = :corpid AND c.lifeStart <= :point AND c.lifeEnd > :point"),
+        query = "SELECT c FROM CorporationKillStat c WHERE c.attribute = :attr AND c.corporationID = :corpid AND c.lifeStart <= :point AND c.lifeEnd > :point"),
 })
-public class CorporationKillStat extends RefCachedData {
+public class CorporationKillStat extends AbstractKillStat {
   private static final Logger log = Logger.getLogger(CorporationKillStat.class.getName());
   private long                corporationID;
   private String              corporationName;
-  private int                 kills;
 
-  @SuppressWarnings("unused")
-  private CorporationKillStat() {}
+  private CorporationKillStat() {
+    super(StatAttribute.TOTAL, 0);
+  }
 
-  public CorporationKillStat(long corporationID, String corporationName, int kills) {
-    super();
+  public CorporationKillStat(StatAttribute attribute, int kills, long corporationID, String corporationName) {
+    super(attribute, kills);
     this.corporationID = corporationID;
     this.corporationName = corporationName;
-    this.kills = kills;
   }
 
   /**
@@ -49,8 +49,9 @@ public class CorporationKillStat extends RefCachedData {
   public boolean equivalent(
                             RefCachedData sup) {
     if (!(sup instanceof CorporationKillStat)) return false;
+    if (!super.equivalent(sup)) return false;
     CorporationKillStat other = (CorporationKillStat) sup;
-    return corporationID == other.corporationID && nullSafeObjectCompare(corporationName, other.corporationName) && kills == other.kills;
+    return corporationID == other.corporationID && nullSafeObjectCompare(corporationName, other.corporationName);
   }
 
   public long getCorporationID() {
@@ -61,17 +62,12 @@ public class CorporationKillStat extends RefCachedData {
     return corporationName;
   }
 
-  public int getKills() {
-    return kills;
-  }
-
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
     result = prime * result + (int) (corporationID ^ (corporationID >>> 32));
     result = prime * result + ((corporationName == null) ? 0 : corporationName.hashCode());
-    result = prime * result + kills;
     return result;
   }
 
@@ -86,17 +82,18 @@ public class CorporationKillStat extends RefCachedData {
     if (corporationName == null) {
       if (other.corporationName != null) return false;
     } else if (!corporationName.equals(other.corporationName)) return false;
-    if (kills != other.kills) return false;
     return true;
   }
 
   @Override
   public String toString() {
-    return "CorporationKillStat [corporationID=" + corporationID + ", corporationName=" + corporationName + ", kills=" + kills + "]";
+    return "CorporationKillStat [corporationID=" + corporationID + ", corporationName=" + corporationName + ", attribute=" + attribute + ", kills=" + kills
+        + "]";
   }
 
   public static CorporationKillStat get(
                                         final long time,
+                                        final StatAttribute attr,
                                         final long corporationID) {
     try {
       return EveKitRefDataProvider.getFactory().runTransaction(new RunInTransaction<CorporationKillStat>() {
@@ -105,6 +102,7 @@ public class CorporationKillStat extends RefCachedData {
           TypedQuery<CorporationKillStat> getter = EveKitRefDataProvider.getFactory().getEntityManager().createNamedQuery("CorporationKillStat.get",
                                                                                                                           CorporationKillStat.class);
           getter.setParameter("point", time);
+          getter.setParameter("attr", attr);
           getter.setParameter("corpid", corporationID);
           try {
             return getter.getSingleResult();
@@ -124,6 +122,7 @@ public class CorporationKillStat extends RefCachedData {
                                                       final int maxresults,
                                                       final boolean reverse,
                                                       final AttributeSelector at,
+                                                      final AttributeSelector attribute,
                                                       final AttributeSelector corporationID,
                                                       final AttributeSelector corporationName,
                                                       final AttributeSelector kills) {
@@ -137,6 +136,14 @@ public class CorporationKillStat extends RefCachedData {
           AttributeSelector.addLifelineSelector(qs, "c", at);
           // Constrain attributes
           AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addEnumSelector(qs, "c", "attribute", attribute, new EnumMapper<StatAttribute>() {
+
+            @Override
+            public StatAttribute mapEnumValue(
+                                              String value) {
+              return StatAttribute.valueOf(value);
+            }
+          }, p);
           AttributeSelector.addLongSelector(qs, "c", "corporationID", corporationID);
           AttributeSelector.addStringSelector(qs, "c", "corporationName", corporationName, p);
           AttributeSelector.addIntSelector(qs, "c", "kills", kills);

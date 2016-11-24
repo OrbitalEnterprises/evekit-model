@@ -23,11 +23,10 @@ import enterprises.orbital.evekit.model.RefCachedData;
 @NamedQueries({
     @NamedQuery(
         name = "RequiredSkill.get",
-        query = "SELECT c FROM RequiredSkill c WHERE c.parentGroupID = :pgid AND c.parentTypeID = :ptid AND c.typeID = :tid AND c.lifeStart <= :point AND c.lifeEnd > :point"),
+        query = "SELECT c FROM RequiredSkill c WHERE c.parentTypeID = :ptid AND c.typeID = :tid AND c.lifeStart <= :point AND c.lifeEnd > :point"),
 })
 public class RequiredSkill extends RefCachedData {
   private static final Logger log = Logger.getLogger(RequiredSkill.class.getName());
-  private int                 parentGroupID;
   private int                 parentTypeID;
   private int                 typeID;
   private int                 level;
@@ -35,9 +34,8 @@ public class RequiredSkill extends RefCachedData {
   @SuppressWarnings("unused")
   private RequiredSkill() {}
 
-  public RequiredSkill(int parentGroupID, int parentTypeID, int typeID, int level) {
+  public RequiredSkill(int parentTypeID, int typeID, int level) {
     super();
-    this.parentGroupID = parentGroupID;
     this.parentTypeID = parentTypeID;
     this.typeID = typeID;
     this.level = level;
@@ -51,11 +49,7 @@ public class RequiredSkill extends RefCachedData {
                             RefCachedData sup) {
     if (!(sup instanceof RequiredSkill)) return false;
     RequiredSkill other = (RequiredSkill) sup;
-    return parentGroupID == other.parentGroupID && parentTypeID == other.parentTypeID && typeID == other.typeID && level == other.level;
-  }
-
-  public int getParentGroupID() {
-    return parentGroupID;
+    return parentTypeID == other.parentTypeID && typeID == other.typeID && level == other.level;
   }
 
   public int getParentTypeID() {
@@ -75,7 +69,6 @@ public class RequiredSkill extends RefCachedData {
     final int prime = 31;
     int result = super.hashCode();
     result = prime * result + level;
-    result = prime * result + parentGroupID;
     result = prime * result + parentTypeID;
     result = prime * result + typeID;
     return result;
@@ -89,7 +82,6 @@ public class RequiredSkill extends RefCachedData {
     if (getClass() != obj.getClass()) return false;
     RequiredSkill other = (RequiredSkill) obj;
     if (level != other.level) return false;
-    if (parentGroupID != other.parentGroupID) return false;
     if (parentTypeID != other.parentTypeID) return false;
     if (typeID != other.typeID) return false;
     return true;
@@ -97,12 +89,11 @@ public class RequiredSkill extends RefCachedData {
 
   @Override
   public String toString() {
-    return "RequiredSkill [parentGroupID=" + parentGroupID + ", parentTypeID=" + parentTypeID + ", typeID=" + typeID + ", level=" + level + "]";
+    return "RequiredSkill [parentTypeID=" + parentTypeID + ", typeID=" + typeID + ", level=" + level + "]";
   }
 
   public static RequiredSkill get(
                                   final long time,
-                                  final int parentGroupID,
                                   final int parentTypeID,
                                   final int typeID) {
     try {
@@ -111,7 +102,6 @@ public class RequiredSkill extends RefCachedData {
         public RequiredSkill run() throws Exception {
           TypedQuery<RequiredSkill> getter = EveKitRefDataProvider.getFactory().getEntityManager().createNamedQuery("RequiredSkill.get", RequiredSkill.class);
           getter.setParameter("point", time);
-          getter.setParameter("pgid", parentGroupID);
           getter.setParameter("ptid", parentTypeID);
           getter.setParameter("tid", typeID);
           try {
@@ -132,7 +122,6 @@ public class RequiredSkill extends RefCachedData {
                                                 final int maxresults,
                                                 final boolean reverse,
                                                 final AttributeSelector at,
-                                                final AttributeSelector parentGroupID,
                                                 final AttributeSelector parentTypeID,
                                                 final AttributeSelector typeID,
                                                 final AttributeSelector level) {
@@ -145,7 +134,6 @@ public class RequiredSkill extends RefCachedData {
           // Constrain lifeline
           AttributeSelector.addLifelineSelector(qs, "c", at);
           // Constrain attributes
-          AttributeSelector.addIntSelector(qs, "c", "parentGroupID", parentGroupID);
           AttributeSelector.addIntSelector(qs, "c", "parentTypeID", parentTypeID);
           AttributeSelector.addIntSelector(qs, "c", "typeID", typeID);
           AttributeSelector.addIntSelector(qs, "c", "level", level);

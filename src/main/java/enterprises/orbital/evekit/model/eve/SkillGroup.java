@@ -24,24 +24,20 @@ import enterprises.orbital.evekit.model.RefCachedData;
 @NamedQueries({
     @NamedQuery(
         name = "SkillGroup.get",
-        query = "SELECT c FROM SkillGroup c WHERE c.type = :type AND c.name = :name AND c.lifeStart <= :point AND c.lifeEnd > :point"),
+        query = "SELECT c FROM SkillGroup c WHERE c.groupID = :gid AND c.lifeStart <= :point AND c.lifeEnd > :point"),
 })
 public class SkillGroup extends RefCachedData {
   private static final Logger log = Logger.getLogger(SkillGroup.class.getName());
-  private String              type;
-  private String              name;
-  private long                groupID;
-  private String              description;
+  private int                 groupID;
+  private String              groupName;
 
   @SuppressWarnings("unused")
   private SkillGroup() {}
 
-  public SkillGroup(String type, String name, long groupID, String description) {
+  public SkillGroup(int groupID, String groupName) {
     super();
-    this.type = type;
-    this.name = name;
     this.groupID = groupID;
-    this.description = description;
+    this.groupName = groupName;
   }
 
   /**
@@ -52,34 +48,23 @@ public class SkillGroup extends RefCachedData {
                             RefCachedData sup) {
     if (!(sup instanceof SkillGroup)) return false;
     SkillGroup other = (SkillGroup) sup;
-    return nullSafeObjectCompare(type, other.type) && nullSafeObjectCompare(name, other.name) && groupID == other.groupID
-        && nullSafeObjectCompare(description, other.description);
+    return groupID == other.groupID && nullSafeObjectCompare(groupName, other.groupName);
   }
 
-  public String getType() {
-    return type;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public long getGroupID() {
+  public int getGroupID() {
     return groupID;
   }
 
-  public String getDescription() {
-    return description;
+  public String getGroupName() {
+    return groupName;
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + ((description == null) ? 0 : description.hashCode());
-    result = prime * result + (int) (groupID ^ (groupID >>> 32));
-    result = prime * result + ((name == null) ? 0 : name.hashCode());
-    result = prime * result + ((type == null) ? 0 : type.hashCode());
+    result = prime * result + groupID;
+    result = prime * result + ((groupName == null) ? 0 : groupName.hashCode());
     return result;
   }
 
@@ -90,36 +75,28 @@ public class SkillGroup extends RefCachedData {
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
     SkillGroup other = (SkillGroup) obj;
-    if (description == null) {
-      if (other.description != null) return false;
-    } else if (!description.equals(other.description)) return false;
     if (groupID != other.groupID) return false;
-    if (name == null) {
-      if (other.name != null) return false;
-    } else if (!name.equals(other.name)) return false;
-    if (type == null) {
-      if (other.type != null) return false;
-    } else if (!type.equals(other.type)) return false;
+    if (groupName == null) {
+      if (other.groupName != null) return false;
+    } else if (!groupName.equals(other.groupName)) return false;
     return true;
   }
 
   @Override
   public String toString() {
-    return "SkillGroup [type=" + type + ", name=" + name + ", groupID=" + groupID + ", description=" + description + "]";
+    return "SkillGroup [groupID=" + groupID + ", groupName=" + groupName + "]";
   }
 
   public static SkillGroup get(
                                final long time,
-                               final String type,
-                               final String name) {
+                               final int groupID) {
     try {
       return EveKitRefDataProvider.getFactory().runTransaction(new RunInTransaction<SkillGroup>() {
         @Override
         public SkillGroup run() throws Exception {
           TypedQuery<SkillGroup> getter = EveKitRefDataProvider.getFactory().getEntityManager().createNamedQuery("SkillGroup.get", SkillGroup.class);
           getter.setParameter("point", time);
-          getter.setParameter("type", type);
-          getter.setParameter("name", name);
+          getter.setParameter("gid", groupID);
           try {
             return getter.getSingleResult();
           } catch (NoResultException e) {
@@ -138,10 +115,8 @@ public class SkillGroup extends RefCachedData {
                                              final int maxresults,
                                              final boolean reverse,
                                              final AttributeSelector at,
-                                             final AttributeSelector type,
-                                             final AttributeSelector name,
                                              final AttributeSelector groupID,
-                                             final AttributeSelector description) {
+                                             final AttributeSelector groupName) {
     try {
       return EveKitRefDataProvider.getFactory().runTransaction(new RunInTransaction<List<SkillGroup>>() {
         @Override
@@ -152,10 +127,8 @@ public class SkillGroup extends RefCachedData {
           AttributeSelector.addLifelineSelector(qs, "c", at);
           // Constrain attributes
           AttributeParameters p = new AttributeParameters("att");
-          AttributeSelector.addStringSelector(qs, "c", "type", type, p);
-          AttributeSelector.addStringSelector(qs, "c", "name", name, p);
-          AttributeSelector.addLongSelector(qs, "c", "groupID", groupID);
-          AttributeSelector.addStringSelector(qs, "c", "description", description, p);
+          AttributeSelector.addIntSelector(qs, "c", "groupID", groupID);
+          AttributeSelector.addStringSelector(qs, "c", "groupName", groupName, p);
           // Set CID constraint and ordering
           if (reverse) {
             qs.append(" and c.cid < ").append(contid);

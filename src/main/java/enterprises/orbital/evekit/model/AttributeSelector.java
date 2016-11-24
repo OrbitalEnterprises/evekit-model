@@ -23,6 +23,11 @@ public class AttributeSelector {
                                    LIKE;
   }
 
+  public static interface EnumMapper<A extends Enum<?>> {
+    public A mapEnumValue(
+                          String value);
+  }
+
   /**
    * If true, allow any value for the attribute associated with this selector.
    */
@@ -270,6 +275,32 @@ public class AttributeSelector {
       String likeParam = ":" + p.addStringParam(as.getLikeValue());
       builder.append(" AND ").append(target).append(".").append(column).append(" LIKE ").append(likeParam);
       break;
+    case WILDCARD:
+    default:
+      // No constraint, skip
+      break;
+    }
+  }
+
+  public static <A extends Enum<?>> void addEnumSelector(
+                                                         StringBuilder builder,
+                                                         String target,
+                                                         String column,
+                                                         AttributeSelector as,
+                                                         EnumMapper<A> mapper,
+                                                         AttributeParameters p) {
+    switch (as.type()) {
+    case SET:
+      builder.append(" AND ").append(target).append(".").append(column).append(" IN (");
+      for (String l : as.getStringValues()) {
+        String next = ":" + p.addEnumParam(mapper.mapEnumValue(l));
+        builder.append(next).append(", ");
+      }
+      builder.setLength(builder.length() - 2);
+      builder.append(")");
+      break;
+    case RANGE:
+    case LIKE:
     case WILDCARD:
     default:
       // No constraint, skip

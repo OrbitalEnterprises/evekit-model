@@ -12,6 +12,7 @@ public class AttributeParameters {
   private Map<String, String>  stringParams  = new HashMap<String, String>();
   private Map<String, Integer> integerParams = new HashMap<String, Integer>();
   private Map<String, Long>    longParams    = new HashMap<String, Long>();
+  private Map<String, Enum<?>> enumParams    = new HashMap<String, Enum<?>>();
 
   public AttributeParameters(String prefix) {
     this.prefix = prefix;
@@ -27,6 +28,13 @@ public class AttributeParameters {
                                String value) {
     String next = getNextParam();
     stringParams.put(next, value);
+    return next;
+  };
+
+  public String addEnumParam(
+                             Enum<?> value) {
+    String next = getNextParam();
+    enumParams.put(next, value);
     return next;
   };
 
@@ -53,6 +61,12 @@ public class AttributeParameters {
       query.setParameter(e.getKey(), e.getValue());
     }
     for (Entry<String, Long> e : longParams.entrySet()) {
+      query.setParameter(e.getKey(), e.getValue());
+    }
+    for (Entry<String, Long> e : longParams.entrySet()) {
+      query.setParameter(e.getKey(), e.getValue());
+    }
+    for (Entry<String, Enum<?>> e : enumParams.entrySet()) {
       query.setParameter(e.getKey(), e.getValue());
     }
   }

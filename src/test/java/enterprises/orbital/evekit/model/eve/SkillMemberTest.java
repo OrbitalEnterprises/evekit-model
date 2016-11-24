@@ -23,8 +23,8 @@ public class SkillMemberTest extends AbstractRefModelTester<SkillMember> {
                                                                             @Override
                                                                             public SkillMember getCUT() {
                                                                               return new SkillMember(
-                                                                                  description, groupID, requiredPrimaryAttribute, requiredSecondaryAttribute,
-                                                                                  typeID, typeName, published);
+                                                                                  groupID, typeID, description, rank, requiredPrimaryAttribute,
+                                                                                  requiredSecondaryAttribute, typeName, published);
                                                                             }
 
                                                                           };
@@ -33,8 +33,8 @@ public class SkillMemberTest extends AbstractRefModelTester<SkillMember> {
                                                                             @Override
                                                                             public SkillMember getCUT() {
                                                                               return new SkillMember(
-                                                                                  description + "1", groupID, requiredPrimaryAttribute,
-                                                                                  requiredSecondaryAttribute, typeID, typeName, published);
+                                                                                  groupID, typeID, description + "1", rank, requiredPrimaryAttribute,
+                                                                                  requiredSecondaryAttribute, typeName, published);
                                                                             }
 
                                                                           };
@@ -47,13 +47,14 @@ public class SkillMemberTest extends AbstractRefModelTester<SkillMember> {
       @Override
       public SkillMember[] getVariants() {
         return new SkillMember[] {
-            new SkillMember(description + "1", groupID, requiredPrimaryAttribute, requiredSecondaryAttribute, typeID, typeName, published),
-            new SkillMember(description, groupID + 1, requiredPrimaryAttribute, requiredSecondaryAttribute, typeID, typeName, published),
-            new SkillMember(description, groupID, requiredPrimaryAttribute + "1", requiredSecondaryAttribute, typeID, typeName, published),
-            new SkillMember(description, groupID, requiredPrimaryAttribute, requiredSecondaryAttribute + "1", typeID, typeName, published),
-            new SkillMember(description, groupID, requiredPrimaryAttribute, requiredSecondaryAttribute, typeID + 1, typeName, published),
-            new SkillMember(description, groupID, requiredPrimaryAttribute, requiredSecondaryAttribute, typeID, typeName + "1", published),
-            new SkillMember(description, groupID, requiredPrimaryAttribute, requiredSecondaryAttribute, typeID, typeName, !published)
+            new SkillMember(groupID + 1, typeID, description, rank, requiredPrimaryAttribute, requiredSecondaryAttribute, typeName, published),
+            new SkillMember(groupID, typeID + 1, description, rank, requiredPrimaryAttribute, requiredSecondaryAttribute, typeName, published),
+            new SkillMember(groupID, typeID, description + "1", rank, requiredPrimaryAttribute, requiredSecondaryAttribute, typeName, published),
+            new SkillMember(groupID, typeID, description, rank + 1, requiredPrimaryAttribute, requiredSecondaryAttribute, typeName, published),
+            new SkillMember(groupID, typeID, description, rank, requiredPrimaryAttribute + "1", requiredSecondaryAttribute, typeName, published),
+            new SkillMember(groupID, typeID, description, rank, requiredPrimaryAttribute, requiredSecondaryAttribute + "1", typeName, published),
+            new SkillMember(groupID, typeID, description, rank, requiredPrimaryAttribute, requiredSecondaryAttribute, typeName + "1", published),
+            new SkillMember(groupID, typeID, description, rank, requiredPrimaryAttribute, requiredSecondaryAttribute, typeName, !published)
         };
       }
 
@@ -68,7 +69,7 @@ public class SkillMemberTest extends AbstractRefModelTester<SkillMember> {
       @Override
       public SkillMember getModel(
                                   long time) {
-        return SkillMember.get(time, groupID, typeID);
+        return SkillMember.get(time, typeID);
       }
 
     });
@@ -77,37 +78,31 @@ public class SkillMemberTest extends AbstractRefModelTester<SkillMember> {
   @Test
   public void testGetByKey() throws Exception {
     // Should exclude:
-    // - objects with different group ID
     // - objects with different type ID
     // - objects not live at the given time
     SkillMember existing, keyed;
 
-    keyed = new SkillMember(description, groupID, requiredPrimaryAttribute, requiredSecondaryAttribute, typeID, typeName, published);
+    keyed = new SkillMember(groupID, typeID, description, rank, requiredPrimaryAttribute, requiredSecondaryAttribute, typeName, published);
     keyed.setup(8888L);
     keyed = RefCachedData.updateData(keyed);
 
-    // Different group ID
-    existing = new SkillMember(description, groupID + 1, requiredPrimaryAttribute, requiredSecondaryAttribute, typeID, typeName, published);
-    existing.setup(8888L);
-    RefCachedData.updateData(existing);
-
     // Different type ID
-    existing = new SkillMember(description, groupID, requiredPrimaryAttribute, requiredSecondaryAttribute, typeID + 1, typeName, published);
+    existing = new SkillMember(groupID, typeID + 1, description, rank, requiredPrimaryAttribute, requiredSecondaryAttribute, typeName, published);
     existing.setup(8888L);
     RefCachedData.updateData(existing);
 
     // Not live at the given time
-    existing = new SkillMember(description + "1", groupID, requiredPrimaryAttribute, requiredSecondaryAttribute, typeID, typeName, published);
+    existing = new SkillMember(groupID, typeID, description + "1", rank, requiredPrimaryAttribute, requiredSecondaryAttribute, typeName, published);
     existing.setup(9999L);
     RefCachedData.updateData(existing);
 
     // EOL before the given time
-    existing = new SkillMember(description + "2", groupID, requiredPrimaryAttribute, requiredSecondaryAttribute, typeID, typeName, published);
+    existing = new SkillMember(groupID, typeID, description + "2", rank, requiredPrimaryAttribute, requiredSecondaryAttribute, typeName, published);
     existing.setup(7777L);
     existing.evolve(null, 7977L);
     RefCachedData.updateData(existing);
 
-    SkillMember result = SkillMember.get(8889L, groupID, typeID);
+    SkillMember result = SkillMember.get(8889L, typeID);
     Assert.assertEquals(keyed, result);
   }
 

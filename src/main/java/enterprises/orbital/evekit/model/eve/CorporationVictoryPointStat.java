@@ -16,6 +16,7 @@ import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.EveKitRefDataProvider;
 import enterprises.orbital.evekit.model.AttributeParameters;
 import enterprises.orbital.evekit.model.AttributeSelector;
+import enterprises.orbital.evekit.model.AttributeSelector.EnumMapper;
 import enterprises.orbital.evekit.model.RefCachedData;
 
 @Entity
@@ -24,22 +25,21 @@ import enterprises.orbital.evekit.model.RefCachedData;
 @NamedQueries({
     @NamedQuery(
         name = "CorporationVictoryPointStat.get",
-        query = "SELECT c FROM CorporationVictoryPointStat c WHERE c.corporationID = :corpid AND c.lifeStart <= :point AND c.lifeEnd > :point"),
+        query = "SELECT c FROM CorporationVictoryPointStat c WHERE c.attribute = :attr AND c.corporationID = :corpid AND c.lifeStart <= :point AND c.lifeEnd > :point"),
 })
-public class CorporationVictoryPointStat extends RefCachedData {
+public class CorporationVictoryPointStat extends AbstractVictoryPointStat {
   private static final Logger log = Logger.getLogger(CorporationVictoryPointStat.class.getName());
   private long                corporationID;
   private String              corporationName;
-  private int                 victoryPoints;
 
-  @SuppressWarnings("unused")
-  private CorporationVictoryPointStat() {}
+  private CorporationVictoryPointStat() {
+    super(StatAttribute.TOTAL, 0);
+  }
 
-  public CorporationVictoryPointStat(long corporationID, String corporationName, int victoryPoints) {
-    super();
+  public CorporationVictoryPointStat(StatAttribute attribute, int victoryPoints, long corporationID, String corporationName) {
+    super(attribute, victoryPoints);
     this.corporationID = corporationID;
     this.corporationName = corporationName;
-    this.victoryPoints = victoryPoints;
   }
 
   /**
@@ -49,8 +49,9 @@ public class CorporationVictoryPointStat extends RefCachedData {
   public boolean equivalent(
                             RefCachedData sup) {
     if (!(sup instanceof CorporationVictoryPointStat)) return false;
+    if (!super.equivalent(sup)) return false;
     CorporationVictoryPointStat other = (CorporationVictoryPointStat) sup;
-    return corporationID == other.corporationID && nullSafeObjectCompare(corporationName, other.corporationName) && victoryPoints == other.victoryPoints;
+    return corporationID == other.corporationID && nullSafeObjectCompare(corporationName, other.corporationName);
   }
 
   public long getCorporationID() {
@@ -61,17 +62,12 @@ public class CorporationVictoryPointStat extends RefCachedData {
     return corporationName;
   }
 
-  public int getVictoryPoints() {
-    return victoryPoints;
-  }
-
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
     result = prime * result + (int) (corporationID ^ (corporationID >>> 32));
     result = prime * result + ((corporationName == null) ? 0 : corporationName.hashCode());
-    result = prime * result + victoryPoints;
     return result;
   }
 
@@ -86,17 +82,17 @@ public class CorporationVictoryPointStat extends RefCachedData {
     if (corporationName == null) {
       if (other.corporationName != null) return false;
     } else if (!corporationName.equals(other.corporationName)) return false;
-    if (victoryPoints != other.victoryPoints) return false;
     return true;
   }
 
   @Override
   public String toString() {
-    return "CorporationVictoryPointStat [corporationID=" + corporationID + ", corporationName=" + corporationName + ", victoryPoints=" + victoryPoints + "]";
+    return "CorporationVictoryPointStat [corporationID=" + corporationID + ", corporationName=" + corporationName + "]";
   }
 
   public static CorporationVictoryPointStat get(
                                                 final long time,
+                                                final StatAttribute attr,
                                                 final long corporationID) {
     try {
       return EveKitRefDataProvider.getFactory().runTransaction(new RunInTransaction<CorporationVictoryPointStat>() {
@@ -105,6 +101,7 @@ public class CorporationVictoryPointStat extends RefCachedData {
           TypedQuery<CorporationVictoryPointStat> getter = EveKitRefDataProvider.getFactory().getEntityManager()
               .createNamedQuery("CorporationVictoryPointStat.get", CorporationVictoryPointStat.class);
           getter.setParameter("point", time);
+          getter.setParameter("attr", attr);
           getter.setParameter("corpid", corporationID);
           try {
             return getter.getSingleResult();
@@ -124,6 +121,7 @@ public class CorporationVictoryPointStat extends RefCachedData {
                                                               final int maxresults,
                                                               final boolean reverse,
                                                               final AttributeSelector at,
+                                                              final AttributeSelector attribute,
                                                               final AttributeSelector corporationID,
                                                               final AttributeSelector corporationName,
                                                               final AttributeSelector victoryPoints) {
@@ -137,6 +135,14 @@ public class CorporationVictoryPointStat extends RefCachedData {
           AttributeSelector.addLifelineSelector(qs, "c", at);
           // Constrain attributes
           AttributeParameters p = new AttributeParameters("att");
+          AttributeSelector.addEnumSelector(qs, "c", "attribute", attribute, new EnumMapper<StatAttribute>() {
+
+            @Override
+            public StatAttribute mapEnumValue(
+                                              String value) {
+              return StatAttribute.valueOf(value);
+            }
+          }, p);
           AttributeSelector.addLongSelector(qs, "c", "corporationID", corporationID);
           AttributeSelector.addStringSelector(qs, "c", "corporationName", corporationName, p);
           AttributeSelector.addIntSelector(qs, "c", "victoryPoints", victoryPoints);

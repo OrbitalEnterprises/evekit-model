@@ -9,27 +9,26 @@ import enterprises.orbital.evekit.model.RefCachedData;
 
 public class RequiredSkillTest extends AbstractRefModelTester<RequiredSkill> {
 
-  final int                                      parentGroupID = TestBase.getRandomInt(100000000);
-  final int                                      parentTypeID  = TestBase.getRandomInt(100000000);
-  final int                                      typeID        = TestBase.getRandomInt(100000000);
-  final int                                      level         = TestBase.getRandomInt(100000000);
+  final int                                      parentTypeID = TestBase.getRandomInt(100000000);
+  final int                                      typeID       = TestBase.getRandomInt(100000000);
+  final int                                      level        = TestBase.getRandomInt(100000000);
 
-  final ClassUnderTestConstructor<RequiredSkill> eol           = new ClassUnderTestConstructor<RequiredSkill>() {
+  final ClassUnderTestConstructor<RequiredSkill> eol          = new ClassUnderTestConstructor<RequiredSkill>() {
 
-                                                                 @Override
-                                                                 public RequiredSkill getCUT() {
-                                                                   return new RequiredSkill(parentGroupID, parentTypeID, typeID, level);
-                                                                 }
+                                                                @Override
+                                                                public RequiredSkill getCUT() {
+                                                                  return new RequiredSkill(parentTypeID, typeID, level);
+                                                                }
 
-                                                               };
+                                                              };
 
-  final ClassUnderTestConstructor<RequiredSkill> live          = new ClassUnderTestConstructor<RequiredSkill>() {
-                                                                 @Override
-                                                                 public RequiredSkill getCUT() {
-                                                                   return new RequiredSkill(parentGroupID, parentTypeID, typeID, level + 1);
-                                                                 }
+  final ClassUnderTestConstructor<RequiredSkill> live         = new ClassUnderTestConstructor<RequiredSkill>() {
+                                                                @Override
+                                                                public RequiredSkill getCUT() {
+                                                                  return new RequiredSkill(parentTypeID, typeID, level + 1);
+                                                                }
 
-                                                               };
+                                                              };
 
   @Test
   public void testBasic() throws Exception {
@@ -39,8 +38,8 @@ public class RequiredSkillTest extends AbstractRefModelTester<RequiredSkill> {
       @Override
       public RequiredSkill[] getVariants() {
         return new RequiredSkill[] {
-            new RequiredSkill(parentGroupID + 1, parentTypeID, typeID, level), new RequiredSkill(parentGroupID, parentTypeID + 1, typeID, level),
-            new RequiredSkill(parentGroupID, parentTypeID, typeID + 1, level), new RequiredSkill(parentGroupID, parentTypeID, typeID, level + 1)
+            new RequiredSkill(parentTypeID + 1, typeID, level), new RequiredSkill(parentTypeID, typeID + 1, level),
+            new RequiredSkill(parentTypeID, typeID, level + 1)
         };
       }
 
@@ -55,7 +54,7 @@ public class RequiredSkillTest extends AbstractRefModelTester<RequiredSkill> {
       @Override
       public RequiredSkill getModel(
                                     long time) {
-        return RequiredSkill.get(time, parentGroupID, parentTypeID, typeID);
+        return RequiredSkill.get(time, parentTypeID, typeID);
       }
 
     });
@@ -64,43 +63,37 @@ public class RequiredSkillTest extends AbstractRefModelTester<RequiredSkill> {
   @Test
   public void testGetByKey() throws Exception {
     // Should exclude:
-    // - objects with different parent group ID
     // - objects with different parent type ID
     // - objects with different type ID
     // - objects not live at the given time
     RequiredSkill existing, keyed;
 
-    keyed = new RequiredSkill(parentGroupID, parentTypeID, typeID, level);
+    keyed = new RequiredSkill(parentTypeID, typeID, level);
     keyed.setup(8888L);
     keyed = RefCachedData.updateData(keyed);
 
-    // Different parent group ID
-    existing = new RequiredSkill(parentGroupID + 1, parentTypeID, typeID, level);
-    existing.setup(8888L);
-    RefCachedData.updateData(existing);
-
     // Different parent type ID
-    existing = new RequiredSkill(parentGroupID, parentTypeID + 1, typeID, level);
+    existing = new RequiredSkill(parentTypeID + 1, typeID, level);
     existing.setup(8888L);
     RefCachedData.updateData(existing);
 
     // Different type ID
-    existing = new RequiredSkill(parentGroupID, parentTypeID, typeID + 1, level);
+    existing = new RequiredSkill(parentTypeID, typeID + 1, level);
     existing.setup(8888L);
     RefCachedData.updateData(existing);
 
     // Not live at the given time
-    existing = new RequiredSkill(parentGroupID, parentTypeID, typeID, level + 1);
+    existing = new RequiredSkill(parentTypeID, typeID, level + 1);
     existing.setup(9999L);
     RefCachedData.updateData(existing);
 
     // EOL before the given time
-    existing = new RequiredSkill(parentGroupID, parentTypeID, typeID, level + 2);
+    existing = new RequiredSkill(parentTypeID, typeID, level + 2);
     existing.setup(7777L);
     existing.evolve(null, 7977L);
     RefCachedData.updateData(existing);
 
-    RequiredSkill result = RequiredSkill.get(8889L, parentGroupID, parentTypeID, typeID);
+    RequiredSkill result = RequiredSkill.get(8889L, parentTypeID, typeID);
     Assert.assertEquals(keyed, result);
   }
 
