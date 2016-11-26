@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.NoResultException;
@@ -29,6 +31,9 @@ import enterprises.orbital.evekit.model.RefCachedData;
 public class ErrorType extends RefCachedData {
   private static final Logger log = Logger.getLogger(ErrorType.class.getName());
   private int                 errorCode;
+  @Lob
+  @Column(
+      length = 102400)
   private String              errorText;
 
   @SuppressWarnings("unused")

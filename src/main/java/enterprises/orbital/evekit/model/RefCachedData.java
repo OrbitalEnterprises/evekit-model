@@ -52,7 +52,8 @@ public abstract class RefCachedData {
   @SequenceGenerator(
       name = "ek_ref_seq",
       initialValue = 100000,
-      allocationSize = 10)
+      allocationSize = 10,
+      sequenceName = "ref_sequence")
   @ApiModelProperty(
       value = "Unique ID")
   private long                cid;

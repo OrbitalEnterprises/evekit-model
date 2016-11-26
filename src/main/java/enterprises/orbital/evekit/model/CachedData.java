@@ -55,7 +55,7 @@ import io.swagger.annotations.ApiModelProperty;
             name = "lifeEndIndex",
             columnList = "lifeEnd",
             unique = false)
-})
+    })
 @JsonIgnoreProperties({
     "owner", "accessMask", "metaData", "mask", "allMetaData"
 })
@@ -75,7 +75,8 @@ public abstract class CachedData {
   @SequenceGenerator(
       name = "ek_seq",
       initialValue = 100000,
-      allocationSize = 10)
+      allocationSize = 10,
+      sequenceName = "cached_sequence")
   @ApiModelProperty(
       value = "Unique ID")
   private long                     cid;
@@ -229,7 +230,8 @@ public abstract class CachedData {
 
   public void setMetaData(
                           String key,
-                          String value) throws MetaDataLimitException, MetaDataCountException {
+                          String value)
+    throws MetaDataLimitException, MetaDataCountException {
     if (key == null || key.length() == 0) throw new MetaDataLimitException("Key empty!");
     if (value == null) throw new MetaDataLimitException("Value null!");
     if (key.length() > 255) throw new MetaDataLimitException("Key too large!");
