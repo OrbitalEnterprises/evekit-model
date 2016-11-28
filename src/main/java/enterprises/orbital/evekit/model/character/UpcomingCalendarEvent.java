@@ -56,12 +56,13 @@ public class UpcomingCalendarEvent extends CachedData {
   private String              ownerName;
   private String              response;
   private boolean             important;
+  private int                 ownerTypeID;
 
   @SuppressWarnings("unused")
   private UpcomingCalendarEvent() {}
 
   public UpcomingCalendarEvent(int duration, long eventDate, long eventID, String eventText, String eventTitle, long ownerID, String ownerName, String response,
-                               boolean important) {
+                               boolean important, int ownerTypeID) {
     super();
     this.duration = duration;
     this.eventDate = eventDate;
@@ -72,6 +73,7 @@ public class UpcomingCalendarEvent extends CachedData {
     this.ownerName = ownerName;
     this.response = response;
     this.important = important;
+    this.ownerTypeID = ownerTypeID;
   }
 
   /**
@@ -84,7 +86,7 @@ public class UpcomingCalendarEvent extends CachedData {
     UpcomingCalendarEvent other = (UpcomingCalendarEvent) sup;
     return duration == other.duration && eventDate == other.eventDate && eventID == other.eventID && nullSafeObjectCompare(eventText, other.eventText)
         && nullSafeObjectCompare(eventTitle, other.eventTitle) && ownerID == other.ownerID && nullSafeObjectCompare(ownerName, other.ownerName)
-        && nullSafeObjectCompare(response, other.response) && important == other.important;
+        && nullSafeObjectCompare(response, other.response) && important == other.important && ownerTypeID == other.ownerTypeID;
   }
 
   /**
@@ -131,6 +133,10 @@ public class UpcomingCalendarEvent extends CachedData {
     return important;
   }
 
+  public int getOwnerTypeID() {
+    return ownerTypeID;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -143,6 +149,7 @@ public class UpcomingCalendarEvent extends CachedData {
     result = prime * result + (important ? 1231 : 1237);
     result = prime * result + (int) (ownerID ^ (ownerID >>> 32));
     result = prime * result + ((ownerName == null) ? 0 : ownerName.hashCode());
+    result = prime * result + ownerTypeID;
     result = prime * result + ((response == null) ? 0 : response.hashCode());
     return result;
   }
@@ -168,6 +175,7 @@ public class UpcomingCalendarEvent extends CachedData {
     if (ownerName == null) {
       if (other.ownerName != null) return false;
     } else if (!ownerName.equals(other.ownerName)) return false;
+    if (ownerTypeID != other.ownerTypeID) return false;
     if (response == null) {
       if (other.response != null) return false;
     } else if (!response.equals(other.response)) return false;
@@ -177,8 +185,8 @@ public class UpcomingCalendarEvent extends CachedData {
   @Override
   public String toString() {
     return "UpcomingCalendarEvent [duration=" + duration + ", eventDate=" + eventDate + ", eventID=" + eventID + ", eventText=" + eventText + ", eventTitle="
-        + eventTitle + ", ownerID=" + ownerID + ", ownerName=" + ownerName + ", response=" + response + ", important=" + important + ", owner=" + owner
-        + ", lifeStart=" + lifeStart + ", lifeEnd=" + lifeEnd + "]";
+        + eventTitle + ", ownerID=" + ownerID + ", ownerName=" + ownerName + ", response=" + response + ", important=" + important + ", ownerTypeID="
+        + ownerTypeID + "]";
   }
 
   public static UpcomingCalendarEvent get(
@@ -241,7 +249,8 @@ public class UpcomingCalendarEvent extends CachedData {
                                                         final AttributeSelector ownerID,
                                                         final AttributeSelector ownerName,
                                                         final AttributeSelector response,
-                                                        final AttributeSelector important) {
+                                                        final AttributeSelector important,
+                                                        final AttributeSelector ownerTypeID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<UpcomingCalendarEvent>>() {
         @Override
@@ -263,6 +272,7 @@ public class UpcomingCalendarEvent extends CachedData {
           AttributeSelector.addStringSelector(qs, "c", "ownerName", ownerName, p);
           AttributeSelector.addStringSelector(qs, "c", "response", response, p);
           AttributeSelector.addBooleanSelector(qs, "c", "important", important);
+          AttributeSelector.addIntSelector(qs, "c", "ownerTypeID", ownerTypeID);
           // Set CID constraint and ordering
           if (reverse) {
             qs.append(" and c.cid < ").append(contid);

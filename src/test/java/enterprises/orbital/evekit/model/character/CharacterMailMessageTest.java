@@ -22,7 +22,7 @@ public class CharacterMailMessageTest extends AbstractModelTester<CharacterMailM
   final Set<Long> toCharacterID    = new HashSet<Long>();
   final long      sentDate         = TestBase.getRandomInt(100000000);
   final String    title            = "test title";
-  final long      corpOrAllianceID = TestBase.getRandomInt(100000000);
+  final long      toCorpOrAllianceID = TestBase.getRandomInt(100000000);
   final Set<Long> toListID         = new HashSet<Long>();
   final boolean   msgRead          = true;
   final int       senderTypeID     = TestBase.getRandomInt(100000000);
@@ -39,7 +39,7 @@ public class CharacterMailMessageTest extends AbstractModelTester<CharacterMailM
   }
 
   public CharacterMailMessage makeMessage(long messageID, String senderName, long sentDate, boolean msgRead) {
-    CharacterMailMessage result = new CharacterMailMessage(messageID, senderID, senderName, sentDate, title, corpOrAllianceID, msgRead, senderTypeID);
+    CharacterMailMessage result = new CharacterMailMessage(messageID, senderID, senderName, sentDate, title, toCorpOrAllianceID, msgRead, senderTypeID);
     result.getToCharacterID().addAll(toCharacterID);
     result.getToListID().addAll(toListID);
     return result;
@@ -70,16 +70,16 @@ public class CharacterMailMessageTest extends AbstractModelTester<CharacterMailM
       @Override
       public CharacterMailMessage[] getVariants() {
         CharacterMailMessage[] result = new CharacterMailMessage[] {
-            new CharacterMailMessage(messageID + 1, senderID, senderName, sentDate, title, corpOrAllianceID, msgRead, senderTypeID),
-            new CharacterMailMessage(messageID, senderID + 1, senderName, sentDate, title, corpOrAllianceID, msgRead, senderTypeID),
-            new CharacterMailMessage(messageID, senderID, senderName + "1", sentDate, title, corpOrAllianceID, msgRead, senderTypeID),
-            new CharacterMailMessage(messageID, senderID, senderName, sentDate + 1, title, corpOrAllianceID, msgRead, senderTypeID),
-            new CharacterMailMessage(messageID, senderID, senderName, sentDate, title + "1", corpOrAllianceID, msgRead, senderTypeID),
-            new CharacterMailMessage(messageID, senderID, senderName, sentDate, title, corpOrAllianceID + 1, msgRead, senderTypeID),
-            new CharacterMailMessage(messageID, senderID, senderName, sentDate, title, corpOrAllianceID, !msgRead, senderTypeID),
-            new CharacterMailMessage(messageID, senderID, senderName, sentDate, title, corpOrAllianceID, msgRead, senderTypeID + 1),
-            new CharacterMailMessage(messageID, senderID, senderName, sentDate, title, corpOrAllianceID, msgRead, senderTypeID),
-            new CharacterMailMessage(messageID, senderID, senderName, sentDate, title, corpOrAllianceID, msgRead, senderTypeID)
+            new CharacterMailMessage(messageID + 1, senderID, senderName, sentDate, title, toCorpOrAllianceID, msgRead, senderTypeID),
+            new CharacterMailMessage(messageID, senderID + 1, senderName, sentDate, title, toCorpOrAllianceID, msgRead, senderTypeID),
+            new CharacterMailMessage(messageID, senderID, senderName + "1", sentDate, title, toCorpOrAllianceID, msgRead, senderTypeID),
+            new CharacterMailMessage(messageID, senderID, senderName, sentDate + 1, title, toCorpOrAllianceID, msgRead, senderTypeID),
+            new CharacterMailMessage(messageID, senderID, senderName, sentDate, title + "1", toCorpOrAllianceID, msgRead, senderTypeID),
+            new CharacterMailMessage(messageID, senderID, senderName, sentDate, title, toCorpOrAllianceID + 1, msgRead, senderTypeID),
+            new CharacterMailMessage(messageID, senderID, senderName, sentDate, title, toCorpOrAllianceID, !msgRead, senderTypeID),
+            new CharacterMailMessage(messageID, senderID, senderName, sentDate, title, toCorpOrAllianceID, msgRead, senderTypeID + 1),
+            new CharacterMailMessage(messageID, senderID, senderName, sentDate, title, toCorpOrAllianceID, msgRead, senderTypeID),
+            new CharacterMailMessage(messageID, senderID, senderName, sentDate, title, toCorpOrAllianceID, msgRead, senderTypeID)
         };
         for (int i = 0; i < result.length; i++) {
           result[i].getToCharacterID().addAll(toCharacterID);

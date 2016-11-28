@@ -88,12 +88,15 @@ public class WalletJournal extends CachedData {
       precision = 19,
       scale = 2)
   private BigDecimal          taxAmount;
+  private int                 owner1TypeID;
+  private int                 owner2TypeID;
 
   @SuppressWarnings("unused")
   private WalletJournal() {}
 
   public WalletJournal(int accountKey, long refID, long date, int refTypeID, String ownerName1, long ownerID1, String ownerName2, long ownerID2,
-                       String argName1, long argID1, BigDecimal amount, BigDecimal balance, String reason, long taxReceiverID, BigDecimal taxAmount) {
+                       String argName1, long argID1, BigDecimal amount, BigDecimal balance, String reason, long taxReceiverID, BigDecimal taxAmount,
+                       int owner1TypeID, int owner2TypeID) {
     this.accountKey = accountKey;
     this.refID = refID;
     this.date = date;
@@ -109,6 +112,8 @@ public class WalletJournal extends CachedData {
     this.reason = reason;
     this.taxReceiverID = taxReceiverID;
     this.taxAmount = taxAmount;
+    this.owner1TypeID = owner1TypeID;
+    this.owner2TypeID = owner2TypeID;
   }
 
   /**
@@ -124,7 +129,8 @@ public class WalletJournal extends CachedData {
         && nullSafeObjectCompare(ownerName1, other.ownerName1) && ownerID1 == other.ownerID1 && nullSafeObjectCompare(ownerName2, other.ownerName2)
         && ownerID2 == other.ownerID2 && nullSafeObjectCompare(argName1, other.argName1) && argID1 == other.argID1
         && nullSafeObjectCompare(amount, other.amount) && nullSafeObjectCompare(balance, other.balance) && nullSafeObjectCompare(reason, other.reason)
-        && taxReceiverID == other.taxReceiverID && nullSafeObjectCompare(taxAmount, other.taxAmount);
+        && taxReceiverID == other.taxReceiverID && nullSafeObjectCompare(taxAmount, other.taxAmount) && owner1TypeID == other.owner1TypeID
+        && owner2TypeID == other.owner2TypeID;
   }
 
   /**
@@ -195,6 +201,14 @@ public class WalletJournal extends CachedData {
     return taxAmount;
   }
 
+  public int getOwner1TypeID() {
+    return owner1TypeID;
+  }
+
+  public int getOwner2TypeID() {
+    return owner2TypeID;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -205,6 +219,8 @@ public class WalletJournal extends CachedData {
     result = prime * result + ((argName1 == null) ? 0 : argName1.hashCode());
     result = prime * result + ((balance == null) ? 0 : balance.hashCode());
     result = prime * result + (int) (date ^ (date >>> 32));
+    result = prime * result + owner1TypeID;
+    result = prime * result + owner2TypeID;
     result = prime * result + (int) (ownerID1 ^ (ownerID1 >>> 32));
     result = prime * result + (int) (ownerID2 ^ (ownerID2 >>> 32));
     result = prime * result + ((ownerName1 == null) ? 0 : ownerName1.hashCode());
@@ -236,6 +252,8 @@ public class WalletJournal extends CachedData {
       if (other.balance != null) return false;
     } else if (!balance.equals(other.balance)) return false;
     if (date != other.date) return false;
+    if (owner1TypeID != other.owner1TypeID) return false;
+    if (owner2TypeID != other.owner2TypeID) return false;
     if (ownerID1 != other.ownerID1) return false;
     if (ownerID2 != other.ownerID2) return false;
     if (ownerName1 == null) {
@@ -260,8 +278,8 @@ public class WalletJournal extends CachedData {
   public String toString() {
     return "WalletJournal [accountKey=" + accountKey + ", refID=" + refID + ", date=" + date + ", refTypeID=" + refTypeID + ", ownerName1=" + ownerName1
         + ", ownerID1=" + ownerID1 + ", ownerName2=" + ownerName2 + ", ownerID2=" + ownerID2 + ", argName1=" + argName1 + ", argID1=" + argID1 + ", amount="
-        + amount + ", balance=" + balance + ", reason=" + reason + ", taxReceiverID=" + taxReceiverID + ", taxAmount=" + taxAmount + ", owner=" + owner
-        + ", lifeStart=" + lifeStart + ", lifeEnd=" + lifeEnd + "]";
+        + amount + ", balance=" + balance + ", reason=" + reason + ", taxReceiverID=" + taxReceiverID + ", taxAmount=" + taxAmount + ", owner1TypeID="
+        + owner1TypeID + ", owner2TypeID=" + owner2TypeID + "]";
   }
 
   /**
@@ -450,7 +468,9 @@ public class WalletJournal extends CachedData {
                                                 final AttributeSelector balance,
                                                 final AttributeSelector reason,
                                                 final AttributeSelector taxReceiverID,
-                                                final AttributeSelector taxAmount) {
+                                                final AttributeSelector taxAmount,
+                                                final AttributeSelector owner1TypeID,
+                                                final AttributeSelector owner2TypeID) {
     try {
       return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<WalletJournal>>() {
         @Override
@@ -478,6 +498,8 @@ public class WalletJournal extends CachedData {
           AttributeSelector.addStringSelector(qs, "c", "reason", reason, p);
           AttributeSelector.addLongSelector(qs, "c", "taxReceiverID", taxReceiverID);
           AttributeSelector.addDoubleSelector(qs, "c", "taxAmount", taxAmount);
+          AttributeSelector.addIntSelector(qs, "c", "owner1TypeID", owner1TypeID);
+          AttributeSelector.addIntSelector(qs, "c", "owner2TypeID", owner2TypeID);
           // Set CID constraint and ordering
           if (reverse) {
             qs.append(" and c.cid < ").append(contid);

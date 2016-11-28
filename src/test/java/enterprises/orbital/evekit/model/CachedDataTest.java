@@ -515,7 +515,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
       int sel = TestBase.getRandomInt(5);
       CachedData next = new UpcomingCalendarEvent(
           TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomInt(), TestBase.getRandomText(50), TestBase.getRandomText(50),
-          TestBase.getRandomLong(), TestBase.getRandomText(50), TestBase.getRandomText(50), TestBase.getRandomBoolean());
+          TestBase.getRandomLong(), TestBase.getRandomText(50), TestBase.getRandomText(50), TestBase.getRandomBoolean(), TestBase.getRandomInt());
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
@@ -836,7 +836,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
           TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomInt(), TestBase.getRandomText(50),
           TestBase.getRandomLong(), TestBase.getRandomText(50), TestBase.getRandomLong(), TestBase.getRandomText(50), TestBase.getRandomLong(),
           TestBase.getRandomBigDecimal(100000000), TestBase.getRandomBigDecimal(100000000), TestBase.getRandomText(50), TestBase.getRandomLong(),
-          TestBase.getRandomBigDecimal(100000000));
+          TestBase.getRandomBigDecimal(100000000), TestBase.getRandomInt(), TestBase.getRandomInt());
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }

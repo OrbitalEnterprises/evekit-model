@@ -68,7 +68,7 @@ public class CharacterMailMessage extends CachedData {
   private Set<Long>           toCharacterID       = new HashSet<Long>();
   private long                sentDate            = -1;
   private String              title;
-  private long                corpOrAllianceID;
+  private long                toCorpOrAllianceID;
   @ElementCollection(
       fetch = FetchType.EAGER)
   private Set<Long>           toListID            = new HashSet<Long>();
@@ -78,7 +78,7 @@ public class CharacterMailMessage extends CachedData {
   @SuppressWarnings("unused")
   private CharacterMailMessage() {}
 
-  public CharacterMailMessage(long messageID, long senderID, String senderName, long sentDate, String title, long corpOrAllianceID, boolean msgRead,
+  public CharacterMailMessage(long messageID, long senderID, String senderName, long sentDate, String title, long toCorpOrAllianceID, boolean msgRead,
                               int senderTypeID) {
     super();
     this.messageID = messageID;
@@ -86,7 +86,7 @@ public class CharacterMailMessage extends CachedData {
     this.senderName = senderName;
     this.sentDate = sentDate;
     this.title = title;
-    this.corpOrAllianceID = corpOrAllianceID;
+    this.toCorpOrAllianceID = toCorpOrAllianceID;
     this.msgRead = msgRead;
     this.senderTypeID = senderTypeID;
     this.toCharacterID = new HashSet<Long>();
@@ -103,7 +103,7 @@ public class CharacterMailMessage extends CachedData {
     CharacterMailMessage other = (CharacterMailMessage) sup;
     return messageID == other.messageID && senderID == other.senderID && nullSafeObjectCompare(senderName, other.senderName)
         && nullSafeObjectCompare(toCharacterID, other.toCharacterID) && sentDate == other.sentDate && nullSafeObjectCompare(title, other.title)
-        && corpOrAllianceID == other.corpOrAllianceID && nullSafeObjectCompare(toListID, other.toListID) && msgRead == other.msgRead
+        && toCorpOrAllianceID == other.toCorpOrAllianceID && nullSafeObjectCompare(toListID, other.toListID) && msgRead == other.msgRead
         && senderTypeID == other.senderTypeID;
   }
 
@@ -139,8 +139,8 @@ public class CharacterMailMessage extends CachedData {
     return title;
   }
 
-  public long getCorpOrAllianceID() {
-    return corpOrAllianceID;
+  public long getToCorpOrAllianceID() {
+    return toCorpOrAllianceID;
   }
 
   public Set<Long> getToListID() {
@@ -159,7 +159,7 @@ public class CharacterMailMessage extends CachedData {
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + (int) (corpOrAllianceID ^ (corpOrAllianceID >>> 32));
+    result = prime * result + (int) (toCorpOrAllianceID ^ (toCorpOrAllianceID >>> 32));
     result = prime * result + (int) (messageID ^ (messageID >>> 32));
     result = prime * result + (msgRead ? 1231 : 1237);
     result = prime * result + (int) (senderID ^ (senderID >>> 32));
@@ -179,7 +179,7 @@ public class CharacterMailMessage extends CachedData {
     if (!super.equals(obj)) return false;
     if (getClass() != obj.getClass()) return false;
     CharacterMailMessage other = (CharacterMailMessage) obj;
-    if (corpOrAllianceID != other.corpOrAllianceID) return false;
+    if (toCorpOrAllianceID != other.toCorpOrAllianceID) return false;
     if (messageID != other.messageID) return false;
     if (msgRead != other.msgRead) return false;
     if (senderID != other.senderID) return false;
@@ -203,8 +203,8 @@ public class CharacterMailMessage extends CachedData {
   @Override
   public String toString() {
     return "CharacterMailMessage [messageID=" + messageID + ", senderID=" + senderID + ", senderName=" + senderName + ", toCharacterID=" + toCharacterID
-        + ", sentDate=" + sentDate + ", title=" + title + ", corpOrAllianceID=" + corpOrAllianceID + ", toListID=" + toListID + ", msgRead=" + msgRead
-        + ", senderTypeID=" + senderTypeID + ", owner=" + owner + ", lifeStart=" + lifeStart + ", lifeEnd=" + lifeEnd + "]";
+        + ", sentDate=" + sentDate + ", title=" + title + ", toCorpOrAllianceID=" + toCorpOrAllianceID + ", toListID=" + toListID + ", msgRead=" + msgRead
+        + ", senderTypeID=" + senderTypeID + "]";
   }
 
   public static CharacterMailMessage get(
@@ -272,7 +272,7 @@ public class CharacterMailMessage extends CachedData {
                                                        final AttributeSelector toCharacterID,
                                                        final AttributeSelector sentDate,
                                                        final AttributeSelector title,
-                                                       final AttributeSelector corpOrAllianceID,
+                                                       final AttributeSelector toCorpOrAllianceID,
                                                        final AttributeSelector toListID,
                                                        final AttributeSelector msgRead,
                                                        final AttributeSelector senderTypeID) {
@@ -294,7 +294,7 @@ public class CharacterMailMessage extends CachedData {
           AttributeSelector.addSetLongSelector(qs, "c", "toCharacterID", toCharacterID);
           AttributeSelector.addLongSelector(qs, "c", "sentDate", sentDate);
           AttributeSelector.addStringSelector(qs, "c", "title", title, p);
-          AttributeSelector.addLongSelector(qs, "c", "corpOrAllianceID", corpOrAllianceID);
+          AttributeSelector.addLongSelector(qs, "c", "toCorpOrAllianceID", toCorpOrAllianceID);
           AttributeSelector.addSetLongSelector(qs, "c", "toListID", toListID);
           AttributeSelector.addBooleanSelector(qs, "c", "msgRead", msgRead);
           AttributeSelector.addIntSelector(qs, "c", "senderTypeID", senderTypeID);

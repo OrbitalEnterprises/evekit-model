@@ -31,6 +31,8 @@ public class WalletJournalTest extends AbstractModelTester<WalletJournal> {
   final String                                   reason        = "test reason";
   final long                                     taxReceiverID = TestBase.getRandomInt(100000000);
   final BigDecimal                               taxAmount     = TestBase.getRandomBigDecimal(100000000);
+  final int                                      owner1TypeID  = TestBase.getRandomInt(100000000);
+  final int                                      owner2TypeID  = TestBase.getRandomInt(100000000);
 
   final ClassUnderTestConstructor<WalletJournal> eol           = new ClassUnderTestConstructor<WalletJournal>() {
 
@@ -38,7 +40,7 @@ public class WalletJournalTest extends AbstractModelTester<WalletJournal> {
                                                                  public WalletJournal getCUT() {
                                                                    return new WalletJournal(
                                                                        accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1,
-                                                                       argID1, amount, balance, reason, taxReceiverID, taxAmount);
+                                                                       argID1, amount, balance, reason, taxReceiverID, taxAmount, owner1TypeID, owner2TypeID);
                                                                  }
 
                                                                };
@@ -48,7 +50,8 @@ public class WalletJournalTest extends AbstractModelTester<WalletJournal> {
                                                                  public WalletJournal getCUT() {
                                                                    return new WalletJournal(
                                                                        accountKey, refID, date, refTypeID + 1, ownerName1, ownerID1, ownerName2, ownerID2,
-                                                                       argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount);
+                                                                       argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount, owner1TypeID,
+                                                                       owner2TypeID);
                                                                  }
 
                                                                };
@@ -63,49 +66,55 @@ public class WalletJournalTest extends AbstractModelTester<WalletJournal> {
         return new WalletJournal[] {
             new WalletJournal(
                 accountKey + 1, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-                taxAmount),
+                taxAmount, owner1TypeID, owner2TypeID),
             new WalletJournal(
                 accountKey, refID + 1, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-                taxAmount),
+                taxAmount, owner1TypeID, owner2TypeID),
             new WalletJournal(
                 accountKey, refID, date + 1, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-                taxAmount),
+                taxAmount, owner1TypeID, owner2TypeID),
             new WalletJournal(
                 accountKey, refID, date, refTypeID + 1, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-                taxAmount),
+                taxAmount, owner1TypeID, owner2TypeID),
             new WalletJournal(
                 accountKey, refID, date, refTypeID, ownerName1 + " 1", ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-                taxAmount),
+                taxAmount, owner1TypeID, owner2TypeID),
             new WalletJournal(
                 accountKey, refID, date, refTypeID, ownerName1, ownerID1 + 1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-                taxAmount),
+                taxAmount, owner1TypeID, owner2TypeID),
             new WalletJournal(
                 accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2 + " 1", ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-                taxAmount),
+                taxAmount, owner1TypeID, owner2TypeID),
             new WalletJournal(
                 accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2 + 1, argName1, argID1, amount, balance, reason, taxReceiverID,
-                taxAmount),
+                taxAmount, owner1TypeID, owner2TypeID),
             new WalletJournal(
                 accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1 + " 1", argID1, amount, balance, reason, taxReceiverID,
-                taxAmount),
+                taxAmount, owner1TypeID, owner2TypeID),
             new WalletJournal(
                 accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1 + 1, amount, balance, reason, taxReceiverID,
-                taxAmount),
+                taxAmount, owner1TypeID, owner2TypeID),
             new WalletJournal(
                 accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount.add(BigDecimal.TEN), balance, reason,
-                taxReceiverID, taxAmount),
+                taxReceiverID, taxAmount, owner1TypeID, owner2TypeID),
             new WalletJournal(
                 accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance.add(BigDecimal.TEN), reason,
-                taxReceiverID, taxAmount),
+                taxReceiverID, taxAmount, owner1TypeID, owner2TypeID),
             new WalletJournal(
                 accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason + " 1", taxReceiverID,
-                taxAmount),
+                taxAmount, owner1TypeID, owner2TypeID),
             new WalletJournal(
                 accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID + 1,
-                taxAmount),
+                taxAmount, owner1TypeID, owner2TypeID),
             new WalletJournal(
                 accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-                taxAmount.add(BigDecimal.TEN))
+                taxAmount.add(BigDecimal.TEN), owner1TypeID, owner2TypeID),
+            new WalletJournal(
+                accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
+                taxAmount, owner1TypeID + 1, owner2TypeID),
+            new WalletJournal(
+                accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
+                taxAmount, owner1TypeID, owner2TypeID + 1)
         };
       }
 
@@ -139,49 +148,51 @@ public class WalletJournalTest extends AbstractModelTester<WalletJournal> {
     Map<Long, WalletJournal> listCheck = new HashMap<Long, WalletJournal>();
 
     existing = new WalletJournal(
-        accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount);
+        accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+        owner1TypeID, owner2TypeID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.updateData(existing);
     listCheck.put(refID, existing);
 
     existing = new WalletJournal(
         accountKey, refID + 10, date + 10, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount);
+        taxAmount, owner1TypeID, owner2TypeID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.updateData(existing);
     listCheck.put(refID + 10, existing);
 
     existing = new WalletJournal(
         accountKey, refID + 20, date + 20, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount);
+        taxAmount, owner1TypeID, owner2TypeID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.updateData(existing);
     listCheck.put(refID + 20, existing);
 
     existing = new WalletJournal(
         accountKey, refID + 30, date + 30, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount);
+        taxAmount, owner1TypeID, owner2TypeID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.updateData(existing);
     listCheck.put(refID + 30, existing);
 
     // Associated with different account
     existing = new WalletJournal(
-        accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount);
+        accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+        owner1TypeID, owner2TypeID);
     existing.setup(otherAccount, 7777L);
     CachedData.updateData(existing);
 
     // Not live at the given time
     existing = new WalletJournal(
         accountKey, refID + 5, date + 5, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount);
+        taxAmount, owner1TypeID, owner2TypeID);
     existing.setup(testAccount, 9999L);
     CachedData.updateData(existing);
 
     // EOL before the given time
     existing = new WalletJournal(
         accountKey, refID + 3, date + 3, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount);
+        taxAmount, owner1TypeID, owner2TypeID);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
     CachedData.updateData(existing);
@@ -221,49 +232,51 @@ public class WalletJournalTest extends AbstractModelTester<WalletJournal> {
     Map<Long, WalletJournal> listCheck = new HashMap<Long, WalletJournal>();
 
     existing = new WalletJournal(
-        accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount);
+        accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+        owner1TypeID, owner2TypeID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.updateData(existing);
     listCheck.put(refID, existing);
 
     existing = new WalletJournal(
         accountKey, refID + 10, date + 10, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount);
+        taxAmount, owner1TypeID, owner2TypeID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.updateData(existing);
     listCheck.put(refID + 10, existing);
 
     existing = new WalletJournal(
         accountKey, refID + 20, date + 20, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount);
+        taxAmount, owner1TypeID, owner2TypeID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.updateData(existing);
     listCheck.put(refID + 20, existing);
 
     existing = new WalletJournal(
         accountKey, refID + 30, date + 30, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount);
+        taxAmount, owner1TypeID, owner2TypeID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.updateData(existing);
     listCheck.put(refID + 30, existing);
 
     // Associated with different account
     existing = new WalletJournal(
-        accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount);
+        accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+        owner1TypeID, owner2TypeID);
     existing.setup(otherAccount, 7777L);
     CachedData.updateData(existing);
 
     // Not live at the given time
     existing = new WalletJournal(
         accountKey, refID + 5, date + 5, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount);
+        taxAmount, owner1TypeID, owner2TypeID);
     existing.setup(testAccount, 9999L);
     CachedData.updateData(existing);
 
     // EOL before the given time
     existing = new WalletJournal(
         accountKey, refID + 3, date + 3, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount);
+        taxAmount, owner1TypeID, owner2TypeID);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
     CachedData.updateData(existing);
@@ -302,61 +315,63 @@ public class WalletJournalTest extends AbstractModelTester<WalletJournal> {
     Map<Long, WalletJournal> listCheck = new HashMap<Long, WalletJournal>();
 
     existing = new WalletJournal(
-        accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount);
+        accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+        owner1TypeID, owner2TypeID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.updateData(existing);
     listCheck.put(refID, existing);
 
     existing = new WalletJournal(
         accountKey, refID + 10, date + 10, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount);
+        taxAmount, owner1TypeID, owner2TypeID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.updateData(existing);
     listCheck.put(refID + 10, existing);
 
     existing = new WalletJournal(
         accountKey, refID + 20, date + 20, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount);
+        taxAmount, owner1TypeID, owner2TypeID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.updateData(existing);
     listCheck.put(refID + 20, existing);
 
     existing = new WalletJournal(
         accountKey, refID + 30, date + 30, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount);
+        taxAmount, owner1TypeID, owner2TypeID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.updateData(existing);
     listCheck.put(refID + 30, existing);
 
     // Associated with different account
     existing = new WalletJournal(
-        accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount);
+        accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+        owner1TypeID, owner2TypeID);
     existing.setup(otherAccount, 7777L);
     CachedData.updateData(existing);
 
     // Out of the specified range
     existing = new WalletJournal(
         accountKey, refID - 10, date - 10, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount);
+        taxAmount, owner1TypeID, owner2TypeID);
     existing.setup(otherAccount, 7777L);
     CachedData.updateData(existing);
     existing = new WalletJournal(
         accountKey, refID + 40, date + 40, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount);
+        taxAmount, owner1TypeID, owner2TypeID);
     existing.setup(otherAccount, 7777L);
     CachedData.updateData(existing);
 
     // Not live at the given time
     existing = new WalletJournal(
         accountKey, refID + 5, date + 5, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount);
+        taxAmount, owner1TypeID, owner2TypeID);
     existing.setup(testAccount, 9999L);
     CachedData.updateData(existing);
 
     // EOL before the given time
     existing = new WalletJournal(
         accountKey, refID + 3, date + 3, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount);
+        taxAmount, owner1TypeID, owner2TypeID);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
     CachedData.updateData(existing);
