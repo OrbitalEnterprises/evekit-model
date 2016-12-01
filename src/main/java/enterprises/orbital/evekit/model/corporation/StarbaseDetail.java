@@ -39,12 +39,12 @@ import enterprises.orbital.evekit.model.CachedData;
 })
 // 2 hour cache time - API caches for 1 hour
 public class StarbaseDetail extends CachedData {
-  private static final Logger log  = Logger.getLogger(StarbaseDetail.class.getName());
-  private static final byte[] MASK = AccountAccessMask.createMask(AccountAccessMask.ACCESS_STARBASE_LIST);
+  private static final Logger log             = Logger.getLogger(StarbaseDetail.class.getName());
+  private static final byte[] MASK            = AccountAccessMask.createMask(AccountAccessMask.ACCESS_STARBASE_LIST);
   private long                itemID;
   private int                 state;
-  private long                stateTimestamp;
-  private long                onlineTimestamp;
+  private long                stateTimestamp  = -1;
+  private long                onlineTimestamp = -1;
   private int                 usageFlags;
   private int                 deployFlags;
   private boolean             allowAllianceMembers;

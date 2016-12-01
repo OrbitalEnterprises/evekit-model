@@ -30,10 +30,10 @@ import enterprises.orbital.evekit.model.CachedData;
 })
 // 2 hour cache time - API caches for 1 hour
 public class FacWarStats extends CachedData {
-  private static final Logger log  = Logger.getLogger(FacWarStats.class.getName());
-  private static final byte[] MASK = AccountAccessMask.createMask(AccountAccessMask.ACCESS_FAC_WAR_STATS);
+  private static final Logger log      = Logger.getLogger(FacWarStats.class.getName());
+  private static final byte[] MASK     = AccountAccessMask.createMask(AccountAccessMask.ACCESS_FAC_WAR_STATS);
   private int                 currentRank;
-  private long                enlisted;
+  private long                enlisted = -1;
   private int                 factionID;
   private String              factionName;
   private int                 highestRank;

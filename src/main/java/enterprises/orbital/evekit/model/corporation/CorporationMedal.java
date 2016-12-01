@@ -42,15 +42,15 @@ import enterprises.orbital.evekit.model.CachedData;
 })
 // 2 hour cache time - API caches for 1 hours
 public class CorporationMedal extends CachedData {
-  private static final Logger log  = Logger.getLogger(CorporationMedal.class.getName());
-  private static final byte[] MASK = AccountAccessMask.createMask(AccountAccessMask.ACCESS_CORPORATION_MEDALS);
+  private static final Logger log     = Logger.getLogger(CorporationMedal.class.getName());
+  private static final byte[] MASK    = AccountAccessMask.createMask(AccountAccessMask.ACCESS_CORPORATION_MEDALS);
   private int                 medalID;
   @Lob
   @Column(
       length = 102400)
   private String              description;
   private String              title;
-  private long                created;
+  private long                created = -1;
   private long                creatorID;
 
   @SuppressWarnings("unused")

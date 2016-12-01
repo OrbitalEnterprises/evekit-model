@@ -36,8 +36,8 @@ import enterprises.orbital.evekit.model.CachedData;
 public class AccountStatus extends CachedData {
   private static final Logger log                    = Logger.getLogger(AccountStatus.class.getName());
   private static final byte[] MASK                   = AccountAccessMask.createMask(AccountAccessMask.ACCESS_ACCOUNT_STATUS);
-  private long                paidUntil;
-  private long                createDate;
+  private long                paidUntil              = -1;
+  private long                createDate             = -1;
   private long                logonCount;
   private long                logonMinutes;
   @ElementCollection(

@@ -47,18 +47,18 @@ import enterprises.orbital.evekit.model.CachedData;
 })
 // 1 hour cache time - API cache time unknown
 public class PlanetaryPin extends CachedData {
-  private static final Logger log  = Logger.getLogger(PlanetaryPin.class.getName());
-  private static final byte[] MASK = AccountAccessMask.createMask(AccountAccessMask.ACCESS_ASSETS);
+  private static final Logger log            = Logger.getLogger(PlanetaryPin.class.getName());
+  private static final byte[] MASK           = AccountAccessMask.createMask(AccountAccessMask.ACCESS_ASSETS);
   private long                planetID;
   private long                pinID;
   private int                 typeID;
   private String              typeName;
   private int                 schematicID;
-  private long                lastLaunchTime;
+  private long                lastLaunchTime = -1;
   private int                 cycleTime;
   private int                 quantityPerCycle;
-  private long                installTime;
-  private long                expiryTime;
+  private long                installTime    = -1;
+  private long                expiryTime     = -1;
   private int                 contentTypeID;
   private String              contentTypeName;
   private int                 contentQuantity;
