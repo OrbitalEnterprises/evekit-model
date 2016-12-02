@@ -234,7 +234,7 @@ public abstract class CachedData {
     throws MetaDataLimitException, MetaDataCountException {
     if (key == null || key.length() == 0) throw new MetaDataLimitException("Key empty!");
     if (value == null) throw new MetaDataLimitException("Value null!");
-    if (key.length() > 255) throw new MetaDataLimitException("Key too large!");
+    if (key.length() > 191) throw new MetaDataLimitException("Key too large!");
     if (value.length() > 255) throw new MetaDataLimitException("Value too large!");
     synchronized (this) {
       ensureMetaData();
