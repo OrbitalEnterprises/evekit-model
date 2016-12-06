@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.NoResultException;
@@ -31,6 +33,9 @@ public class SkillMember extends RefCachedData {
 
   private int                 groupID;
   private int                 typeID;
+  @Lob
+  @Column(
+      length = 102400)
   private String              description;
   private int                 rank;
   private String              requiredPrimaryAttribute;
