@@ -1,6 +1,7 @@
 package enterprises.orbital.evekit.model.corporation;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -11,7 +12,11 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.NoResultException;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.TypedQuery;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import enterprises.orbital.base.OrbitalProperties;
 import enterprises.orbital.base.PersistentProperty;
@@ -22,6 +27,7 @@ import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AttributeParameters;
 import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
+import io.swagger.annotations.ApiModelProperty;
 
 @Entity
 @Table(
@@ -62,6 +68,14 @@ public class CorporationMemberMedal extends CachedData {
   private long                issuerID;
   private String              reason;
   private String              status;
+  @Transient
+  @ApiModelProperty(
+      value = "issued Date")
+  @JsonProperty("issuedDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                issuedDate;
 
   @SuppressWarnings("unused")
   private CorporationMemberMedal() {}
@@ -74,6 +88,15 @@ public class CorporationMemberMedal extends CachedData {
     this.issuerID = issuerID;
     this.reason = reason;
     this.status = status;
+  }
+
+  /**
+   * Update transient date values for readability.
+   */
+  @Override
+  public void prepareDates() {
+    fixDates();
+    issuedDate = assignDateField(issued);
   }
 
   /**

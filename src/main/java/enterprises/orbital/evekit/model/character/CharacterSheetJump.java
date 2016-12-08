@@ -1,6 +1,7 @@
 package enterprises.orbital.evekit.model.character;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -10,7 +11,11 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.NoResultException;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.TypedQuery;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
@@ -18,6 +23,7 @@ import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
+import io.swagger.annotations.ApiModelProperty;
 
 @Entity
 @Table(
@@ -36,6 +42,30 @@ public class CharacterSheetJump extends CachedData {
   private long                  jumpActivation = -1;
   private long                  jumpFatigue    = -1;
   private long                  jumpLastUpdate = -1;
+  @Transient
+  @ApiModelProperty(
+      value = "jumpActivation Date")
+  @JsonProperty("jumpActivationDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                  jumpActivationDate;
+  @Transient
+  @ApiModelProperty(
+      value = "jumpFatigue Date")
+  @JsonProperty("jumpFatigueDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                  jumpFatigueDate;
+  @Transient
+  @ApiModelProperty(
+      value = "jumpLastUpdate Date")
+  @JsonProperty("jumpLastUpdateDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                  jumpLastUpdateDate;
 
   @SuppressWarnings("unused")
   private CharacterSheetJump() {}
@@ -45,6 +75,17 @@ public class CharacterSheetJump extends CachedData {
     this.jumpActivation = jumpActivation;
     this.jumpFatigue = jumpFatigue;
     this.jumpLastUpdate = jumpLastUpdate;
+  }
+
+  /**
+   * Update transient date values for readability.
+   */
+  @Override
+  public void prepareDates() {
+    fixDates();
+    jumpActivationDate = assignDateField(jumpActivation);
+    jumpFatigueDate = assignDateField(jumpFatigue);
+    jumpLastUpdateDate = assignDateField(jumpLastUpdate);
   }
 
   /**

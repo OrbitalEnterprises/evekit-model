@@ -43,6 +43,14 @@ public class FactionVictoryPointStat extends AbstractVictoryPointStat {
   }
 
   /**
+   * Update transient date values for readability.
+   */
+  @Override
+  public void prepareDates() {
+    fixDates();
+  }
+
+  /**
    * {@inheritDoc}
    */
   @Override

@@ -1,6 +1,7 @@
 package enterprises.orbital.evekit.model.corporation;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -15,7 +16,11 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.NoResultException;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.TypedQuery;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import enterprises.orbital.base.OrbitalProperties;
 import enterprises.orbital.base.PersistentProperty;
@@ -26,6 +31,7 @@ import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AttributeParameters;
 import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
+import io.swagger.annotations.ApiModelProperty;
 
 @Entity
 @Table(
@@ -65,6 +71,14 @@ public class MemberSecurityLog extends CachedData {
   @ElementCollection(
       fetch = FetchType.EAGER)
   private Set<Long>           newRoles            = new HashSet<Long>();
+  @Transient
+  @ApiModelProperty(
+      value = "changeTime Date")
+  @JsonProperty("changeTimeDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                changeTimeDate;
 
   @SuppressWarnings("unused")
   private MemberSecurityLog() {}
@@ -79,6 +93,15 @@ public class MemberSecurityLog extends CachedData {
     this.roleLocationType = roleLocationType;
     this.oldRoles = new HashSet<Long>();
     this.newRoles = new HashSet<Long>();
+  }
+
+  /**
+   * Update transient date values for readability.
+   */
+  @Override
+  public void prepareDates() {
+    fixDates();
+    changeTimeDate = assignDateField(changeTime);
   }
 
   /**

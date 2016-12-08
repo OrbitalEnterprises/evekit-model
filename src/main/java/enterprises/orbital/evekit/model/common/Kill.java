@@ -1,6 +1,7 @@
 package enterprises.orbital.evekit.model.common;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -11,7 +12,11 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.NoResultException;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.TypedQuery;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import enterprises.orbital.base.OrbitalProperties;
 import enterprises.orbital.base.PersistentProperty;
@@ -22,6 +27,7 @@ import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AttributeParameters;
 import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
+import io.swagger.annotations.ApiModelProperty;
 
 @Entity
 @Table(
@@ -56,6 +62,14 @@ public class Kill extends CachedData {
   private long                killTime            = -1;
   private int                 moonID;
   private long                solarSystemID;
+  @Transient
+  @ApiModelProperty(
+      value = "killTime Date")
+  @JsonProperty("killTimeDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                killTimeDate;
 
   @SuppressWarnings("unused")
   private Kill() {}
@@ -65,6 +79,15 @@ public class Kill extends CachedData {
     this.killTime = killTime;
     this.moonID = moonID;
     this.solarSystemID = solarSystemID;
+  }
+
+  /**
+   * Update transient date values for readability.
+   */
+  @Override
+  public void prepareDates() {
+    fixDates();
+    killTimeDate = assignDateField(killTime);
   }
 
   /**

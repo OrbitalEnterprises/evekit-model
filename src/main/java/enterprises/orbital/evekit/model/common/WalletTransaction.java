@@ -2,6 +2,7 @@ package enterprises.orbital.evekit.model.common;
 
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,7 +14,11 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.NoResultException;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.TypedQuery;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import enterprises.orbital.base.OrbitalProperties;
 import enterprises.orbital.base.PersistentProperty;
@@ -24,6 +29,7 @@ import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AttributeParameters;
 import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
+import io.swagger.annotations.ApiModelProperty;
 
 @Entity
 @Table(
@@ -76,6 +82,14 @@ public class WalletTransaction extends CachedData {
   private int                 clientTypeID;
   private long                characterID;
   private String              characterName;
+  @Transient
+  @ApiModelProperty(
+      value = "date Date")
+  @JsonProperty("dateDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                dateDate;
 
   @SuppressWarnings("unused")
   private WalletTransaction() {}
@@ -101,6 +115,15 @@ public class WalletTransaction extends CachedData {
     this.clientTypeID = clientTypeID;
     this.characterID = characterID;
     this.characterName = characterName;
+  }
+
+  /**
+   * Update transient date values for readability.
+   */
+  @Override
+  public void prepareDates() {
+    fixDates();
+    dateDate = assignDateField(date);
   }
 
   /**

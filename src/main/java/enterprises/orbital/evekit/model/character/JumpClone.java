@@ -59,6 +59,14 @@ public class JumpClone extends CachedData {
   }
 
   /**
+   * Update transient date values for readability.
+   */
+  @Override
+  public void prepareDates() {
+    fixDates();
+  }
+
+  /**
    * {@inheritDoc}
    */
   @Override

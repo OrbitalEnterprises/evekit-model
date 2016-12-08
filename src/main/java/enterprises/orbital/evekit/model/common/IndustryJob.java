@@ -2,6 +2,7 @@ package enterprises.orbital.evekit.model.common;
 
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,7 +14,11 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.NoResultException;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.TypedQuery;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import enterprises.orbital.base.OrbitalProperties;
 import enterprises.orbital.base.PersistentProperty;
@@ -24,6 +29,7 @@ import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AttributeParameters;
 import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
+import io.swagger.annotations.ApiModelProperty;
 
 @Entity
 @Table(
@@ -92,6 +98,38 @@ public class IndustryJob extends CachedData {
   private long                completedDate       = -1;
   private long                completedCharacterID;
   private int                 successfulRuns;
+  @Transient
+  @ApiModelProperty(
+      value = "startDate Date")
+  @JsonProperty("startDateDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                startDateDate;
+  @Transient
+  @ApiModelProperty(
+      value = "endDate Date")
+  @JsonProperty("endDateDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                endDateDate;
+  @Transient
+  @ApiModelProperty(
+      value = "pauseDate Date")
+  @JsonProperty("pauseDateDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                pauseDateDate;
+  @Transient
+  @ApiModelProperty(
+      value = "completedDate Date")
+  @JsonProperty("completedDateDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                completedDateDate;
 
   @SuppressWarnings("unused")
   private IndustryJob() {}
@@ -129,6 +167,18 @@ public class IndustryJob extends CachedData {
     this.completedDate = completedDate;
     this.completedCharacterID = completedCharacterID;
     this.successfulRuns = successfulRuns;
+  }
+
+  /**
+   * Update transient date values for readability.
+   */
+  @Override
+  public void prepareDates() {
+    fixDates();
+    startDateDate = assignDateField(startDate);
+    endDateDate = assignDateField(endDate);
+    pauseDateDate = assignDateField(pauseDate);
+    completedDateDate = assignDateField(completedDate);
   }
 
   /**

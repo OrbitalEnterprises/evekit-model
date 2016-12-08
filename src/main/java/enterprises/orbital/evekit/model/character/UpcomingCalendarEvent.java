@@ -1,6 +1,7 @@
 package enterprises.orbital.evekit.model.character;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,7 +14,11 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.NoResultException;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.TypedQuery;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
@@ -22,6 +27,7 @@ import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AttributeParameters;
 import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
+import io.swagger.annotations.ApiModelProperty;
 
 @Entity
 @Table(
@@ -57,6 +63,14 @@ public class UpcomingCalendarEvent extends CachedData {
   private String              response;
   private boolean             important;
   private int                 ownerTypeID;
+  @Transient
+  @ApiModelProperty(
+      value = "eventDate Date")
+  @JsonProperty("eventDateDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                eventDateDate;
 
   @SuppressWarnings("unused")
   private UpcomingCalendarEvent() {}
@@ -74,6 +88,15 @@ public class UpcomingCalendarEvent extends CachedData {
     this.response = response;
     this.important = important;
     this.ownerTypeID = ownerTypeID;
+  }
+
+  /**
+   * Update transient date values for readability.
+   */
+  @Override
+  public void prepareDates() {
+    fixDates();
+    eventDateDate = assignDateField(eventDate);
   }
 
   /**

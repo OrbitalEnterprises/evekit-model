@@ -64,6 +64,14 @@ public class Corporation extends CachedData {
   private long                walletJournalExpiry        = -1;
   private long                walletTransactionsExpiry   = -1;
 
+  /**
+   * Update transient date values for readability.
+   */
+  @Override
+  public void prepareDates() {
+    // NOP
+  }
+
   public String getCorporationName() {
     return corporationName;
   }

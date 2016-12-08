@@ -1,6 +1,7 @@
 package enterprises.orbital.evekit.model.character;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -11,7 +12,11 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.NoResultException;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.TypedQuery;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
@@ -19,6 +24,7 @@ import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
+import io.swagger.annotations.ApiModelProperty;
 
 @Entity
 @Table(
@@ -48,6 +54,22 @@ public class SkillInQueue extends CachedData {
   private int                 startSP;
   private long                startTime = -1;
   private int                 typeID;
+  @Transient
+  @ApiModelProperty(
+      value = "endTime Date")
+  @JsonProperty("endTimeDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                endTimeDate;
+  @Transient
+  @ApiModelProperty(
+      value = "startTime Date")
+  @JsonProperty("startTimeDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                startTimeDate;
 
   @SuppressWarnings("unused")
   private SkillInQueue() {}
@@ -61,6 +83,16 @@ public class SkillInQueue extends CachedData {
     this.startSP = startSP;
     this.startTime = startTime;
     this.typeID = typeID;
+  }
+
+  /**
+   * Update transient date values for readability.
+   */
+  @Override
+  public void prepareDates() {
+    fixDates();
+    startTimeDate = assignDateField(startTime);
+    endTimeDate = assignDateField(endTime);
   }
 
   /**

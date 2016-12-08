@@ -2,6 +2,7 @@ package enterprises.orbital.evekit.model;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -23,9 +24,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NoResultException;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.TypedQuery;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
@@ -118,10 +122,45 @@ public abstract class CachedData {
   @ApiModelProperty(
       value = "Model lifeline end (milliseconds UTC), MAX_LONG for live data")
   protected long                   lifeEnd;
+  // Transient timestamp fields for better readability
+  @Transient
+  @ApiModelProperty(
+      value = "lifeStart Date")
+  @JsonProperty("lifeStartDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                     lifeStartDate;
+  @Transient
+  @ApiModelProperty(
+      value = "lifeEnd Date")
+  @JsonProperty("lifeEndDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                     lifeEndDate;
   // Object meta data - this will be serialized into storage
   @ElementCollection(
       fetch = FetchType.EAGER)
   private Map<String, String>      metaData        = null;
+
+  /**
+   * Update transient date values for readability.
+   */
+  public abstract void prepareDates();
+
+  protected Date assignDateField(
+                                 long dateValue) {
+    return dateValue < 0 ? null : new Date(dateValue);
+  }
+
+  /**
+   * Update transient date values. This method should normally be called by superclasses after updating their own date values.
+   */
+  protected void fixDates() {
+    lifeStartDate = assignDateField(lifeStart);
+    lifeEndDate = assignDateField(lifeEnd);
+  }
 
   public static boolean nullSafeObjectCompare(
                                               Object a,

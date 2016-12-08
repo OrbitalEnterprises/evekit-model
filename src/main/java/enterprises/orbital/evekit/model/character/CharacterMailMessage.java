@@ -1,6 +1,7 @@
 package enterprises.orbital.evekit.model.character;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -15,7 +16,11 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.NoResultException;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.TypedQuery;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import enterprises.orbital.base.OrbitalProperties;
 import enterprises.orbital.base.PersistentProperty;
@@ -26,6 +31,7 @@ import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AttributeParameters;
 import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
+import io.swagger.annotations.ApiModelProperty;
 
 @Entity
 @Table(
@@ -74,6 +80,14 @@ public class CharacterMailMessage extends CachedData {
   private Set<Long>           toListID            = new HashSet<Long>();
   private boolean             msgRead;
   private int                 senderTypeID;
+  @Transient
+  @ApiModelProperty(
+      value = "sentDate Date")
+  @JsonProperty("sentDateDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                sentDateDate;
 
   @SuppressWarnings("unused")
   private CharacterMailMessage() {}
@@ -91,6 +105,15 @@ public class CharacterMailMessage extends CachedData {
     this.senderTypeID = senderTypeID;
     this.toCharacterID = new HashSet<Long>();
     this.toListID = new HashSet<Long>();
+  }
+
+  /**
+   * Update transient date values for readability.
+   */
+  @Override
+  public void prepareDates() {
+    fixDates();
+    sentDateDate = assignDateField(sentDate);
   }
 
   /**

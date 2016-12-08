@@ -2,6 +2,7 @@ package enterprises.orbital.evekit.model.common;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -15,7 +16,11 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.NoResultException;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.TypedQuery;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
@@ -23,6 +28,7 @@ import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
+import io.swagger.annotations.ApiModelProperty;
 
 @Entity
 @Table(
@@ -43,6 +49,22 @@ public class AccountStatus extends CachedData {
   @ElementCollection(
       fetch = FetchType.EAGER)
   private List<Long>          multiCharacterTraining = new ArrayList<Long>();
+  @Transient
+  @ApiModelProperty(
+      value = "paidUntil Date")
+  @JsonProperty("paidUntilDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                paidUntilDate;
+  @Transient
+  @ApiModelProperty(
+      value = "createDate Date")
+  @JsonProperty("createDateDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                createDateDate;
 
   @SuppressWarnings("unused")
   private AccountStatus() {}
@@ -53,6 +75,16 @@ public class AccountStatus extends CachedData {
     this.logonCount = logonCount;
     this.logonMinutes = logonMinutes;
     this.multiCharacterTraining = new ArrayList<Long>();
+  }
+
+  /**
+   * Update transient date values for readability.
+   */
+  @Override
+  public void prepareDates() {
+    fixDates();
+    paidUntilDate = assignDateField(paidUntil);
+    createDateDate = assignDateField(createDate);
   }
 
   /**

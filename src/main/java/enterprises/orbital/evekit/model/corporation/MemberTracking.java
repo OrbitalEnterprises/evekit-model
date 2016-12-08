@@ -1,6 +1,7 @@
 package enterprises.orbital.evekit.model.corporation;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -11,7 +12,11 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.NoResultException;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.TypedQuery;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import enterprises.orbital.base.OrbitalProperties;
 import enterprises.orbital.base.PersistentProperty;
@@ -22,6 +27,7 @@ import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AttributeParameters;
 import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
+import io.swagger.annotations.ApiModelProperty;
 
 @Entity
 @Table(
@@ -59,6 +65,30 @@ public class MemberTracking extends CachedData {
   private int                 shipTypeID;
   private long                startDateTime       = -1;
   private String              title;
+  @Transient
+  @ApiModelProperty(
+      value = "logoffDateTime Date")
+  @JsonProperty("logoffDateTimeDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                logoffDateTimeDate;
+  @Transient
+  @ApiModelProperty(
+      value = "logonDateTime Date")
+  @JsonProperty("logonDateTimeDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                logonDateTimeDate;
+  @Transient
+  @ApiModelProperty(
+      value = "startDateTime Date")
+  @JsonProperty("startDateTimeDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                startDateTimeDate;
 
   @SuppressWarnings("unused")
   private MemberTracking() {}
@@ -80,6 +110,17 @@ public class MemberTracking extends CachedData {
     this.shipTypeID = shipTypeID;
     this.startDateTime = startDateTime;
     this.title = title;
+  }
+
+  /**
+   * Update transient date values for readability.
+   */
+  @Override
+  public void prepareDates() {
+    fixDates();
+    logoffDateTimeDate = assignDateField(logoffDateTime);
+    logonDateTimeDate = assignDateField(logonDateTime);
+    startDateTimeDate = assignDateField(startDateTime);
   }
 
   /**

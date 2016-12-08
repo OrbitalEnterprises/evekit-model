@@ -1,6 +1,7 @@
 package enterprises.orbital.evekit.model.common;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -10,7 +11,11 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.NoResultException;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.TypedQuery;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
@@ -19,6 +24,7 @@ import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AttributeParameters;
 import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
+import io.swagger.annotations.ApiModelProperty;
 
 @Entity
 @Table(
@@ -44,6 +50,14 @@ public class FacWarStats extends CachedData {
   private int                 victoryPointsLastWeek;
   private int                 victoryPointsTotal;
   private int                 victoryPointsYesterday;
+  @Transient
+  @ApiModelProperty(
+      value = "enlisted Date")
+  @JsonProperty("enlistedDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                enlistedDate;
 
   @SuppressWarnings("unused")
   private FacWarStats() {}
@@ -63,6 +77,15 @@ public class FacWarStats extends CachedData {
     this.victoryPointsLastWeek = victoryPointsLastWeek;
     this.victoryPointsTotal = victoryPointsTotal;
     this.victoryPointsYesterday = victoryPointsYesterday;
+  }
+
+  /**
+   * Update transient date values for readability.
+   */
+  @Override
+  public void prepareDates() {
+    fixDates();
+    enlistedDate = assignDateField(enlisted);
   }
 
   /**

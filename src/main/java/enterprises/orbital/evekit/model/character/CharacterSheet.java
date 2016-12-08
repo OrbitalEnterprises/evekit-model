@@ -1,6 +1,7 @@
 package enterprises.orbital.evekit.model.character;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -10,7 +11,11 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.NoResultException;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.TypedQuery;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
@@ -19,6 +24,7 @@ import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AttributeParameters;
 import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
+import io.swagger.annotations.ApiModelProperty;
 
 @Entity
 @Table(
@@ -71,6 +77,38 @@ public class CharacterSheet extends CachedData {
   private int                   freeRespecs;
   private long                  freeSkillPoints;
   private long                  remoteStationDate = -1;
+  @Transient
+  @ApiModelProperty(
+      value = "doB Date")
+  @JsonProperty("doBDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                  doBDate;
+  @Transient
+  @ApiModelProperty(
+      value = "lastRespecDate Date")
+  @JsonProperty("lastRespecDateDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                  lastRespecDateDate;
+  @Transient
+  @ApiModelProperty(
+      value = "lastTimedRespec Date")
+  @JsonProperty("lastTimedRespecDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                  lastTimedRespecDate;
+  @Transient
+  @ApiModelProperty(
+      value = "remoteStationDate Date")
+  @JsonProperty("remoteStationDateDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                  remoteStationDateDate;
 
   @SuppressWarnings("unused")
   private CharacterSheet() {}
@@ -106,6 +144,18 @@ public class CharacterSheet extends CachedData {
     this.freeRespecs = freeRespecs;
     this.freeSkillPoints = freeSkillPoints;
     this.remoteStationDate = remoteStationDate;
+  }
+
+  /**
+   * Update transient date values for readability.
+   */
+  @Override
+  public void prepareDates() {
+    fixDates();
+    doBDate = assignDateField(doB);
+    lastRespecDateDate = assignDateField(lastRespecDate);
+    lastTimedRespecDate = assignDateField(lastTimedRespec);
+    remoteStationDateDate = assignDateField(remoteStationDate);
   }
 
   /**

@@ -46,6 +46,14 @@ public class RefData extends RefCachedData {
   private long                mapKillExpiry             = -1;
   private long                sovereigntyExpiry         = -1;
 
+  /**
+   * Update transient date values for readability.
+   */
+  @Override
+  public void prepareDates() {
+    // NOP
+  }
+
   public long getServerStatusExpiry() {
     return serverStatusExpiry;
   }

@@ -1,6 +1,7 @@
 package enterprises.orbital.evekit.model.corporation;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -11,7 +12,11 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.NoResultException;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.TypedQuery;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
@@ -19,6 +24,7 @@ import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
+import io.swagger.annotations.ApiModelProperty;
 
 @Entity
 @Table(
@@ -50,6 +56,22 @@ public class Starbase extends CachedData {
   private long                stateTimestamp  = -1;
   private int                 typeID;
   private long                standingOwnerID;
+  @Transient
+  @ApiModelProperty(
+      value = "onlineTimestamp Date")
+  @JsonProperty("onlineTimestampDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                onlineTimestampDate;
+  @Transient
+  @ApiModelProperty(
+      value = "stateTimestamp Date")
+  @JsonProperty("stateTimestampDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                stateTimestampDate;
 
   @SuppressWarnings("unused")
   private Starbase() {}
@@ -64,6 +86,16 @@ public class Starbase extends CachedData {
     this.stateTimestamp = stateTimestamp;
     this.typeID = typeID;
     this.standingOwnerID = standingOwnerID;
+  }
+
+  /**
+   * Update transient date values for readability.
+   */
+  @Override
+  public void prepareDates() {
+    fixDates();
+    onlineTimestampDate = assignDateField(onlineTimestamp);
+    stateTimestampDate = assignDateField(stateTimestamp);
   }
 
   /**

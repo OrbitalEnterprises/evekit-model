@@ -2,6 +2,7 @@ package enterprises.orbital.evekit.model.common;
 
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,7 +14,11 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.NoResultException;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.TypedQuery;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import enterprises.orbital.base.OrbitalProperties;
 import enterprises.orbital.base.PersistentProperty;
@@ -24,6 +29,7 @@ import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AttributeParameters;
 import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
+import io.swagger.annotations.ApiModelProperty;
 
 @Entity
 @Table(
@@ -88,6 +94,38 @@ public class Contract extends CachedData {
       scale = 2)
   private BigDecimal          buyout;
   private double              volume;
+  @Transient
+  @ApiModelProperty(
+      value = "dateIssued Date")
+  @JsonProperty("dateIssuedDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                dateIssuedDate;
+  @Transient
+  @ApiModelProperty(
+      value = "dateExpired Date")
+  @JsonProperty("dateExpiredDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                dateExpiredDate;
+  @Transient
+  @ApiModelProperty(
+      value = "dateAccepted Date")
+  @JsonProperty("dateAcceptedDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                dateAcceptedDate;
+  @Transient
+  @ApiModelProperty(
+      value = "dateCompleted Date")
+  @JsonProperty("dateCompletedDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                dateCompletedDate;
 
   @SuppressWarnings("unused")
   private Contract() {}
@@ -118,6 +156,18 @@ public class Contract extends CachedData {
     this.collateral = collateral;
     this.buyout = buyout;
     this.volume = volume;
+  }
+
+  /**
+   * Update transient date values for readability.
+   */
+  @Override
+  public void prepareDates() {
+    fixDates();
+    dateIssuedDate = assignDateField(dateIssued);
+    dateExpiredDate = assignDateField(dateExpired);
+    dateAcceptedDate = assignDateField(dateAccepted);
+    dateCompletedDate = assignDateField(dateCompleted);
   }
 
   /**

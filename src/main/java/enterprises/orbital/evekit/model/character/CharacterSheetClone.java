@@ -1,6 +1,7 @@
 package enterprises.orbital.evekit.model.character;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -10,7 +11,11 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.NoResultException;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.TypedQuery;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
@@ -18,6 +23,7 @@ import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
+import io.swagger.annotations.ApiModelProperty;
 
 @Entity
 @Table(
@@ -34,12 +40,29 @@ public class CharacterSheetClone extends CachedData {
   // Stores just the cloneJumpDate part of the character sheet since this may change
   // frequently and we want to avoid having to evolve the entire character sheet.
   private long                  cloneJumpDate = -1;
+  @Transient
+  @ApiModelProperty(
+      value = "cloneJumpDate Date")
+  @JsonProperty("cloneJumpDateDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+  private Date                  cloneJumpDateDate;
 
   @SuppressWarnings("unused")
   private CharacterSheetClone() {}
 
   public CharacterSheetClone(long cloneJumpDate) {
     this.cloneJumpDate = cloneJumpDate;
+  }
+
+  /**
+   * Update transient date values for readability.
+   */
+  @Override
+  public void prepareDates() {
+    fixDates();
+    cloneJumpDateDate = assignDateField(cloneJumpDate);
   }
 
   /**
