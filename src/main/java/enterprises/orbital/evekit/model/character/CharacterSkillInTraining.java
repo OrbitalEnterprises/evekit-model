@@ -51,7 +51,7 @@ public class CharacterSkillInTraining extends CachedData {
   @JsonProperty("currentTrainingQueueTimeDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                  currentTrainingQueueTimeDate;
   @Transient
   @ApiModelProperty(
@@ -59,7 +59,7 @@ public class CharacterSkillInTraining extends CachedData {
   @JsonProperty("trainingStartTimeDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                  trainingStartTimeDate;
   @Transient
   @ApiModelProperty(
@@ -67,7 +67,7 @@ public class CharacterSkillInTraining extends CachedData {
   @JsonProperty("trainingEndTimeDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                  trainingEndTimeDate;
 
   @SuppressWarnings("unused")

@@ -42,7 +42,7 @@ public class AllianceMemberCorporation extends RefCachedData {
   @JsonProperty("startDateDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                startDateDate;
 
   @SuppressWarnings("unused")

@@ -48,7 +48,7 @@ public class CharacterSheetJump extends CachedData {
   @JsonProperty("jumpActivationDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                  jumpActivationDate;
   @Transient
   @ApiModelProperty(
@@ -56,7 +56,7 @@ public class CharacterSheetJump extends CachedData {
   @JsonProperty("jumpFatigueDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                  jumpFatigueDate;
   @Transient
   @ApiModelProperty(
@@ -64,7 +64,7 @@ public class CharacterSheetJump extends CachedData {
   @JsonProperty("jumpLastUpdateDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                  jumpLastUpdateDate;
 
   @SuppressWarnings("unused")

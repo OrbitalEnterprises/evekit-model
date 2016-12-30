@@ -95,7 +95,7 @@ public abstract class RefCachedData {
   @JsonProperty("lifeStartDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                lifeStartDate;
   @Transient
   @ApiModelProperty(
@@ -103,7 +103,7 @@ public abstract class RefCachedData {
   @JsonProperty("lifeEndDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                lifeEndDate;
 
   /**

@@ -76,7 +76,7 @@ public class PlanetaryPin extends CachedData {
   @JsonProperty("lastLaunchTimeDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                lastLaunchTimeDate;
   @Transient
   @ApiModelProperty(
@@ -84,7 +84,7 @@ public class PlanetaryPin extends CachedData {
   @JsonProperty("installTimeDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                installTimeDate;
   @Transient
   @ApiModelProperty(
@@ -92,7 +92,7 @@ public class PlanetaryPin extends CachedData {
   @JsonProperty("expiryTimeDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                expiryTimeDate;
 
   @SuppressWarnings("unused")

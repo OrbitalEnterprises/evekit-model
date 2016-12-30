@@ -73,7 +73,7 @@ public class ContractBid extends CachedData {
   @JsonProperty("dateBidDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                dateBidDate;
 
   @SuppressWarnings("unused")

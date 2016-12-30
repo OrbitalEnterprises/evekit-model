@@ -129,7 +129,7 @@ public abstract class CachedData {
   @JsonProperty("lifeStartDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                     lifeStartDate;
   @Transient
   @ApiModelProperty(
@@ -137,7 +137,7 @@ public abstract class CachedData {
   @JsonProperty("lifeEndDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                     lifeEndDate;
   // Object meta data - this will be serialized into storage
   @ElementCollection(

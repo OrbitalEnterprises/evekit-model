@@ -100,7 +100,7 @@ public class Contract extends CachedData {
   @JsonProperty("dateIssuedDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                dateIssuedDate;
   @Transient
   @ApiModelProperty(
@@ -108,7 +108,7 @@ public class Contract extends CachedData {
   @JsonProperty("dateExpiredDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                dateExpiredDate;
   @Transient
   @ApiModelProperty(
@@ -116,7 +116,7 @@ public class Contract extends CachedData {
   @JsonProperty("dateAcceptedDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                dateAcceptedDate;
   @Transient
   @ApiModelProperty(
@@ -124,7 +124,7 @@ public class Contract extends CachedData {
   @JsonProperty("dateCompletedDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                dateCompletedDate;
 
   @SuppressWarnings("unused")

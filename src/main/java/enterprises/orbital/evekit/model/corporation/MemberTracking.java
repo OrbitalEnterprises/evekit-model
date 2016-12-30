@@ -71,7 +71,7 @@ public class MemberTracking extends CachedData {
   @JsonProperty("logoffDateTimeDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                logoffDateTimeDate;
   @Transient
   @ApiModelProperty(
@@ -79,7 +79,7 @@ public class MemberTracking extends CachedData {
   @JsonProperty("logonDateTimeDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                logonDateTimeDate;
   @Transient
   @ApiModelProperty(
@@ -87,7 +87,7 @@ public class MemberTracking extends CachedData {
   @JsonProperty("startDateTimeDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                startDateTimeDate;
 
   @SuppressWarnings("unused")

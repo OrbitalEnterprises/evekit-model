@@ -83,7 +83,7 @@ public class CharacterSheet extends CachedData {
   @JsonProperty("doBDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                  doBDate;
   @Transient
   @ApiModelProperty(
@@ -91,7 +91,7 @@ public class CharacterSheet extends CachedData {
   @JsonProperty("lastRespecDateDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                  lastRespecDateDate;
   @Transient
   @ApiModelProperty(
@@ -99,7 +99,7 @@ public class CharacterSheet extends CachedData {
   @JsonProperty("lastTimedRespecDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                  lastTimedRespecDate;
   @Transient
   @ApiModelProperty(
@@ -107,7 +107,7 @@ public class CharacterSheet extends CachedData {
   @JsonProperty("remoteStationDateDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                  remoteStationDateDate;
 
   @SuppressWarnings("unused")

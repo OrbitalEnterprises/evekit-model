@@ -60,7 +60,7 @@ public class SkillInQueue extends CachedData {
   @JsonProperty("endTimeDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                endTimeDate;
   @Transient
   @ApiModelProperty(
@@ -68,7 +68,7 @@ public class SkillInQueue extends CachedData {
   @JsonProperty("startTimeDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                startTimeDate;
 
   @SuppressWarnings("unused")

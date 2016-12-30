@@ -55,7 +55,7 @@ public class AccountStatus extends CachedData {
   @JsonProperty("paidUntilDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                paidUntilDate;
   @Transient
   @ApiModelProperty(
@@ -63,7 +63,7 @@ public class AccountStatus extends CachedData {
   @JsonProperty("createDateDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                createDateDate;
 
   @SuppressWarnings("unused")

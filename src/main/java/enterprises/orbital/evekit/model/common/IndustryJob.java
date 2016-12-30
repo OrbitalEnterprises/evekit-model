@@ -104,7 +104,7 @@ public class IndustryJob extends CachedData {
   @JsonProperty("startDateDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                startDateDate;
   @Transient
   @ApiModelProperty(
@@ -112,7 +112,7 @@ public class IndustryJob extends CachedData {
   @JsonProperty("endDateDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                endDateDate;
   @Transient
   @ApiModelProperty(
@@ -120,7 +120,7 @@ public class IndustryJob extends CachedData {
   @JsonProperty("pauseDateDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                pauseDateDate;
   @Transient
   @ApiModelProperty(
@@ -128,7 +128,7 @@ public class IndustryJob extends CachedData {
   @JsonProperty("completedDateDate")
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
-      pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   private Date                completedDateDate;
 
   @SuppressWarnings("unused")
