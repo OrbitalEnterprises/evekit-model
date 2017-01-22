@@ -804,6 +804,19 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     count = TestBase.getRandomInt(200) + 50;
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
+      CachedData next = new Location(
+          TestBase.getRandomLong(), TestBase.getRandomText(50), TestBase.getRandomDouble(1000), TestBase.getRandomDouble(1000), TestBase.getRandomDouble(1000));
+      for (int j = 0; j < sel; j++) {
+        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
+      }
+      next.setup(testAccount, testTime);
+      next = CachedData.updateData(next);
+    }
+    System.out.println("Created Locations");
+
+    count = TestBase.getRandomInt(200) + 50;
+    for (int i = 0; i < count; i++) {
+      int sel = TestBase.getRandomInt(5);
       CachedData next = new MarketOrder(
           TestBase.getRandomLong(), TestBase.getRandomInt(), TestBase.getRandomBoolean(), TestBase.getRandomLong(), TestBase.getRandomInt(),
           TestBase.getRandomBigDecimal(100000000), TestBase.getRandomLong(), TestBase.getRandomInt(), TestBase.getRandomInt(),
