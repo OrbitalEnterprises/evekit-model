@@ -20,7 +20,8 @@ public class AttributeSelector {
                                    WILDCARD,
                                    SET,
                                    RANGE,
-                                   LIKE;
+                                   LIKE,
+                                   AT;
   }
 
   public static interface EnumMapper<A extends Enum<?>> {
@@ -49,6 +50,11 @@ public class AttributeSelector {
    * The upper bound of a range selector.
    */
   public String      end;
+
+  public Long        atStart;
+  public Long        atEnd;
+  public String      atStartIQ;
+  public String      atEndIQ;
 
   @SuppressWarnings("unused")
   private AttributeSelector() {}
