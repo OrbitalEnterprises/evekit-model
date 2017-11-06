@@ -160,8 +160,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
 
     // Setup account
     EveKitUserAccount userAccount = EveKitUserAccount.createNewUserAccount(true, true);
-    SynchronizedEveAccount testAccount = SynchronizedEveAccount.createSynchronizedEveAccount(userAccount, "testaccount", true, true, 1234, "abcd", 5678,
-                                                                                             "charname", 8765, "corpname");
+    SynchronizedEveAccount testAccount = SynchronizedEveAccount.createSynchronizedEveAccount(userAccount, "testaccount", true, true);
     long testTime = OrbitalProperties.getCurrentTime();
     // Now create at least one of every model element attached to this account.
     int count = TestBase.getRandomInt(5) + 1;
