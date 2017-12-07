@@ -6,14 +6,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.persistence.Entity;
-import javax.persistence.Index;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.NoResultException;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-import javax.persistence.TypedQuery;
+import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -69,7 +62,13 @@ public class Bookmark extends CachedData {
   private double              x;
   private double              y;
   private double              z;
+  @Lob
+  @Column(
+      length = 102400)
   private String              memo;
+  @Lob
+  @Column(
+      length = 102400)
   private String              note;
   @Transient
   @ApiModelProperty(
@@ -274,7 +273,7 @@ public class Bookmark extends CachedData {
         }
       });
     } catch (Exception e) {
-      log.log(Level.SEVERE, "query error", e);
+      log.log(Level.SEVERE, "query error, account: " + owner.getAid(), e);
     }
     return null;
   }
@@ -293,7 +292,7 @@ public class Bookmark extends CachedData {
         }
       });
     } catch (Exception e) {
-      log.log(Level.SEVERE, "query error", e);
+      log.log(Level.SEVERE, "query error, account: " + owner.getAid(), e);
     }
     return Collections.emptyList();
   }
@@ -314,7 +313,7 @@ public class Bookmark extends CachedData {
         }
       });
     } catch (Exception e) {
-      log.log(Level.SEVERE, "query error", e);
+      log.log(Level.SEVERE, "query error, account: " + owner.getAid(), e);
     }
     return Collections.emptyList();
   }
