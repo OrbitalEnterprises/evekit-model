@@ -150,8 +150,9 @@ public abstract class CachedData {
   public abstract void prepareDates();
 
   protected Date assignDateField(
-                                 long dateValue) {
-    return dateValue < 0 ? null : new Date(dateValue);
+      long dateValue) {
+    final long MAX_PARSEABLE_DATE = 253370782800000L;
+    return dateValue < 0 ? null : new Date(Math.min(dateValue, MAX_PARSEABLE_DATE));
   }
 
   /**
