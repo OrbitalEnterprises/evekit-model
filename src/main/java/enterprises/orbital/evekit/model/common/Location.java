@@ -51,7 +51,7 @@ public class Location extends CachedData {
   private double              z;
 
   @SuppressWarnings("unused")
-  private Location() {}
+  protected Location() {}
 
   public Location(long itemID, String itemName, double x, double y, double z) {
     super();

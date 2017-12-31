@@ -60,7 +60,7 @@ public class FacWarStats extends CachedData {
   private Date                enlistedDate;
 
   @SuppressWarnings("unused")
-  private FacWarStats() {}
+  protected FacWarStats() {}
 
   public FacWarStats(int currentRank, long enlisted, int factionID, String factionName, int highestRank, int killsLastWeek, int killsTotal, int killsYesterday,
                      int pilots, int victoryPointsLastWeek, int victoryPointsTotal, int victoryPointsYesterday) {

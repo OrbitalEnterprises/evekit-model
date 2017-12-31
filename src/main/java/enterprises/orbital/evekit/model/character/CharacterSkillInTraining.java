@@ -71,7 +71,7 @@ public class CharacterSkillInTraining extends CachedData {
   private Date                  trainingEndTimeDate;
 
   @SuppressWarnings("unused")
-  private CharacterSkillInTraining() {}
+  protected CharacterSkillInTraining() {}
 
   public CharacterSkillInTraining(boolean skillInTraining, long currentTrainingQueueTime, long trainingStartTime, long trainingEndTime, int trainingStartSP,
                                   int trainingDestinationSP, int trainingToLevel, int skillTypeID) {

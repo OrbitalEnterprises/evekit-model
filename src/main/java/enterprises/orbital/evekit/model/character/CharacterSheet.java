@@ -111,7 +111,7 @@ public class CharacterSheet extends CachedData {
   private Date                  remoteStationDateDate;
 
   @SuppressWarnings("unused")
-  private CharacterSheet() {}
+  protected CharacterSheet() {}
 
   public CharacterSheet(long characterID, String name, long corporationID, String corporationName, String race, long doB, int bloodlineID, String bloodline,
                         int ancestryID, String ancestry, String gender, String allianceName, long allianceID, String factionName, long factionID,

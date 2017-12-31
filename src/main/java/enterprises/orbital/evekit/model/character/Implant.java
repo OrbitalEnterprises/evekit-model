@@ -46,7 +46,7 @@ public class Implant extends CachedData {
   private String              typeName;
 
   @SuppressWarnings("unused")
-  private Implant() {}
+  protected Implant() {}
 
   public Implant(int typeID, String typeName) {
     super();

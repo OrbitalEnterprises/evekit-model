@@ -96,7 +96,7 @@ public class PlanetaryPin extends CachedData {
   private Date                expiryTimeDate;
 
   @SuppressWarnings("unused")
-  private PlanetaryPin() {}
+  protected PlanetaryPin() {}
 
   public PlanetaryPin(long planetID, long pinID, int typeID, String typeName, int schematicID, long lastLaunchTime, int cycleTime, int quantityPerCycle,
                       long installTime, long expiryTime, int contentTypeID, String contentTypeName, int contentQuantity, double longitude, double latitude) {

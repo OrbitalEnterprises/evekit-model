@@ -49,7 +49,7 @@ public class MailingList extends CachedData {
   private long                listID;
 
   @SuppressWarnings("unused")
-  private MailingList() {}
+  protected MailingList() {}
 
   public MailingList(String displayName, long listID) {
     super();

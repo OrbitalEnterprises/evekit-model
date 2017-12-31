@@ -81,7 +81,7 @@ public class MemberSecurity extends CachedData {
   private Set<Long>           titles                = new HashSet<Long>();
 
   @SuppressWarnings("unused")
-  private MemberSecurity() {}
+  protected MemberSecurity() {}
 
   public MemberSecurity(long characterID, String name) {
     super();

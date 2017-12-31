@@ -77,7 +77,7 @@ public class ContractBid extends CachedData {
   private Date                dateBidDate;
 
   @SuppressWarnings("unused")
-  private ContractBid() {}
+  protected ContractBid() {}
 
   public ContractBid(long bidID, long contractID, long bidderID, long dateBid, BigDecimal amount) {
     super();

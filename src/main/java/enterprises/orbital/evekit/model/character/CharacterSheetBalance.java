@@ -41,7 +41,7 @@ public class CharacterSheetBalance extends CachedData {
   private BigDecimal            balance;
 
   @SuppressWarnings("unused")
-  private CharacterSheetBalance() {}
+  protected CharacterSheetBalance() {}
 
   public CharacterSheetBalance(BigDecimal balance) {
     super();

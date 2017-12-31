@@ -81,7 +81,7 @@ public class MemberSecurityLog extends CachedData {
   private Date                changeTimeDate;
 
   @SuppressWarnings("unused")
-  private MemberSecurityLog() {}
+  protected MemberSecurityLog() {}
 
   public MemberSecurityLog(long changeTime, long changedCharacterID, String changedCharacterName, long issuerID, String issuerName, String roleLocationType) {
     super();

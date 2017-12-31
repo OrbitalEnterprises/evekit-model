@@ -78,7 +78,7 @@ public class CorporationMemberMedal extends CachedData {
   private Date                issuedDate;
 
   @SuppressWarnings("unused")
-  private CorporationMemberMedal() {}
+  protected CorporationMemberMedal() {}
 
   public CorporationMemberMedal(int medalID, long characterID, long issued, long issuerID, String reason, String status) {
     super();

@@ -58,7 +58,7 @@ public class CharacterNotificationBody extends CachedData {
   private boolean             missing;
 
   @SuppressWarnings("unused")
-  private CharacterNotificationBody() {}
+  protected CharacterNotificationBody() {}
 
   public CharacterNotificationBody(long notificationID, boolean retrieved, String text, boolean missing) {
     super();

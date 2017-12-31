@@ -53,7 +53,7 @@ public class Facility extends CachedData {
   private double              tax;
 
   @SuppressWarnings("unused")
-  private Facility() {}
+  protected Facility() {}
 
   public Facility(long facilityID, int typeID, String typeName, int solarSystemID, String solarSystemName, int regionID, String regionName,
                   int starbaseModifier, double tax) {

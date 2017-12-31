@@ -81,7 +81,7 @@ public class ChatChannelMember extends CachedData {
   private Date                untilWhenDate;
 
   @SuppressWarnings("unused")
-  private ChatChannelMember() {}
+  protected ChatChannelMember() {}
 
   public ChatChannelMember(long channelID, String category, long accessorID, String accessorName, long untilWhen, String reason) {
     super();

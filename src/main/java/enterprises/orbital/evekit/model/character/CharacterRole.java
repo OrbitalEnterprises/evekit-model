@@ -51,7 +51,7 @@ public class CharacterRole extends CachedData {
   private String              roleName;
 
   @SuppressWarnings("unused")
-  private CharacterRole() {}
+  protected CharacterRole() {}
 
   public CharacterRole(String roleCategory, long roleID, String roleName) {
     super();

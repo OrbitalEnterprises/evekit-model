@@ -58,7 +58,7 @@ public class CustomsOffice extends CachedData {
   private double              taxRateStandingHorrible;
 
   @SuppressWarnings("unused")
-  private CustomsOffice() {}
+  protected CustomsOffice() {}
 
   public CustomsOffice(long itemID, int solarSystemID, String solarSystemName, int reinforceHour, boolean allowAlliance, boolean allowStandings,
                        double standingLevel, double taxRateAlliance, double taxRateCorp, double taxRateStandingHigh, double taxRateStandingGood,

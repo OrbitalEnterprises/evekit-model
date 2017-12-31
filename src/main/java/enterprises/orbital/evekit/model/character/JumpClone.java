@@ -48,7 +48,7 @@ public class JumpClone extends CachedData {
   private String              cloneName;
 
   @SuppressWarnings("unused")
-  private JumpClone() {}
+  protected JumpClone() {}
 
   public JumpClone(int jumpCloneID, int typeID, long locationID, String cloneName) {
     super();

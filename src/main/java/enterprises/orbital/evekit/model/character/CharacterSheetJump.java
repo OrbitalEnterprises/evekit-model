@@ -68,7 +68,7 @@ public class CharacterSheetJump extends CachedData {
   private Date                  jumpLastUpdateDate;
 
   @SuppressWarnings("unused")
-  private CharacterSheetJump() {}
+  protected CharacterSheetJump() {}
 
   public CharacterSheetJump(long jumpActivation, long jumpFatigue, long jumpLastUpdate) {
     super();

@@ -75,7 +75,7 @@ public class CharacterNotification extends CachedData {
   private Date                sentDateDate;
 
   @SuppressWarnings("unused")
-  private CharacterNotification() {}
+  protected CharacterNotification() {}
 
   public CharacterNotification(long notificationID, int typeID, long senderID, long sentDate, boolean msgRead) {
     super();

@@ -50,7 +50,7 @@ public class Shareholder extends CachedData {
   private int                 shares;
 
   @SuppressWarnings("unused")
-  private Shareholder() {}
+  protected Shareholder() {}
 
   public Shareholder(long shareholderID, boolean isCorporation, long shareholderCorporationID, String shareholderCorporationName, String shareholderName,
                      int shares) {

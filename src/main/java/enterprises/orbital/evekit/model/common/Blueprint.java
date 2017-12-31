@@ -56,7 +56,7 @@ public class Blueprint extends CachedData {
   private int                 runs;
 
   @SuppressWarnings("unused")
-  private Blueprint() {}
+  protected Blueprint() {}
 
   public Blueprint(long itemID, long locationID, int typeID, String typeName, int flagID, int quantity, int timeEfficiency, int materialEfficiency, int runs) {
     super();

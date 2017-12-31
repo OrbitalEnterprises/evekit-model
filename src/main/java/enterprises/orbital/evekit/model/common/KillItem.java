@@ -70,7 +70,7 @@ public class KillItem extends CachedData {
   private int                 containerSequence   = TOP_LEVEL;
 
   @SuppressWarnings("unused")
-  private KillItem() {}
+  protected KillItem() {}
 
   public KillItem(long killID, int typeID, int flag, int qtyDestroyed, int qtyDropped, boolean singleton, int sequence, int containerSequence) {
     this.killID = killID;

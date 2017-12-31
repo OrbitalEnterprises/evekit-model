@@ -66,7 +66,7 @@ public class ResearchAgent extends CachedData {
   private Date                researchStartDateDate;
 
   @SuppressWarnings("unused")
-  private ResearchAgent() {}
+  protected ResearchAgent() {}
 
   public ResearchAgent(int agentID, double currentPoints, double pointsPerDay, double remainderPoints, long researchStartDate, int skillTypeID) {
     super();

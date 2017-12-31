@@ -72,7 +72,7 @@ public class SkillInQueue extends CachedData {
   private Date                startTimeDate;
 
   @SuppressWarnings("unused")
-  private SkillInQueue() {}
+  protected SkillInQueue() {}
 
   public SkillInQueue(int endSP, long endTime, int level, int queuePosition, int startSP, long startTime, int typeID) {
     super();

@@ -52,7 +52,7 @@ public class KillVictim extends CachedData {
   private int                 shipTypeID;
 
   @SuppressWarnings("unused")
-  private KillVictim() {}
+  protected KillVictim() {}
 
   public KillVictim(long killID, long allianceID, String allianceName, long killCharacterID, String killCharacterName, long killCorporationID,
                     String killCorporationName, long damageTaken, long factionID, String factionName, int shipTypeID) {

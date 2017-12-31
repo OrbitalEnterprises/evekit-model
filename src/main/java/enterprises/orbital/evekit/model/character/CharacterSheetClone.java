@@ -50,7 +50,7 @@ public class CharacterSheetClone extends CachedData {
   private Date                  cloneJumpDateDate;
 
   @SuppressWarnings("unused")
-  private CharacterSheetClone() {}
+  protected CharacterSheetClone() {}
 
   public CharacterSheetClone(long cloneJumpDate) {
     this.cloneJumpDate = cloneJumpDate;

@@ -54,7 +54,7 @@ public class ContactLabel extends CachedData {
   private String              name;
 
   @SuppressWarnings("unused")
-  private ContactLabel() {}
+  protected ContactLabel() {}
 
   public ContactLabel(String list, long labelID, String name) {
     super();

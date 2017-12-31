@@ -52,7 +52,7 @@ public class CalendarEventAttendee extends CachedData {
   private String              response;
 
   @SuppressWarnings("unused")
-  private CalendarEventAttendee() {}
+  protected CalendarEventAttendee() {}
 
   public CalendarEventAttendee(long eventID, long characterID, String characterName, String response) {
     this.eventID = eventID;

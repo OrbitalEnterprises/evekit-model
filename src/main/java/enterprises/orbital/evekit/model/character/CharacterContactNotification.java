@@ -70,7 +70,7 @@ public class CharacterContactNotification extends CachedData {
   private Date                sentDateDate;
 
   @SuppressWarnings("unused")
-  private CharacterContactNotification() {}
+  protected CharacterContactNotification() {}
 
   public CharacterContactNotification(long notificationID, long senderID, String senderName, long sentDate, String messageData) {
     this.notificationID = notificationID;

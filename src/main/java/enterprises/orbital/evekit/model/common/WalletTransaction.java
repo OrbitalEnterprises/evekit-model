@@ -92,7 +92,7 @@ public class WalletTransaction extends CachedData {
   private Date                dateDate;
 
   @SuppressWarnings("unused")
-  private WalletTransaction() {}
+  protected WalletTransaction() {}
 
   public WalletTransaction(int accountKey, long transactionID, long date, int quantity, String typeName, int typeID, BigDecimal price, long clientID,
                            String clientName, int stationID, String stationName, String transactionType, String transactionFor, long journalTransactionID,

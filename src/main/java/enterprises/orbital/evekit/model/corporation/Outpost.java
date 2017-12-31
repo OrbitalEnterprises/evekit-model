@@ -65,7 +65,7 @@ public class Outpost extends CachedData {
   private long                z;
 
   @SuppressWarnings("unused")
-  private Outpost() {}
+  protected Outpost() {}
 
   public Outpost(long stationID, long ownerID, String stationName, int solarSystemID, BigDecimal dockingCostPerShipVolume, BigDecimal officeRentalCost,
                  int stationTypeID, double reprocessingEfficiency, double reprocessingStationTake, long standingOwnerID, long x, long y, long z) {

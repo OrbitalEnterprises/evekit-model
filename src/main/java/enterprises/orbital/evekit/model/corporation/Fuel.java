@@ -53,7 +53,7 @@ public class Fuel extends CachedData {
   private int                 quantity;
 
   @SuppressWarnings("unused")
-  private Fuel() {}
+  protected Fuel() {}
 
   public Fuel(long itemID, int typeID, int quantity) {
     super();

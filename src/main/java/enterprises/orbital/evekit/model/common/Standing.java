@@ -58,7 +58,7 @@ public class Standing extends CachedData {
   private double              standing;
 
   @SuppressWarnings("unused")
-  private Standing() {}
+  protected Standing() {}
 
   public Standing(String standingEntity, int fromID, String fromName, double standing) {
     super();

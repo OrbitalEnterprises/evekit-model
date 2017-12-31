@@ -82,7 +82,7 @@ public class StarbaseDetail extends CachedData {
   private Date                stateTimestampDate;
 
   @SuppressWarnings("unused")
-  private StarbaseDetail() {}
+  protected StarbaseDetail() {}
 
   public StarbaseDetail(long itemID, int state, long stateTimestamp, long onlineTimestamp, int usageFlags, int deployFlags, boolean allowAllianceMembers,
                         boolean allowCorporationMembers, long useStandingsFrom, boolean onAggressionEnabled, int onAggressionStanding,

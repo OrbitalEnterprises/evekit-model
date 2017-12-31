@@ -91,7 +91,7 @@ public class MemberTracking extends CachedData {
   private Date                startDateTimeDate;
 
   @SuppressWarnings("unused")
-  private MemberTracking() {}
+  protected MemberTracking() {}
 
   public MemberTracking(long characterID, String base, long baseID, long grantableRoles, String location, long locationID, long logoffDateTime,
                         long logonDateTime, String name, long roles, String shipType, int shipTypeID, long startDateTime, String title) {

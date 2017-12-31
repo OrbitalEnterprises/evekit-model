@@ -65,7 +65,7 @@ public class OutpostServiceDetail extends CachedData {
   private BigDecimal          discountPerGoodStanding;
 
   @SuppressWarnings("unused")
-  private OutpostServiceDetail() {}
+  protected OutpostServiceDetail() {}
 
   public OutpostServiceDetail(long stationID, String serviceName, long ownerID, double minStanding, BigDecimal surchargePerBadStanding,
                               BigDecimal discountPerGoodStanding) {

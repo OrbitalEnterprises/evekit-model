@@ -46,7 +46,7 @@ public class SecurityRole extends CachedData {
   private String              roleName;
 
   @SuppressWarnings("unused")
-  private SecurityRole() {}
+  protected SecurityRole() {}
 
   public SecurityRole(long roleID, String roleName) {
     super();

@@ -97,7 +97,7 @@ public class MarketOrder extends CachedData {
   private Date                issuedDate;
 
   @SuppressWarnings("unused")
-  private MarketOrder() {}
+  protected MarketOrder() {}
 
   public MarketOrder(long orderID, int accountKey, boolean bid, long charID, int duration, BigDecimal escrow, long issued, int minVolume, int orderState,
                      BigDecimal price, int orderRange, long stationID, int typeID, int volEntered, int volRemaining) {

@@ -69,7 +69,7 @@ public class PlanetaryColony extends CachedData {
   private Date                lastUpdateDate;
 
   @SuppressWarnings("unused")
-  private PlanetaryColony() {}
+  protected PlanetaryColony() {}
 
   public PlanetaryColony(long planetID, int solarSystemID, String solarSystemName, String planetName, int planetTypeID, String planetTypeName, long ownerID,
                          String ownerName, long lastUpdate, int upgradeLevel, int numberOfPins) {

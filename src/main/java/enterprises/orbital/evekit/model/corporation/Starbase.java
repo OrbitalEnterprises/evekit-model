@@ -74,7 +74,7 @@ public class Starbase extends CachedData {
   private Date                stateTimestampDate;
 
   @SuppressWarnings("unused")
-  private Starbase() {}
+  protected Starbase() {}
 
   public Starbase(long itemID, long locationID, int moonID, long onlineTimestamp, int state, long stateTimestamp, int typeID, long standingOwnerID) {
     super();

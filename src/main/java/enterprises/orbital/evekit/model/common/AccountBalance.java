@@ -58,7 +58,7 @@ public class AccountBalance extends CachedData {
   private BigDecimal          balance;
 
   @SuppressWarnings("unused")
-  private AccountBalance() {}
+  protected AccountBalance() {}
 
   public AccountBalance(int accountID, int accountKey, BigDecimal balance) {
     this.accountID = accountID;

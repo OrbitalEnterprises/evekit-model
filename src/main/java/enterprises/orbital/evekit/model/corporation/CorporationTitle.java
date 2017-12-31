@@ -75,7 +75,7 @@ public class CorporationTitle extends CachedData {
   private Set<Long>           rolesAtOther          = new HashSet<Long>();
 
   @SuppressWarnings("unused")
-  private CorporationTitle() {}
+  protected CorporationTitle() {}
 
   public CorporationTitle(long titleID, String titleName) {
     super();

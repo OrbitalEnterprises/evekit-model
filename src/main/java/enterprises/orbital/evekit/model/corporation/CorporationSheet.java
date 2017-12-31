@@ -61,7 +61,7 @@ public class CorporationSheet extends CachedData {
   private String              url;
 
   @SuppressWarnings("unused")
-  private CorporationSheet() {}
+  protected CorporationSheet() {}
 
   public CorporationSheet(long allianceID, String allianceName, long ceoID, String ceoName, long corporationID, String corporationName, String description,
                           int logoColor1, int logoColor2, int logoColor3, int logoGraphicID, int logoShape1, int logoShape2, int logoShape3, int memberCount,

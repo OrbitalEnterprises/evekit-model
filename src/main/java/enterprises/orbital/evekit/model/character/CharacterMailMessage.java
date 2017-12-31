@@ -90,7 +90,7 @@ public class CharacterMailMessage extends CachedData {
   private Date                sentDateDate;
 
   @SuppressWarnings("unused")
-  private CharacterMailMessage() {}
+  protected CharacterMailMessage() {}
 
   public CharacterMailMessage(long messageID, long senderID, String senderName, long sentDate, String title, long toCorpOrAllianceID, boolean msgRead,
                               int senderTypeID) {

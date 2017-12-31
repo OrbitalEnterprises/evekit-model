@@ -132,7 +132,7 @@ public class IndustryJob extends CachedData {
   private Date                completedDateDate;
 
   @SuppressWarnings("unused")
-  private IndustryJob() {}
+  protected IndustryJob() {}
 
   public IndustryJob(long jobID, long installerID, String installerName, long facilityID, int solarSystemID, String solarSystemName, long stationID,
                      int activityID, long blueprintID, int blueprintTypeID, String blueprintTypeName, long blueprintLocationID, long outputLocationID, int runs,

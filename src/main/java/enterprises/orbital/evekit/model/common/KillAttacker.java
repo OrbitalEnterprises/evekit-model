@@ -65,7 +65,7 @@ public class KillAttacker extends CachedData {
   private boolean             finalBlow;
 
   @SuppressWarnings("unused")
-  private KillAttacker() {}
+  protected KillAttacker() {}
 
   public KillAttacker(long killID, long attackerCharacterID, long allianceID, String allianceName, String attackerCharacterName, long attackerCorporationID,
                       String attackerCorporationName, int damageDone, int factionID, String factionName, double securityStatus, int shipTypeID,

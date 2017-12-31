@@ -46,7 +46,7 @@ public class CharacterTitle extends CachedData {
   private String              titleName;
 
   @SuppressWarnings("unused")
-  private CharacterTitle() {}
+  protected CharacterTitle() {}
 
   public CharacterTitle(long titleID, String titleName) {
     super();

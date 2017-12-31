@@ -63,7 +63,7 @@ public class PlanetaryRoute extends CachedData {
   private long                waypoint5;
 
   @SuppressWarnings("unused")
-  private PlanetaryRoute() {}
+  protected PlanetaryRoute() {}
 
   public PlanetaryRoute(long planetID, long routeID, long sourcePinID, long destinationPinID, int contentTypeID, String contentTypeName, int quantity,
                         long waypoint1, long waypoint2, long waypoint3, long waypoint4, long waypoint5) {

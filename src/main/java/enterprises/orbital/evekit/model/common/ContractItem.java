@@ -57,7 +57,7 @@ public class ContractItem extends CachedData {
   private boolean             included;
 
   @SuppressWarnings("unused")
-  private ContractItem() {}
+  protected ContractItem() {}
 
   public ContractItem(long contractID, long recordID, int typeID, long quantity, long rawQuantity, boolean singleton, boolean included) {
     super();

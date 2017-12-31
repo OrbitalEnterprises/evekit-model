@@ -51,7 +51,7 @@ public class JumpCloneImplant extends CachedData {
   private String              typeName;
 
   @SuppressWarnings("unused")
-  private JumpCloneImplant() {}
+  protected JumpCloneImplant() {}
 
   public JumpCloneImplant(int jumpCloneID, int typeID, String typeName) {
     super();

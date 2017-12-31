@@ -68,7 +68,7 @@ public class Contact extends CachedData {
   private long                labelMask;
 
   @SuppressWarnings("unused")
-  private Contact() {}
+  protected Contact() {}
 
   public Contact(String list, int contactID, String contactName, double standing, int contactTypeID, boolean inWatchlist, long labelMask) {
     this.list = list;

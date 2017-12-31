@@ -58,7 +58,7 @@ public class PlanetaryLink extends CachedData {
   private int                 linkLevel;
 
   @SuppressWarnings("unused")
-  private PlanetaryLink() {}
+  protected PlanetaryLink() {}
 
   public PlanetaryLink(long planetID, long sourcePinID, long destinationPinID, int linkLevel) {
     super();

@@ -64,7 +64,7 @@ public class Asset extends CachedData {
   private long                container           = TOP_LEVEL;
 
   @SuppressWarnings("unused")
-  private Asset() {}
+  protected Asset() {}
 
   public Asset(long itemID, long locationID, int typeID, long quantity, int flag, boolean singleton, long rawQuantity, long container) {
     this.itemID = itemID;

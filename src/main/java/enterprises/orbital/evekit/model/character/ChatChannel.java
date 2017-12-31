@@ -56,7 +56,7 @@ public class ChatChannel extends CachedData {
   private String              motd;
 
   @SuppressWarnings("unused")
-  private ChatChannel() {}
+  protected ChatChannel() {}
 
   public ChatChannel(long channelID, long ownerID, String ownerName, String displayName, String comparisonKey, boolean hasPassword, String motd) {
     super();

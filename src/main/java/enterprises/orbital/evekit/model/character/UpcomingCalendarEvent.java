@@ -73,7 +73,7 @@ public class UpcomingCalendarEvent extends CachedData {
   private Date                eventDateDate;
 
   @SuppressWarnings("unused")
-  private UpcomingCalendarEvent() {}
+  protected UpcomingCalendarEvent() {}
 
   public UpcomingCalendarEvent(int duration, long eventDate, long eventID, String eventText, String eventTitle, long ownerID, String ownerName, String response,
                                boolean important, int ownerTypeID) {

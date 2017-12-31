@@ -50,7 +50,7 @@ public class CharacterSkill extends CachedData {
   private boolean             published;
 
   @SuppressWarnings("unused")
-  private CharacterSkill() {}
+  protected CharacterSkill() {}
 
   public CharacterSkill(int typeID, int level, int skillpoints, boolean published) {
     super();

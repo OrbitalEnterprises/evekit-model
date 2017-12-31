@@ -58,7 +58,7 @@ public class CharacterMailMessageBody extends CachedData {
   private String              body;
 
   @SuppressWarnings("unused")
-  private CharacterMailMessageBody() {}
+  protected CharacterMailMessageBody() {}
 
   public CharacterMailMessageBody(long messageID, boolean retrieved, String body) {
     this.messageID = messageID;

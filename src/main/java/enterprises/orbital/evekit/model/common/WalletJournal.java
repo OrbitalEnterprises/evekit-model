@@ -106,7 +106,7 @@ public class WalletJournal extends CachedData {
   private Date                dateDate;
 
   @SuppressWarnings("unused")
-  private WalletJournal() {}
+  protected WalletJournal() {}
 
   public WalletJournal(int accountKey, long refID, long date, int refTypeID, String ownerName1, long ownerID1, String ownerName2, long ownerID2,
                        String argName1, long argID1, BigDecimal amount, BigDecimal balance, String reason, long taxReceiverID, BigDecimal taxAmount,

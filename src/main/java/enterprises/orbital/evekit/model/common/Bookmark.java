@@ -80,7 +80,7 @@ public class Bookmark extends CachedData {
   private Date                createdDate;
 
   @SuppressWarnings("unused")
-  private Bookmark() {}
+  protected Bookmark() {}
 
   public Bookmark(int folderID, String folderName, long folderCreatorID, int bookmarkID, long bookmarkCreatorID, long created, long itemID, int typeID,
                   long locationID, double x, double y, double z, String memo, String note) {

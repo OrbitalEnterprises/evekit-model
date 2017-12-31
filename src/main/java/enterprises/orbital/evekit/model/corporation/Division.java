@@ -51,7 +51,7 @@ public class Division extends CachedData {
   private String              description;
 
   @SuppressWarnings("unused")
-  private Division() {}
+  protected Division() {}
 
   public Division(boolean wallet, int accountKey, String description) {
     super();

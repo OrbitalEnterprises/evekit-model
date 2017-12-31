@@ -72,7 +72,7 @@ public class Kill extends CachedData {
   private Date                killTimeDate;
 
   @SuppressWarnings("unused")
-  private Kill() {}
+  protected Kill() {}
 
   public Kill(long killID, long killTime, int moonID, long solarSystemID) {
     this.killID = killID;

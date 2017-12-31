@@ -64,7 +64,7 @@ public class CharacterMedal extends CachedData {
   private Date issuedDate;
 
   @SuppressWarnings("unused")
-  private CharacterMedal() {}
+  protected CharacterMedal() {}
 
   public CharacterMedal(String description, int medalID, String title, long corporationID, long issued, long issuerID,
                         String reason, String status) {

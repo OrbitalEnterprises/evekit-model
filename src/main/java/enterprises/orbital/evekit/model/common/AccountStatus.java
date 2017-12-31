@@ -67,7 +67,7 @@ public class AccountStatus extends CachedData {
   private Date                createDateDate;
 
   @SuppressWarnings("unused")
-  private AccountStatus() {}
+  protected AccountStatus() {}
 
   public AccountStatus(long paidUntil, long createDate, long logonCount, long logonMinutes) {
     this.paidUntil = paidUntil;

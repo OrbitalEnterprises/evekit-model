@@ -128,7 +128,7 @@ public class Contract extends CachedData {
   private Date                dateCompletedDate;
 
   @SuppressWarnings("unused")
-  private Contract() {}
+  protected Contract() {}
 
   public Contract(long contractID, long issuerID, long issuerCorpID, long assigneeID, long acceptorID, long startStationID, long endStationID, String type,
                   String status, String title, boolean forCorp, String availability, long dateIssued, long dateExpired, long dateAccepted, int numDays,

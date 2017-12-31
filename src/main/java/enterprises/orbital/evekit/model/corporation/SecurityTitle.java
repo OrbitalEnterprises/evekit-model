@@ -46,7 +46,7 @@ public class SecurityTitle extends CachedData {
   private String              titleName;
 
   @SuppressWarnings("unused")
-  private SecurityTitle() {}
+  protected SecurityTitle() {}
 
   public SecurityTitle(long titleID, String titleName) {
     super();

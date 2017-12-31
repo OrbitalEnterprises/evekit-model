@@ -77,7 +77,7 @@ public class ContainerLog extends CachedData {
   private Date                logTimeDate;
 
   @SuppressWarnings("unused")
-  private ContainerLog() {}
+  protected ContainerLog() {}
 
   public ContainerLog(long logTime, String action, long actorID, String actorName, int flag, long itemID, int itemTypeID, long locationID,
                       String newConfiguration, String oldConfiguration, String passwordType, long quantity, int typeID) {
