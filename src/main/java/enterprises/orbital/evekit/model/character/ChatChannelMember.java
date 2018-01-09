@@ -97,7 +97,7 @@ public class ChatChannelMember extends CachedData {
    * Update transient date values for readability.
    */
   @Override
-  public void prepareDates() {
+  public void prepareTransient() {
     fixDates();
     untilWhenDate = assignDateField(untilWhen);
   }

@@ -140,7 +140,7 @@ public class PlanetaryPinTest extends AbstractModelTester<PlanetaryPin> {
         planetID, pinID, typeID, typeName, schematicID, lastLaunchTime, cycleTime, quantityPerCycle, installTime, expiryTime, contentTypeID, contentTypeName,
         contentQuantity, longitude, latitude);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(planetID, new HashMap<Long, Map<Integer, PlanetaryPin>>());
     listCheck.get(planetID).put(pinID, new HashMap<Integer, PlanetaryPin>());
     listCheck.get(planetID).get(pinID).put(contentTypeID, existing);
@@ -149,14 +149,14 @@ public class PlanetaryPinTest extends AbstractModelTester<PlanetaryPin> {
         planetID, pinID, typeID, typeName, schematicID, lastLaunchTime, cycleTime, quantityPerCycle, installTime, expiryTime, contentTypeID + 10,
         contentTypeName, contentQuantity, longitude, latitude);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.get(planetID).get(pinID).put(contentTypeID + 10, existing);
 
     existing = new PlanetaryPin(
         planetID + 10, pinID + 10, typeID, typeName, schematicID, lastLaunchTime, cycleTime, quantityPerCycle, installTime, expiryTime, contentTypeID,
         contentTypeName, contentQuantity, longitude, latitude);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(planetID + 10, new HashMap<Long, Map<Integer, PlanetaryPin>>());
     listCheck.get(planetID + 10).put(pinID + 10, new HashMap<Integer, PlanetaryPin>());
     listCheck.get(planetID + 10).get(pinID + 10).put(contentTypeID, existing);
@@ -166,14 +166,14 @@ public class PlanetaryPinTest extends AbstractModelTester<PlanetaryPin> {
         planetID, pinID, typeID, typeName, schematicID, lastLaunchTime, cycleTime, quantityPerCycle, installTime, expiryTime, contentTypeID, contentTypeName,
         contentQuantity, longitude, latitude);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new PlanetaryPin(
         planetID + 3, pinID + 3, typeID, typeName, schematicID, lastLaunchTime, cycleTime, quantityPerCycle, installTime, expiryTime, contentTypeID,
         contentTypeName, contentQuantity, longitude, latitude);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new PlanetaryPin(
@@ -181,7 +181,7 @@ public class PlanetaryPinTest extends AbstractModelTester<PlanetaryPin> {
         contentTypeName, contentQuantity, longitude, latitude);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     List<PlanetaryPin> result = PlanetaryPin.getAllPlanetaryPins(testAccount, 8888L);
     Assert.assertEquals(3, result.size());
@@ -210,7 +210,7 @@ public class PlanetaryPinTest extends AbstractModelTester<PlanetaryPin> {
         planetID, pinID, typeID, typeName, schematicID, lastLaunchTime, cycleTime, quantityPerCycle, installTime, expiryTime, contentTypeID, contentTypeName,
         contentQuantity, longitude, latitude);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(planetID, new HashMap<Long, PlanetaryPin>());
     listCheck.get(planetID).put(pinID, existing);
 
@@ -218,7 +218,7 @@ public class PlanetaryPinTest extends AbstractModelTester<PlanetaryPin> {
         planetID, pinID + 10, typeID, typeName, schematicID, lastLaunchTime, cycleTime, quantityPerCycle, installTime, expiryTime, contentTypeID,
         contentTypeName, contentQuantity, longitude, latitude);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.get(planetID).put(pinID + 10, existing);
 
     // Associated with different account
@@ -226,21 +226,21 @@ public class PlanetaryPinTest extends AbstractModelTester<PlanetaryPin> {
         planetID, pinID, typeID, typeName, schematicID, lastLaunchTime, cycleTime, quantityPerCycle, installTime, expiryTime, contentTypeID, contentTypeName,
         contentQuantity, longitude, latitude);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Associated with different planet
     existing = new PlanetaryPin(
         planetID + 10, pinID + 10, typeID, typeName, schematicID, lastLaunchTime, cycleTime, quantityPerCycle, installTime, expiryTime, contentTypeID,
         contentTypeName, contentQuantity, longitude, latitude);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new PlanetaryPin(
         planetID + 3, pinID + 3, typeID, typeName, schematicID, lastLaunchTime, cycleTime, quantityPerCycle, installTime, expiryTime, contentTypeID,
         contentTypeName, contentQuantity, longitude, latitude);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new PlanetaryPin(
@@ -248,7 +248,7 @@ public class PlanetaryPinTest extends AbstractModelTester<PlanetaryPin> {
         contentTypeName, contentQuantity, longitude, latitude);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     List<PlanetaryPin> result = PlanetaryPin.getAllPlanetaryPins(testAccount, 8888L);
     Assert.assertEquals(listCheck.get(planetID).size(), result.size());

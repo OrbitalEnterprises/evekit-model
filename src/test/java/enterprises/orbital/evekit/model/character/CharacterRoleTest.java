@@ -1,18 +1,16 @@
 package enterprises.orbital.evekit.model.character;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import enterprises.orbital.evekit.TestBase;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AbstractModelTester;
 import enterprises.orbital.evekit.model.CachedData;
-import enterprises.orbital.evekit.model.character.CharacterRole;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class CharacterRoleTest extends AbstractModelTester<CharacterRole> {
 
@@ -76,31 +74,31 @@ public class CharacterRoleTest extends AbstractModelTester<CharacterRole> {
 
     existing = new CharacterRole(roleCategory, roleID, roleName);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(roleCategory, new HashMap<Long, CharacterRole>());
     listCheck.get(roleCategory).put(roleID, existing);
 
     existing = new CharacterRole(roleCategory + " 10", roleID + 10, roleName);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(roleCategory + " 10", new HashMap<Long, CharacterRole>());
     listCheck.get(roleCategory + " 10").put(roleID + 10, existing);
 
     // Associated with different account
     existing = new CharacterRole(roleCategory, roleID, roleName);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new CharacterRole(roleCategory + " 3", roleID + 3, roleName);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new CharacterRole(roleCategory + " 4", roleID + 4, roleName);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     List<CharacterRole> result = CharacterRole.getAllRoles(testAccount, 8888L);
     Assert.assertEquals(listCheck.size(), result.size());

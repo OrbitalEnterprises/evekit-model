@@ -1,18 +1,16 @@
 package enterprises.orbital.evekit.model.character;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import enterprises.orbital.evekit.TestBase;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AbstractModelTester;
 import enterprises.orbital.evekit.model.CachedData;
-import enterprises.orbital.evekit.model.character.SkillInQueue;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class SkillInQueueTest extends AbstractModelTester<SkillInQueue> {
   final int                                     endSP         = TestBase.getRandomInt(100000000);
@@ -87,39 +85,39 @@ public class SkillInQueueTest extends AbstractModelTester<SkillInQueue> {
 
     existing = new SkillInQueue(endSP, endTime, level, queuePosition, startSP, startTime, typeID);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(queuePosition, existing);
 
     existing = new SkillInQueue(endSP, endTime, level, queuePosition + 1, startSP, startTime, typeID);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(queuePosition + 1, existing);
 
     existing = new SkillInQueue(endSP, endTime, level, queuePosition + 2, startSP, startTime, typeID);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(queuePosition + 2, existing);
 
     existing = new SkillInQueue(endSP, endTime, level, queuePosition + 3, startSP, startTime, typeID);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(queuePosition + 3, existing);
 
     // Associated with different account
     existing = new SkillInQueue(endSP, endTime, level, queuePosition, startSP, startTime, typeID);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new SkillInQueue(endSP, endTime, level, queuePosition + 4, startSP, startTime, typeID);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new SkillInQueue(endSP, endTime, level, queuePosition + 5, startSP, startTime, typeID);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify proper part of skill queue is returned
     List<SkillInQueue> result = SkillInQueue.getAtOrAfterPosition(testAccount, 8888L, queuePosition + 2);

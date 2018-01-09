@@ -73,29 +73,29 @@ public class SecurityTitleTest extends AbstractModelTester<SecurityTitle> {
 
     existing = new SecurityTitle(titleID, titleName);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(titleID, existing);
 
     existing = new SecurityTitle(titleID + 1, titleName);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(titleID + 1, existing);
 
     // Associated with different account
     existing = new SecurityTitle(titleID + 2, titleName);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new SecurityTitle(titleID + 3, titleName);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new SecurityTitle(titleID + 4, titleName);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     List<SecurityTitle> result = SecurityTitle.getAll(testAccount, 8888L);
     Assert.assertEquals(listCheck.size(), result.size());

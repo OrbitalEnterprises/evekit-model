@@ -1,18 +1,16 @@
 package enterprises.orbital.evekit.model.common;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import enterprises.orbital.evekit.TestBase;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AbstractModelTester;
 import enterprises.orbital.evekit.model.CachedData;
-import enterprises.orbital.evekit.model.common.Bookmark;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class BookmarkTest extends AbstractModelTester<Bookmark> {
   final int                                 folderID          = TestBase.getRandomInt(100000000);
@@ -102,44 +100,44 @@ public class BookmarkTest extends AbstractModelTester<Bookmark> {
 
     existing = new Bookmark(folderID, folderName, folderCreatorID, bookmarkID, bookmarkCreatorID, created, itemID, typeID, locationID, x, y, z, memo, note);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(folderID, new HashMap<Integer, Bookmark>());
     listCheck.get(folderID).put(bookmarkID, existing);
 
     existing = new Bookmark(
         folderID, folderName, folderCreatorID, bookmarkID + 10, bookmarkCreatorID, created, itemID, typeID, locationID, x, y, z, memo, note);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.get(folderID).put(bookmarkID + 10, existing);
 
     existing = new Bookmark(
         folderID + 10, folderName, folderCreatorID, bookmarkID, bookmarkCreatorID, created, itemID, typeID, locationID, x, y, z, memo, note);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(folderID + 10, new HashMap<Integer, Bookmark>());
     listCheck.get(folderID + 10).put(bookmarkID, existing);
 
     existing = new Bookmark(
         folderID + 10, folderName, folderCreatorID, bookmarkID + 10, bookmarkCreatorID, created, itemID, typeID, locationID, x, y, z, memo, note);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.get(folderID + 10).put(bookmarkID + 10, existing);
 
     // Associated with different account
     existing = new Bookmark(folderID, folderName, folderCreatorID, bookmarkID, bookmarkCreatorID, created, itemID, typeID, locationID, x, y, z, memo, note);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new Bookmark(folderID, folderName, folderCreatorID, bookmarkID + 5, bookmarkCreatorID, created, itemID, typeID, locationID, x, y, z, memo, note);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new Bookmark(folderID, folderName, folderCreatorID, bookmarkID + 3, bookmarkCreatorID, created, itemID, typeID, locationID, x, y, z, memo, note);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all bookmarks are returned
     List<Bookmark> result = Bookmark.getAllBookmarks(testAccount, 8888L);
@@ -164,49 +162,49 @@ public class BookmarkTest extends AbstractModelTester<Bookmark> {
 
     existing = new Bookmark(folderID, folderName, folderCreatorID, bookmarkID, bookmarkCreatorID, created, itemID, typeID, locationID, x, y, z, memo, note);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(folderID, new HashMap<Integer, Bookmark>());
     listCheck.get(folderID).put(bookmarkID, existing);
 
     existing = new Bookmark(
         folderID, folderName, folderCreatorID, bookmarkID + 10, bookmarkCreatorID, created, itemID, typeID, locationID, x, y, z, memo, note);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.get(folderID).put(bookmarkID + 10, existing);
 
     existing = new Bookmark(
         folderID, folderName, folderCreatorID, bookmarkID + 20, bookmarkCreatorID, created, itemID, typeID, locationID, x, y, z, memo, note);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.get(folderID).put(bookmarkID + 20, existing);
 
     existing = new Bookmark(
         folderID, folderName, folderCreatorID, bookmarkID + 30, bookmarkCreatorID, created, itemID, typeID, locationID, x, y, z, memo, note);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.get(folderID).put(bookmarkID + 30, existing);
 
     // Associated with different account
     existing = new Bookmark(folderID, folderName, folderCreatorID, bookmarkID, bookmarkCreatorID, created, itemID, typeID, locationID, x, y, z, memo, note);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Associated with different folder
     existing = new Bookmark(
         folderID + 10, folderName, folderCreatorID, bookmarkID, bookmarkCreatorID, created, itemID, typeID, locationID, x, y, z, memo, note);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new Bookmark(folderID, folderName, folderCreatorID, bookmarkID + 5, bookmarkCreatorID, created, itemID, typeID, locationID, x, y, z, memo, note);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new Bookmark(folderID, folderName, folderCreatorID, bookmarkID + 3, bookmarkCreatorID, created, itemID, typeID, locationID, x, y, z, memo, note);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all bookmarks are returned
     List<Bookmark> result = Bookmark.getByFolderID(testAccount, 8888L, folderID);

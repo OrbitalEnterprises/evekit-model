@@ -75,34 +75,34 @@ public class FuelTest extends AbstractModelTester<Fuel> {
 
     existing = new Fuel(itemID, typeID, quantity);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(typeID, existing);
 
     existing = new Fuel(itemID, typeID + 1, quantity);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(typeID + 1, existing);
 
     // Associated with different account
     existing = new Fuel(itemID, typeID, quantity);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Associated with different item ID
     existing = new Fuel(itemID + 1, typeID, quantity);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new Fuel(itemID, typeID + 3, quantity);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new Fuel(itemID, typeID + 4, quantity);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     List<Fuel> result = Fuel.getAllByItemID(testAccount, 8888L, itemID);
     Assert.assertEquals(listCheck.size(), result.size());
@@ -123,29 +123,29 @@ public class FuelTest extends AbstractModelTester<Fuel> {
 
     existing = new Fuel(itemID, typeID, quantity);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(itemID, existing);
 
     existing = new Fuel(itemID + 1, typeID + 1, quantity);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(itemID + 1, existing);
 
     // Associated with different account
     existing = new Fuel(itemID + 2, typeID + 2, quantity);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new Fuel(itemID + 3, typeID + 3, quantity);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new Fuel(itemID + 4, typeID + 4, quantity);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     List<Fuel> result = Fuel.getAll(testAccount, 8888L);
     Assert.assertEquals(listCheck.size(), result.size());

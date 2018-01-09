@@ -140,48 +140,48 @@ public class MarketOrderTest extends AbstractModelTester<MarketOrder> {
     existing = new MarketOrder(
         orderID, accountKey, bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange, stationID, typeID, volEntered, volRemaining);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(orderID, existing);
 
     existing = new MarketOrder(
         orderID + 10, accountKey, bid, charID, duration, escrow, issued + 10, minVolume, orderState, price, orderRange, stationID, typeID, volEntered,
         volRemaining);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(orderID + 10, existing);
 
     existing = new MarketOrder(
         orderID + 20, accountKey, bid, charID, duration, escrow, issued + 20, minVolume, orderState, price, orderRange, stationID, typeID, volEntered,
         volRemaining);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(orderID + 20, existing);
 
     existing = new MarketOrder(
         orderID + 30, accountKey, bid, charID, duration, escrow, issued + 30, minVolume, orderState, price, orderRange, stationID, typeID, volEntered,
         volRemaining);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(orderID + 30, existing);
 
     // Associated with different account
     existing = new MarketOrder(
         orderID, accountKey, bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange, stationID, typeID, volEntered, volRemaining);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new MarketOrder(
         orderID + 5, accountKey, bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange, stationID, typeID, volEntered, volRemaining);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new MarketOrder(
         orderID + 3, accountKey, bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange, stationID, typeID, volEntered, volRemaining);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all jobsare returned
     List<MarketOrder> result = MarketOrder.getAllForward(testAccount, 8888L, 10, 0);
@@ -220,48 +220,48 @@ public class MarketOrderTest extends AbstractModelTester<MarketOrder> {
     existing = new MarketOrder(
         orderID, accountKey, bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange, stationID, typeID, volEntered, volRemaining);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(orderID, existing);
 
     existing = new MarketOrder(
         orderID + 10, accountKey, bid, charID, duration, escrow, issued + 10, minVolume, orderState, price, orderRange, stationID, typeID, volEntered,
         volRemaining);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(orderID + 10, existing);
 
     existing = new MarketOrder(
         orderID + 20, accountKey, bid, charID, duration, escrow, issued + 20, minVolume, orderState, price, orderRange, stationID, typeID, volEntered,
         volRemaining);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(orderID + 20, existing);
 
     existing = new MarketOrder(
         orderID + 30, accountKey, bid, charID, duration, escrow, issued + 30, minVolume, orderState, price, orderRange, stationID, typeID, volEntered,
         volRemaining);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(orderID + 30, existing);
 
     // Associated with different account
     existing = new MarketOrder(
         orderID, accountKey, bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange, stationID, typeID, volEntered, volRemaining);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new MarketOrder(
         orderID + 5, accountKey, bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange, stationID, typeID, volEntered, volRemaining);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new MarketOrder(
         orderID + 3, accountKey, bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange, stationID, typeID, volEntered, volRemaining);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all jobsare returned
     List<MarketOrder> result = MarketOrder.getAllBackward(testAccount, 8888L, 10, Long.MAX_VALUE);
@@ -302,58 +302,58 @@ public class MarketOrderTest extends AbstractModelTester<MarketOrder> {
     existing = new MarketOrder(
         orderID, accountKey, bid, charID, duration, escrow, issued, minVolume, 0, price, orderRange, stationID, typeID, volEntered, volRemaining);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(orderID, existing);
 
     existing = new MarketOrder(
         orderID + 10, accountKey, bid, charID, duration, escrow, issued + 10, minVolume, 0, price, orderRange, stationID, typeID, volEntered, volRemaining);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(orderID + 10, existing);
 
     existing = new MarketOrder(
         orderID + 20, accountKey, bid, charID, duration, escrow, issued + 20, minVolume, 0, price, orderRange, stationID, typeID, volEntered, volRemaining);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(orderID + 20, existing);
 
     existing = new MarketOrder(
         orderID + 30, accountKey, bid, charID, duration, escrow, issued + 30, minVolume, 0, price, orderRange, stationID, typeID, volEntered, volRemaining);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(orderID + 30, existing);
 
     // Associated with different account
     existing = new MarketOrder(
         orderID, accountKey, bid, charID, duration, escrow, issued, minVolume, 0, price, orderRange, stationID, typeID, volEntered, volRemaining);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Outside the duration bound
     existing = new MarketOrder(
         orderID + 7, accountKey, bid, charID, duration, escrow, issued + 6 * 24 * 60 * 60 * 1000L, minVolume, 0, price, orderRange, stationID, typeID,
         volEntered, volRemaining);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Non-zero order state
     existing = new MarketOrder(
         orderID + 7, accountKey, bid, charID, duration, escrow, issued, minVolume, 1, price, orderRange, stationID, typeID, volEntered, volRemaining);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new MarketOrder(
         orderID + 5, accountKey, bid, charID, duration, escrow, issued, minVolume, 0, price, orderRange, stationID, typeID, volEntered, volRemaining);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new MarketOrder(
         orderID + 3, accountKey, bid, charID, duration, escrow, issued, minVolume, 0, price, orderRange, stationID, typeID, volEntered, volRemaining);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all jobs are returned
     List<MarketOrder> result = MarketOrder.getAllActive(testAccount, 8888L, 10, 0, issued, 5);

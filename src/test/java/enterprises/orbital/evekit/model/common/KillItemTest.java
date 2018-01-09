@@ -1,18 +1,16 @@
 package enterprises.orbital.evekit.model.common;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import enterprises.orbital.evekit.TestBase;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AbstractModelTester;
 import enterprises.orbital.evekit.model.CachedData;
-import enterprises.orbital.evekit.model.common.KillItem;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class KillItemTest extends AbstractModelTester<KillItem> {
 
@@ -92,49 +90,49 @@ public class KillItemTest extends AbstractModelTester<KillItem> {
 
     existing = new KillItem(killID, typeID, flag, qtyDestroyed, qtyDropped, singleton, sequence, containerSequence);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(sequence, existing);
 
     existing = new KillItem(killID, typeID, flag, qtyDestroyed, qtyDropped, singleton, sequence + 10, containerSequence);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(sequence + 10, existing);
 
     existing = new KillItem(killID, typeID, flag, qtyDestroyed, qtyDropped, singleton, sequence + 20, containerSequence);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(sequence + 20, existing);
 
     existing = new KillItem(killID, typeID, flag, qtyDestroyed, qtyDropped, singleton, sequence + 30, containerSequence);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(sequence + 30, existing);
 
     // Associated with different account
     existing = new KillItem(killID, typeID, flag, qtyDestroyed, qtyDropped, singleton, sequence, containerSequence);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Associated with a different kill
     existing = new KillItem(killID + 1, typeID, flag, qtyDestroyed, qtyDropped, singleton, sequence, containerSequence);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Associated with a different container
     existing = new KillItem(killID, typeID, flag, qtyDestroyed, qtyDropped, singleton, sequence + 40, containerSequence + 20);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new KillItem(killID, typeID, flag, qtyDestroyed, qtyDropped, singleton, sequence + 5, containerSequence);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new KillItem(killID, typeID, flag, qtyDestroyed, qtyDropped, singleton, sequence + 3, containerSequence);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all contacts are returned
     List<KillItem> result = KillItem.getContainedKillItems(testAccount, 8888L, killID, containerSequence);
@@ -162,44 +160,44 @@ public class KillItemTest extends AbstractModelTester<KillItem> {
 
     existing = new KillItem(killID, typeID, flag, qtyDestroyed, qtyDropped, singleton, sequence, containerSequence);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(sequence, existing);
 
     existing = new KillItem(killID, typeID, flag, qtyDestroyed, qtyDropped, singleton, sequence + 10, containerSequence);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(sequence + 10, existing);
 
     existing = new KillItem(killID, typeID, flag, qtyDestroyed, qtyDropped, singleton, sequence + 20, containerSequence);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(sequence + 20, existing);
 
     existing = new KillItem(killID, typeID, flag, qtyDestroyed, qtyDropped, singleton, sequence + 30, containerSequence);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(sequence + 30, existing);
 
     // Associated with different account
     existing = new KillItem(killID, typeID, flag, qtyDestroyed, qtyDropped, singleton, sequence, containerSequence);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Associated with a different kill
     existing = new KillItem(killID + 1, typeID, flag, qtyDestroyed, qtyDropped, singleton, sequence, containerSequence);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new KillItem(killID, typeID, flag, qtyDestroyed, qtyDropped, singleton, sequence + 5, containerSequence);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new KillItem(killID, typeID, flag, qtyDestroyed, qtyDropped, singleton, sequence + 3, containerSequence);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all contacts are returned
     List<KillItem> result = KillItem.getAllKillItems(testAccount, 8888L, killID, 10, KillItem.TOP_LEVEL - 1);

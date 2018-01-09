@@ -116,7 +116,7 @@ public class MemberTracking extends CachedData {
    * Update transient date values for readability.
    */
   @Override
-  public void prepareDates() {
+  public void prepareTransient() {
     fixDates();
     logoffDateTimeDate = assignDateField(logoffDateTime);
     logonDateTimeDate = assignDateField(logonDateTime);

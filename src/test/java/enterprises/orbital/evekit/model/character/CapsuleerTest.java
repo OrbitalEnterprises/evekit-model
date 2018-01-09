@@ -53,7 +53,7 @@ public class CapsuleerTest extends AbstractAccountBasedTest {
     existing.setup(testAccount, 1234L);
     existing.setCharacterName(testAccount.getEveCharacterName());
     existing.setCharacterID(testAccount.getEveCharacterID());
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
 
     // Get the Capsuleer and check.
     result = Capsuleer.getCapsuleer(testAccount);
@@ -70,7 +70,7 @@ public class CapsuleerTest extends AbstractAccountBasedTest {
     existing.setup(otherAccount, 1234L);
     existing.setCharacterName(otherAccount.getEveCharacterName());
     existing.setCharacterID(otherAccount.getEveCharacterID());
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Get the Capsuleer and check.
     result = Capsuleer.getCapsuleer(testAccount);
@@ -86,7 +86,7 @@ public class CapsuleerTest extends AbstractAccountBasedTest {
     existing.setup(testAccount, 1234L);
     existing.setCharacterName(testAccount.getEveCharacterName());
     existing.setCharacterID(testAccount.getEveCharacterID());
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
 
     // Get the Capsuleer and check.
     result = Capsuleer.getOrCreateCapsuleer(testAccount);
@@ -104,7 +104,7 @@ public class CapsuleerTest extends AbstractAccountBasedTest {
     other.setup(otherAccount, 1234L);
     other.setCharacterName(otherAccount.getEveCharacterName());
     other.setCharacterID(otherAccount.getEveCharacterID());
-    other = CachedData.updateData(other);
+    other = CachedData.update(other);
 
     // Get the Capsuleer and check.
     result = Capsuleer.getOrCreateCapsuleer(testAccount);
@@ -132,11 +132,11 @@ public class CapsuleerTest extends AbstractAccountBasedTest {
     existing.setup(testAccount, 1234L);
     existing.setCharacterName(testAccount.getEveCharacterName());
     existing.setCharacterID(testAccount.getEveCharacterID());
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
 
     // Update the Capsuleer.
     existing.setAccountBalanceExpiry(OrbitalProperties.getCurrentTime());
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
 
     Capsuleer result = Capsuleer.getCapsuleer(testAccount);
     Assert.assertEquals(existing, result);

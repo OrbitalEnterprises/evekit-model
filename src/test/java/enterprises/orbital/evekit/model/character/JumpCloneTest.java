@@ -77,29 +77,29 @@ public class JumpCloneTest extends AbstractModelTester<JumpClone> {
 
     existing = new JumpClone(jumpCloneID, typeID, locationID, cloneName);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(jumpCloneID, existing);
 
     existing = new JumpClone(jumpCloneID + 10, typeID + 10, locationID + 10, cloneName + " 10");
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(jumpCloneID + 10, existing);
 
     // Associated with different account
     existing = new JumpClone(jumpCloneID, typeID, locationID, cloneName);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new JumpClone(jumpCloneID + 3, typeID + 3, locationID + 3, cloneName + " 3");
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new JumpClone(jumpCloneID + 4, typeID + 4, locationID + 4, cloneName + " 4");
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     List<JumpClone> result = JumpClone.getAll(testAccount, 8888L);
     Assert.assertEquals(listCheck.size(), result.size());

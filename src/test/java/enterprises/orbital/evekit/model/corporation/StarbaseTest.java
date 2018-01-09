@@ -92,29 +92,29 @@ public class StarbaseTest extends AbstractModelTester<Starbase> {
 
     existing = new Starbase(itemID, locationID, moonID, onlineTimestamp, state, stateTimestamp, typeID, standingOwnerID);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(itemID, existing);
 
     existing = new Starbase(itemID + 1, locationID, moonID, onlineTimestamp, state, stateTimestamp, typeID, standingOwnerID);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(itemID + 1, existing);
 
     // Associated with different account
     existing = new Starbase(itemID + 2, locationID, moonID, onlineTimestamp, state, stateTimestamp, typeID, standingOwnerID);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new Starbase(itemID + 3, locationID, moonID, onlineTimestamp, state, stateTimestamp, typeID, standingOwnerID);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new Starbase(itemID + 4, locationID, moonID, onlineTimestamp, state, stateTimestamp, typeID, standingOwnerID);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     List<Starbase> result = Starbase.getAll(testAccount, 8888L);
     Assert.assertEquals(listCheck.size(), result.size());

@@ -1,5 +1,6 @@
 package enterprises.orbital.evekit.model.character;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,7 +74,7 @@ public class CalendarEventAttendeeTest extends AbstractModelTester<CalendarEvent
   }
 
   @Test
-  public void testGetByEventID() {
+  public void testGetByEventID() throws IOException {
     // Should exclude:
     // - attendees for a different account
     // - attendees not live at the given time
@@ -83,29 +84,29 @@ public class CalendarEventAttendeeTest extends AbstractModelTester<CalendarEvent
 
     existing = new CalendarEventAttendee(eventID, 1234L, "test event", "test response 1");
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(1234L, existing);
 
     existing = new CalendarEventAttendee(eventID, 5678L, "test event", "test response 2");
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(5678L, existing);
 
     // Associated with different account
     existing = new CalendarEventAttendee(eventID, 1234L, "test event", "test response 3");
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new CalendarEventAttendee(eventID, 1234L, "test event", "test response 4");
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new CalendarEventAttendee(eventID, 1234L, "test event", "test response 5");
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     List<CalendarEventAttendee> result = CalendarEventAttendee.getByEventID(testAccount, 8888L, eventID);
     Assert.assertEquals(listCheck.size(), result.size());

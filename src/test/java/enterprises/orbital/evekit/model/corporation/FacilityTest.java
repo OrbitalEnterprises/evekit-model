@@ -92,29 +92,29 @@ public class FacilityTest extends AbstractModelTester<Facility> {
 
     existing = new Facility(facilityID, typeID, typeName, solarSystemID, solarSystemName, regionID, regionName, starbaseModifier, tax);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(facilityID, existing);
 
     existing = new Facility(facilityID + 1, typeID, typeName, solarSystemID, solarSystemName, regionID, regionName, starbaseModifier, tax);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(facilityID + 1, existing);
 
     // Associated with different account
     existing = new Facility(facilityID + 2, typeID, typeName, solarSystemID, solarSystemName, regionID, regionName, starbaseModifier, tax);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new Facility(facilityID + 3, typeID, typeName, solarSystemID, solarSystemName, regionID, regionName, starbaseModifier, tax);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new Facility(facilityID + 4, typeID, typeName, solarSystemID, solarSystemName, regionID, regionName, starbaseModifier, tax);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     List<Facility> result = Facility.getAll(testAccount, 8888L);
     Assert.assertEquals(listCheck.size(), result.size());

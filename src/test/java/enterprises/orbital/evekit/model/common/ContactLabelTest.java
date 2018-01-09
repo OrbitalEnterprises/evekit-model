@@ -74,41 +74,41 @@ public class ContactLabelTest extends AbstractModelTester<ContactLabel> {
 
     existing = new ContactLabel(list, labelID, name);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(list, new HashMap<Long, ContactLabel>());
     listCheck.get(list).put(labelID, existing);
 
     existing = new ContactLabel(list, labelID + 10, name);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.get(list).put(labelID + 10, existing);
 
     existing = new ContactLabel(list + "1", labelID, name);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(list + "1", new HashMap<Long, ContactLabel>());
     listCheck.get(list + "1").put(labelID, existing);
 
     existing = new ContactLabel(list + "1", labelID + 10, name);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.get(list + "1").put(labelID + 10, existing);
 
     // Associated with different account
     existing = new ContactLabel(list, labelID, name);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new ContactLabel(list, labelID + 5, name);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new ContactLabel(list, labelID + 3, name);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all contact labels are returned
     List<ContactLabel> result = ContactLabel.getAllContactLabels(testAccount, 8888L);
@@ -133,45 +133,45 @@ public class ContactLabelTest extends AbstractModelTester<ContactLabel> {
 
     existing = new ContactLabel(list, labelID, name);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(list, new HashMap<Long, ContactLabel>());
     listCheck.get(list).put(labelID, existing);
 
     existing = new ContactLabel(list, labelID + 10, name);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.get(list).put(labelID + 10, existing);
 
     existing = new ContactLabel(list, labelID + 20, name);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.get(list).put(labelID + 20, existing);
 
     existing = new ContactLabel(list, labelID + 30, name);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.get(list).put(labelID + 30, existing);
 
     // Associated with different account
     existing = new ContactLabel(list, labelID, name);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Associated with different list
     existing = new ContactLabel(list + "1", labelID, name);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new ContactLabel(list, labelID + 5, name);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new ContactLabel(list, labelID + 3, name);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all contact labels are returned
     List<ContactLabel> result = ContactLabel.getByList(testAccount, 8888L, list);

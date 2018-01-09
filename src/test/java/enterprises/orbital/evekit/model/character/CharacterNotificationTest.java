@@ -86,44 +86,44 @@ public class CharacterNotificationTest extends AbstractModelTester<CharacterNoti
 
     existing = new CharacterNotification(notificationID, typeID, senderID, sentDate, msgRead);
     existing.setup(testAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
     listCheck.add(notificationID);
 
     existing = new CharacterNotification(notificationID + 10, typeID + 1, senderID + 1, sentDate + 10, msgRead);
     existing.setup(testAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
     listCheck.add(notificationID + 10);
 
     existing = new CharacterNotification(notificationID + 20, typeID + 2, senderID + 2, sentDate + 20, msgRead);
     existing.setup(testAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
     listCheck.add(notificationID + 20);
 
     existing = new CharacterNotification(notificationID + 30, typeID + 3, senderID + 3, sentDate + 30, msgRead);
     existing.setup(testAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
     listCheck.add(notificationID + 30);
 
     // Associated with different account
     existing = new CharacterNotification(notificationID, typeID, senderID, sentDate, msgRead);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new CharacterNotification(notificationID + 5, typeID + 5, senderID + 5, sentDate + 5, msgRead);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new CharacterNotification(notificationID + 3, typeID + 6, senderID + 6, sentDate + 6, msgRead);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Unread at given time
     existing = new CharacterNotification(notificationID + 40, typeID + 7, senderID + 7, sentDate + 40, false);
     existing.setup(testAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
     listCheck.add(notificationID + 40);
 
     // Verify only unread message is returned

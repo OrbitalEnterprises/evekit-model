@@ -92,39 +92,39 @@ public class CharacterContactNotificationTest extends AbstractModelTester<Charac
 
     existing = new CharacterContactNotification(notificationID, senderID, senderName, sentDate, messageData);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(notificationID, existing);
 
     existing = new CharacterContactNotification(notificationID + 10, senderID, senderName + " 2", sentDate + 10, messageData + " 2");
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(notificationID + 10, existing);
 
     existing = new CharacterContactNotification(notificationID + 20, senderID, senderName + " 3", sentDate + 20, messageData + " 3");
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(notificationID + 20, existing);
 
     existing = new CharacterContactNotification(notificationID + 30, senderID, senderName + " 4", sentDate + 30, messageData + " 4");
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(notificationID + 30, existing);
 
     // Associated with different account
     existing = new CharacterContactNotification(notificationID, senderID, senderName, sentDate, messageData);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new CharacterContactNotification(notificationID + 5, senderID, senderName + " 0.5", sentDate + 5, messageData + " 0.5");
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new CharacterContactNotification(notificationID + 3, senderID, senderName + " 0.3", sentDate + 3, messageData + " 0.3");
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all notifications are returned
     List<CharacterContactNotification> result = CharacterContactNotification.getAllNotifications(testAccount, 8888L, 5, 0);

@@ -132,45 +132,45 @@ public class ContainerLogTest extends AbstractModelTester<ContainerLog> {
     existing = new ContainerLog(
         logTime, action, actorID, actorName, flag, itemID, itemTypeID, locationID, newConfiguration, oldConfiguration, passwordType, quantity, typeID);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(logTime, existing);
 
     existing = new ContainerLog(
         logTime + 10, action, actorID, actorName, flag, itemID, itemTypeID, locationID, newConfiguration, oldConfiguration, passwordType, quantity, typeID);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(logTime + 10, existing);
 
     existing = new ContainerLog(
         logTime + 20, action, actorID, actorName, flag, itemID, itemTypeID, locationID, newConfiguration, oldConfiguration, passwordType, quantity, typeID);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(logTime + 20, existing);
 
     existing = new ContainerLog(
         logTime + 30, action, actorID, actorName, flag, itemID, itemTypeID, locationID, newConfiguration, oldConfiguration, passwordType, quantity, typeID);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(logTime + 30, existing);
 
     // Associated with different account
     existing = new ContainerLog(
         logTime, action, actorID, actorName, flag, itemID, itemTypeID, locationID, newConfiguration, oldConfiguration, passwordType, quantity, typeID);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new ContainerLog(
         logTime + 5, action, actorID, actorName, flag, itemID, itemTypeID, locationID, newConfiguration, oldConfiguration, passwordType, quantity, typeID);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new ContainerLog(
         logTime + 3, action, actorID, actorName, flag, itemID, itemTypeID, locationID, newConfiguration, oldConfiguration, passwordType, quantity, typeID);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all jobsare returned
     List<ContainerLog> result = ContainerLog.getAllForward(testAccount, 8888L, 10, 0);
@@ -208,45 +208,45 @@ public class ContainerLogTest extends AbstractModelTester<ContainerLog> {
     existing = new ContainerLog(
         logTime, action, actorID, actorName, flag, itemID, itemTypeID, locationID, newConfiguration, oldConfiguration, passwordType, quantity, typeID);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(logTime, existing);
 
     existing = new ContainerLog(
         logTime + 10, action, actorID, actorName, flag, itemID, itemTypeID, locationID, newConfiguration, oldConfiguration, passwordType, quantity, typeID);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(logTime + 10, existing);
 
     existing = new ContainerLog(
         logTime + 20, action, actorID, actorName, flag, itemID, itemTypeID, locationID, newConfiguration, oldConfiguration, passwordType, quantity, typeID);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(logTime + 20, existing);
 
     existing = new ContainerLog(
         logTime + 30, action, actorID, actorName, flag, itemID, itemTypeID, locationID, newConfiguration, oldConfiguration, passwordType, quantity, typeID);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(logTime + 30, existing);
 
     // Associated with different account
     existing = new ContainerLog(
         logTime, action, actorID, actorName, flag, itemID, itemTypeID, locationID, newConfiguration, oldConfiguration, passwordType, quantity, typeID);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new ContainerLog(
         logTime + 5, action, actorID, actorName, flag, itemID, itemTypeID, locationID, newConfiguration, oldConfiguration, passwordType, quantity, typeID);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new ContainerLog(
         logTime + 3, action, actorID, actorName, flag, itemID, itemTypeID, locationID, newConfiguration, oldConfiguration, passwordType, quantity, typeID);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all logs are returned
     List<ContainerLog> result = ContainerLog.getAllBackward(testAccount, 8888L, 10, Long.MAX_VALUE);

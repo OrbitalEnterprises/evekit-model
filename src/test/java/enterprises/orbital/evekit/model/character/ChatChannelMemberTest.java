@@ -85,25 +85,25 @@ public class ChatChannelMemberTest extends AbstractModelTester<ChatChannelMember
 
     existing = new ChatChannelMember(channelID, category, accessorID, accessorName, untilWhen, reason);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(channelID, new HashMap<String, Map<Long, ChatChannelMember>>());
     listCheck.get(channelID).put(category, new HashMap<Long, ChatChannelMember>());
     listCheck.get(channelID).get(category).put(accessorID, existing);
 
     existing = new ChatChannelMember(channelID, category + "10", accessorID, accessorName, untilWhen, reason);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.get(channelID).put(category + "10", new HashMap<Long, ChatChannelMember>());
     listCheck.get(channelID).get(category + "10").put(accessorID, existing);
 
     existing = new ChatChannelMember(channelID, category, accessorID + 10, accessorName, untilWhen, reason);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.get(channelID).get(category).put(accessorID + 10, existing);
 
     existing = new ChatChannelMember(channelID + 10, category, accessorID, accessorName, untilWhen, reason);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(channelID + 10, new HashMap<String, Map<Long, ChatChannelMember>>());
     listCheck.get(channelID + 10).put(category, new HashMap<Long, ChatChannelMember>());
     listCheck.get(channelID + 10).get(category).put(accessorID, existing);
@@ -111,18 +111,18 @@ public class ChatChannelMemberTest extends AbstractModelTester<ChatChannelMember
     // Associated with different account
     existing = new ChatChannelMember(channelID, category, accessorID, accessorName, untilWhen, reason);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new ChatChannelMember(channelID, category, accessorID + 5, accessorName, untilWhen, reason);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new ChatChannelMember(channelID, category, accessorID + 3, accessorName, untilWhen, reason);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all members are returned
     List<ChatChannelMember> result = ChatChannelMember.getAllChatChannelMembers(testAccount, 8888L);
@@ -149,47 +149,47 @@ public class ChatChannelMemberTest extends AbstractModelTester<ChatChannelMember
 
     existing = new ChatChannelMember(channelID, category, accessorID, accessorName, untilWhen, reason);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(channelID, new HashMap<String, Map<Long, ChatChannelMember>>());
     listCheck.get(channelID).put(category, new HashMap<Long, ChatChannelMember>());
     listCheck.get(channelID).get(category).put(accessorID, existing);
 
     existing = new ChatChannelMember(channelID, category + "10", accessorID, accessorName, untilWhen, reason);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.get(channelID).put(category + "10", new HashMap<Long, ChatChannelMember>());
     listCheck.get(channelID).get(category + "10").put(accessorID, existing);
 
     existing = new ChatChannelMember(channelID, category, accessorID + 10, accessorName, untilWhen, reason);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.get(channelID).get(category).put(accessorID + 10, existing);
 
     existing = new ChatChannelMember(channelID, category, accessorID + 20, accessorName, untilWhen, reason);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.get(channelID).get(category).put(accessorID + 20, existing);
 
     // Associated with different channel
     existing = new ChatChannelMember(channelID + 10, category, accessorID, accessorName, untilWhen, reason);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Associated with different account
     existing = new ChatChannelMember(channelID, category, accessorID, accessorName, untilWhen, reason);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new ChatChannelMember(channelID, category, accessorID + 5, accessorName, untilWhen, reason);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new ChatChannelMember(channelID, category, accessorID + 3, accessorName, untilWhen, reason);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all members are returned
     List<ChatChannelMember> result = ChatChannelMember.getByChannelID(testAccount, 8888L, channelID);
@@ -218,56 +218,56 @@ public class ChatChannelMemberTest extends AbstractModelTester<ChatChannelMember
 
     existing = new ChatChannelMember(channelID, category, accessorID, accessorName, untilWhen, reason);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(channelID, new HashMap<String, Map<Long, ChatChannelMember>>());
     listCheck.get(channelID).put(category, new HashMap<Long, ChatChannelMember>());
     listCheck.get(channelID).get(category).put(accessorID, existing);
 
     existing = new ChatChannelMember(channelID, category, accessorID + 10, accessorName, untilWhen, reason);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.get(channelID).get(category).put(accessorID + 10, existing);
 
     existing = new ChatChannelMember(channelID, category, accessorID + 20, accessorName, untilWhen, reason);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.get(channelID).get(category).put(accessorID + 20, existing);
 
     existing = new ChatChannelMember(channelID, category, accessorID + 30, accessorName, untilWhen, reason);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.get(channelID).get(category).put(accessorID + 30, existing);
 
     // Associated with different channel
     existing = new ChatChannelMember(channelID + 10, category, accessorID, accessorName, untilWhen, reason);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Associated with different category
     existing = new ChatChannelMember(channelID, category + "10", accessorID, accessorName, untilWhen, reason);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Associated with different channel and category
     existing = new ChatChannelMember(channelID + 10, category + "10", accessorID, accessorName, untilWhen, reason);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Associated with different account
     existing = new ChatChannelMember(channelID, category, accessorID, accessorName, untilWhen, reason);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new ChatChannelMember(channelID, category, accessorID + 5, accessorName, untilWhen, reason);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new ChatChannelMember(channelID, category, accessorID + 3, accessorName, untilWhen, reason);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all members are returned
     List<ChatChannelMember> result = ChatChannelMember.getByChannelIDAndCategory(testAccount, 8888L, channelID, category);

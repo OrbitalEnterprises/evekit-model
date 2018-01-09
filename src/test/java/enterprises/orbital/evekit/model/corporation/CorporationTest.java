@@ -60,7 +60,7 @@ public class CorporationTest extends AbstractAccountBasedTest {
     existing.setup(testAccount, 1234L);
     existing.setCorporationName(testAccount.getEveCorporationName());
     existing.setCorporationID(testAccount.getEveCorporationID());
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
 
     // Get the Corporation and check.
     result = Corporation.getCorporation(testAccount);
@@ -77,7 +77,7 @@ public class CorporationTest extends AbstractAccountBasedTest {
     existing.setup(otherAccount, 1234L);
     existing.setCorporationName(otherAccount.getEveCorporationName());
     existing.setCorporationID(otherAccount.getEveCorporationID());
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
 
     // Get the Corporation and check.
     result = Corporation.getCorporation(testAccount);
@@ -93,7 +93,7 @@ public class CorporationTest extends AbstractAccountBasedTest {
     existing.setup(testAccount, 1234L);
     existing.setCorporationName(testAccount.getEveCorporationName());
     existing.setCorporationID(testAccount.getEveCorporationID());
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
 
     // Get the Corporation and check.
     result = Corporation.getOrCreateCorporation(testAccount);
@@ -111,7 +111,7 @@ public class CorporationTest extends AbstractAccountBasedTest {
     other.setup(otherAccount, 1234L);
     other.setCorporationName(otherAccount.getEveCorporationName());
     other.setCorporationID(otherAccount.getEveCorporationID());
-    other = CachedData.updateData(other);
+    other = CachedData.update(other);
 
     // Get the Corporation and check.
     result = Corporation.getOrCreateCorporation(testAccount);
@@ -139,11 +139,11 @@ public class CorporationTest extends AbstractAccountBasedTest {
     existing.setup(testAccount, 1234L);
     existing.setCorporationName(testAccount.getEveCorporationName());
     existing.setCorporationID(testAccount.getEveCorporationID());
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
 
     // Update the Corporation.
     existing.setAccountBalanceExpiry(OrbitalProperties.getCurrentTime());
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
 
     Corporation result = Corporation.getCorporation(testAccount);
     Assert.assertEquals(existing, result);

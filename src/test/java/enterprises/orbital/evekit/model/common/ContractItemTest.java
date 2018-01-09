@@ -92,44 +92,44 @@ public class ContractItemTest extends AbstractModelTester<ContractItem> {
 
     existing = new ContractItem(contractID, recordID, typeID, quantity, rawQuantity, singleton, included);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(recordID, existing);
 
     existing = new ContractItem(contractID, recordID + 10, typeID, quantity, rawQuantity, singleton, included);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(recordID + 10, existing);
 
     existing = new ContractItem(contractID, recordID + 20, typeID, quantity, rawQuantity, singleton, included);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(recordID + 20, existing);
 
     existing = new ContractItem(contractID, recordID + 30, typeID, quantity, rawQuantity, singleton, included);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(recordID + 30, existing);
 
     // Associated with different account
     existing = new ContractItem(contractID, recordID, typeID, quantity, rawQuantity, singleton, included);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Associated with a different contract
     existing = new ContractItem(contractID + 1, recordID, typeID, quantity, rawQuantity, singleton, included);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new ContractItem(contractID, recordID + 5, typeID, quantity, rawQuantity, singleton, included);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new ContractItem(contractID, recordID + 3, typeID, quantity, rawQuantity, singleton, included);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all contacts are returned
     List<ContractItem> result = ContractItem.getAllContractItems(testAccount, 8888L, contractID, 10, -1);

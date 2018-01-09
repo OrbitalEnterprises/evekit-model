@@ -1,5 +1,6 @@
 package enterprises.orbital.evekit.model;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -32,6 +33,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
+import enterprises.orbital.evekit.account.EveKitRefDataProvider;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import io.swagger.annotations.ApiModel;
@@ -145,9 +147,9 @@ public abstract class CachedData {
   private Map<String, String>      metaData        = null;
 
   /**
-   * Update transient date values for readability.
+   * Update transient values for readability.
    */
-  public abstract void prepareDates();
+  public abstract void prepareTransient();
 
   protected Date assignDateField(
       long dateValue) {
@@ -384,6 +386,19 @@ public abstract class CachedData {
         + lifeStart + ", lifeEnd=" + lifeEnd + "]";
   }
 
+  @SuppressWarnings("Duplicates")
+  protected static void setCIDOrdering(StringBuilder qs, long contid, boolean reverse) {
+    if (reverse) {
+      qs.append(" and c.cid < ")
+        .append(contid);
+      qs.append(" order by cid desc");
+    } else {
+      qs.append(" and c.cid > ")
+        .append(contid);
+      qs.append(" order by cid asc");
+    }
+  }
+
   public static CachedData get(
                                final long cid,
                                final String tableName) {
@@ -414,24 +429,26 @@ public abstract class CachedData {
     return CachedData.get(cid, type);
   }
 
-  public static <A extends CachedData> A updateData(
-                                                    final A data) {
+  public static <A extends CachedData> A update(
+      final A data) throws IOException {
     try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<A>() {
-        @Override
-        public A run() throws Exception {
-          A result = EveKitUserAccountProvider.getFactory().getEntityManager().merge(data);
-          // Ensure type map entry exists
-          String typeName = data.getClass().getSimpleName();
-          ModelTypeMap tn = new ModelTypeMap(result.getCid(), typeName);
-          if (ModelTypeMap.update(tn) == null) return null;
-          return result;
-        }
-      });
+      return EveKitUserAccountProvider.getFactory()
+                                  .runTransaction(() -> {
+                                    A result = EveKitUserAccountProvider.getFactory()
+                                                                    .getEntityManager()
+                                                                    .merge(data);
+                                    // Ensure type map entry exists
+                                    String typeName = data.getClass()
+                                                          .getSimpleName();
+                                    ModelTypeMap tn = new ModelTypeMap(result.getCid(), typeName);
+                                    if (ModelTypeMap.update(tn) == null) return null;
+                                    return result;
+                                  });
     } catch (Exception e) {
+      if (e.getCause() instanceof IOException) throw (IOException) e.getCause();
       log.log(Level.SEVERE, "query error", e);
+      throw new IOException(e.getCause());
     }
-    return null;
   }
 
   public static void cleanup(

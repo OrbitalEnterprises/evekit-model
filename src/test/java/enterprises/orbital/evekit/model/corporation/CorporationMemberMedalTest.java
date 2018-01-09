@@ -87,39 +87,39 @@ public class CorporationMemberMedalTest extends AbstractModelTester<CorporationM
 
     existing = new CorporationMemberMedal(medalID, characterID, issued, issuerID, reason, status);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(issued, existing);
 
     existing = new CorporationMemberMedal(medalID, characterID + 10, issued + 10, issuerID, reason, status);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(issued + 10, existing);
 
     existing = new CorporationMemberMedal(medalID, characterID + 20, issued + 20, issuerID, reason, status);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(issued + 20, existing);
 
     existing = new CorporationMemberMedal(medalID, characterID + 30, issued + 30, issuerID, reason, status);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(issued + 30, existing);
 
     // Associated with different account
     existing = new CorporationMemberMedal(medalID, characterID, issued, issuerID, reason, status);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new CorporationMemberMedal(medalID, characterID + 5, issued + 5, issuerID, reason, status);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new CorporationMemberMedal(medalID, characterID + 3, issued + 3, issuerID, reason, status);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all jobsare returned
     List<CorporationMemberMedal> result = CorporationMemberMedal.getAllForward(testAccount, 8888L, 10, 0);
@@ -157,39 +157,39 @@ public class CorporationMemberMedalTest extends AbstractModelTester<CorporationM
 
     existing = new CorporationMemberMedal(medalID, characterID, issued, issuerID, reason, status);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(issued, existing);
 
     existing = new CorporationMemberMedal(medalID, characterID + 10, issued + 10, issuerID, reason, status);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(issued + 10, existing);
 
     existing = new CorporationMemberMedal(medalID, characterID + 20, issued + 20, issuerID, reason, status);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(issued + 20, existing);
 
     existing = new CorporationMemberMedal(medalID, characterID + 30, issued + 30, issuerID, reason, status);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(issued + 30, existing);
 
     // Associated with different account
     existing = new CorporationMemberMedal(medalID, characterID, issued, issuerID, reason, status);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new CorporationMemberMedal(medalID, characterID + 5, issued + 5, issuerID, reason, status);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new CorporationMemberMedal(medalID, characterID + 3, issued + 3, issuerID, reason, status);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all jobsare returned
     List<CorporationMemberMedal> result = CorporationMemberMedal.getAllBackward(testAccount, 8888L, 10, Long.MAX_VALUE);

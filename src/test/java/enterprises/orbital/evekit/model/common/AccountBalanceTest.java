@@ -17,54 +17,22 @@ import enterprises.orbital.evekit.model.common.AccountBalance;
 
 public class AccountBalanceTest extends AbstractModelTester<AccountBalance> {
 
-  final int                                       accountID  = TestBase.getRandomInt(100000000);
-  final int                                       accountKey = TestBase.getRandomInt(100000000);
-  final BigDecimal                                balance    = TestBase.getRandomBigDecimal(100000000);
+  private final int                                       division  = TestBase.getRandomInt(100000000);
+  private final BigDecimal                                balance    = TestBase.getRandomBigDecimal(100000000);
 
-  final ClassUnderTestConstructor<AccountBalance> eol        = new ClassUnderTestConstructor<AccountBalance>() {
-
-                                                               @Override
-                                                               public AccountBalance getCUT() {
-                                                                 return new AccountBalance(accountID, accountKey, balance);
-                                                               }
-
-                                                             };
-
-  final ClassUnderTestConstructor<AccountBalance> live       = new ClassUnderTestConstructor<AccountBalance>() {
-                                                               @Override
-                                                               public AccountBalance getCUT() {
-                                                                 return new AccountBalance(accountID, accountKey + 1, balance);
-                                                               }
-
-                                                             };
+  private final ClassUnderTestConstructor<AccountBalance> eol        = () -> new AccountBalance(division, balance);
+  private final ClassUnderTestConstructor<AccountBalance> live       = () -> new AccountBalance(division, balance.add(BigDecimal.ONE));
 
   @Test
   public void testBasic() throws Exception {
-
-    runBasicTests(eol, new CtorVariants<AccountBalance>() {
-
-      @Override
-      public AccountBalance[] getVariants() {
-        return new AccountBalance[] {
-            new AccountBalance(accountID + 1, accountKey, balance), new AccountBalance(accountID, accountKey + 1, balance),
-            new AccountBalance(accountID, accountKey, balance.add(BigDecimal.TEN))
-        };
-      }
-
-    }, AccountAccessMask.createMask(AccountAccessMask.ACCESS_ACCOUNT_BALANCE));
+    runBasicTests(eol, () -> new AccountBalance[] {
+            new AccountBalance(division + 1, balance), new AccountBalance(division, balance.add(BigDecimal.TEN))
+        }, AccountAccessMask.createMask(AccountAccessMask.ACCESS_ACCOUNT_BALANCE));
   }
 
   @Test
   public void testGetLifeline() throws Exception {
-
-    runGetLifelineTest(eol, live, new ModelRetriever<AccountBalance>() {
-
-      @Override
-      public AccountBalance getModel(SynchronizedEveAccount account, long time) {
-        return AccountBalance.get(account, time, accountID);
-      }
-
-    });
+    runGetLifelineTest(eol, live, (account, time) -> AccountBalance.get(account, time, division));
   }
 
   @Test
@@ -72,80 +40,36 @@ public class AccountBalanceTest extends AbstractModelTester<AccountBalance> {
     // Should exclude:
     // - balances for a different account
     // - balances not live at the given time
-    // - balances with a different key
+    // - balances with a different division
     AccountBalance existing, keyed;
 
-    keyed = new AccountBalance(accountID, accountKey, balance);
+    keyed = new AccountBalance(division, balance);
     keyed.setup(testAccount, 7777L);
-    keyed = CachedData.updateData(keyed);
+    keyed = CachedData.update(keyed);
 
-    // Different key
-    existing = new AccountBalance(accountID + 10, accountKey + 10, balance);
+    // Different division
+    existing = new AccountBalance(division + 10, balance);
     existing.setup(testAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Associated with different account
-    existing = new AccountBalance(accountID, accountKey, balance);
+    existing = new AccountBalance(division, balance);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
-    existing = new AccountBalance(accountID + 3, accountKey, balance);
+    existing = new AccountBalance(division + 3, balance);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
-    existing = new AccountBalance(accountID + 4, accountKey, balance);
+    existing = new AccountBalance(division + 4, balance);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
-    AccountBalance result = AccountBalance.getByKey(testAccount, 8888L, accountKey);
+    AccountBalance result = AccountBalance.get(testAccount, 8888L, division);
     Assert.assertEquals(keyed, result);
-  }
-
-  @Test
-  public void testGetAll() throws Exception {
-    // Should exclude:
-    // - balances for a different account
-    // - balances not live at the given time
-    AccountBalance existing;
-    Map<Integer, AccountBalance> listCheck = new HashMap<Integer, AccountBalance>();
-
-    existing = new AccountBalance(accountID, accountKey, balance);
-    existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
-    listCheck.put(accountID, existing);
-
-    existing = new AccountBalance(accountID + 10, accountKey, balance);
-    existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
-    listCheck.put(accountID + 10, existing);
-
-    // Associated with different account
-    existing = new AccountBalance(accountID, accountKey, balance);
-    existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
-
-    // Not live at the given time
-    existing = new AccountBalance(accountID + 3, accountKey, balance);
-    existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
-
-    // EOL before the given time
-    existing = new AccountBalance(accountID + 4, accountKey, balance);
-    existing.setup(testAccount, 7777L);
-    existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
-
-    List<AccountBalance> result = AccountBalance.getAll(testAccount, 8888L);
-    Assert.assertEquals(listCheck.size(), result.size());
-    for (AccountBalance next : result) {
-      int accountID = next.getAccountID();
-      Assert.assertTrue(listCheck.containsKey(accountID));
-      Assert.assertEquals(listCheck.get(accountID), next);
-    }
-
   }
 
 }

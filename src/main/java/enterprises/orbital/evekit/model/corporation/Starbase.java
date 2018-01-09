@@ -92,7 +92,7 @@ public class Starbase extends CachedData {
    * Update transient date values for readability.
    */
   @Override
-  public void prepareDates() {
+  public void prepareTransient() {
     fixDates();
     onlineTimestampDate = assignDateField(onlineTimestamp);
     stateTimestampDate = assignDateField(stateTimestamp);

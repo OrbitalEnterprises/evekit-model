@@ -1,19 +1,13 @@
 package enterprises.orbital.evekit.model.character;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AbstractModelTester;
 import enterprises.orbital.evekit.model.CachedData;
-import enterprises.orbital.evekit.model.character.MailingList;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.*;
 
 public class MailingListTest extends AbstractModelTester<MailingList> {
   final String                                 listName = "test list";
@@ -77,27 +71,27 @@ public class MailingListTest extends AbstractModelTester<MailingList> {
 
     existing = new MailingList("test list", 1234L);
     existing.setup(testAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     existing = new MailingList("test list", 8213L);
     existing.setup(testAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Associated with different account
     existing = new MailingList("test list", 5678L);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new MailingList("test list", 9721L);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new MailingList("test list", 2714L);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     List<Long> result = MailingList.getAllListIDs(testAccount, 8888L);
     Assert.assertEquals(listIDs.size(), result.size());
@@ -116,29 +110,29 @@ public class MailingListTest extends AbstractModelTester<MailingList> {
 
     existing = new MailingList("test list", 1234L);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(1234L, existing);
 
     existing = new MailingList("test list", 8213L);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(8213L, existing);
 
     // Associated with different account
     existing = new MailingList("test list", 5678L);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new MailingList("test list", 9721L);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new MailingList("test list", 2714L);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     List<MailingList> result = MailingList.getAllLists(testAccount, 8888L);
     Assert.assertEquals(listCheck.size(), result.size());

@@ -123,39 +123,39 @@ public class MemberSecurityLogTest extends AbstractModelTester<MemberSecurityLog
 
     existing = new MemberSecurityLog(changeTime, changedCharacterID, changedCharacterName, issuerID, issuerName, roleLocationType);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(changeTime, existing);
 
     existing = new MemberSecurityLog(changeTime + 10, changedCharacterID, changedCharacterName, issuerID, issuerName, roleLocationType);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(changeTime + 10, existing);
 
     existing = new MemberSecurityLog(changeTime + 20, changedCharacterID, changedCharacterName, issuerID, issuerName, roleLocationType);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(changeTime + 20, existing);
 
     existing = new MemberSecurityLog(changeTime + 30, changedCharacterID, changedCharacterName, issuerID, issuerName, roleLocationType);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(changeTime + 30, existing);
 
     // Associated with different account
     existing = new MemberSecurityLog(changeTime, changedCharacterID, changedCharacterName, issuerID, issuerName, roleLocationType);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new MemberSecurityLog(changeTime + 5, changedCharacterID, changedCharacterName, issuerID, issuerName, roleLocationType);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new MemberSecurityLog(changeTime + 3, changedCharacterID, changedCharacterName, issuerID, issuerName, roleLocationType);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all logs are returned
     List<MemberSecurityLog> result = MemberSecurityLog.getAllForward(testAccount, 8888L, 10, 0);
@@ -193,39 +193,39 @@ public class MemberSecurityLogTest extends AbstractModelTester<MemberSecurityLog
 
     existing = new MemberSecurityLog(changeTime, changedCharacterID, changedCharacterName, issuerID, issuerName, roleLocationType);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(changeTime, existing);
 
     existing = new MemberSecurityLog(changeTime + 10, changedCharacterID, changedCharacterName, issuerID, issuerName, roleLocationType);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(changeTime + 10, existing);
 
     existing = new MemberSecurityLog(changeTime + 20, changedCharacterID, changedCharacterName, issuerID, issuerName, roleLocationType);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(changeTime + 20, existing);
 
     existing = new MemberSecurityLog(changeTime + 30, changedCharacterID, changedCharacterName, issuerID, issuerName, roleLocationType);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(changeTime + 30, existing);
 
     // Associated with different account
     existing = new MemberSecurityLog(changeTime, changedCharacterID, changedCharacterName, issuerID, issuerName, roleLocationType);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new MemberSecurityLog(changeTime + 5, changedCharacterID, changedCharacterName, issuerID, issuerName, roleLocationType);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new MemberSecurityLog(changeTime + 3, changedCharacterID, changedCharacterName, issuerID, issuerName, roleLocationType);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all logs are returned
     List<MemberSecurityLog> result = MemberSecurityLog.getAllBackward(testAccount, 8888L, 10, Long.MAX_VALUE);

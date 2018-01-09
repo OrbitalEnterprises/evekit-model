@@ -88,41 +88,41 @@ public class ContactTest extends AbstractModelTester<Contact> {
 
     existing = new Contact(list, contactID, contactName, standing, contactTypeID, inWatchlist, labelMask);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(list, new HashMap<Integer, Contact>());
     listCheck.get(list).put(contactID, existing);
 
     existing = new Contact(list, contactID + 10, contactName, standing, contactTypeID, inWatchlist, labelMask);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.get(list).put(contactID + 10, existing);
 
     existing = new Contact(list + "1", contactID, contactName, standing, contactTypeID, inWatchlist, labelMask);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(list + "1", new HashMap<Integer, Contact>());
     listCheck.get(list + "1").put(contactID, existing);
 
     existing = new Contact(list + "1", contactID + 10, contactName, standing, contactTypeID, inWatchlist, labelMask);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.get(list + "1").put(contactID + 10, existing);
 
     // Associated with different account
     existing = new Contact(list, contactID, contactName, standing, contactTypeID, inWatchlist, labelMask);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new Contact(list, contactID + 5, contactName, standing, contactTypeID, inWatchlist, labelMask);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new Contact(list, contactID + 3, contactName, standing, contactTypeID, inWatchlist, labelMask);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all contacts are returned
     List<Contact> result = Contact.getAllContacts(testAccount, 8888L, 10, -1);
@@ -165,45 +165,45 @@ public class ContactTest extends AbstractModelTester<Contact> {
 
     existing = new Contact(list, contactID, contactName, standing, contactTypeID, inWatchlist, labelMask);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(list, new HashMap<Integer, Contact>());
     listCheck.get(list).put(contactID, existing);
 
     existing = new Contact(list, contactID + 10, contactName, standing, contactTypeID, inWatchlist, labelMask);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.get(list).put(contactID + 10, existing);
 
     existing = new Contact(list, contactID + 20, contactName, standing, contactTypeID, inWatchlist, labelMask);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.get(list).put(contactID + 20, existing);
 
     existing = new Contact(list, contactID + 30, contactName, standing, contactTypeID, inWatchlist, labelMask);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.get(list).put(contactID + 30, existing);
 
     // Associated with different account
     existing = new Contact(list, contactID, contactName, standing, contactTypeID, inWatchlist, labelMask);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Associated with different list
     existing = new Contact(list + "1", contactID, contactName, standing, contactTypeID, inWatchlist, labelMask);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new Contact(list, contactID + 5, contactName, standing, contactTypeID, inWatchlist, labelMask);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new Contact(list, contactID + 3, contactName, standing, contactTypeID, inWatchlist, labelMask);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all contacts are returned
     List<Contact> result = Contact.getByList(testAccount, 8888L, list, 10, -1);

@@ -79,29 +79,29 @@ public class CorporationMedalTest extends AbstractModelTester<CorporationMedal> 
 
     existing = new CorporationMedal(medalID, description, title, created, creatorID);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(medalID, existing);
 
     existing = new CorporationMedal(medalID + 1, description, title, created, creatorID);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(medalID + 1, existing);
 
     // Associated with different account
     existing = new CorporationMedal(medalID + 2, description, title, created, creatorID);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new CorporationMedal(medalID + 3, description, title, created, creatorID);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new CorporationMedal(medalID + 4, description, title, created, creatorID);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     List<CorporationMedal> result = CorporationMedal.getAll(testAccount, 8888L);
     Assert.assertEquals(listCheck.size(), result.size());

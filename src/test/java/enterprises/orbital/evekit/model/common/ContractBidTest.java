@@ -82,41 +82,41 @@ public class ContractBidTest extends AbstractModelTester<ContractBid> {
 
     existing = new ContractBid(bidID, contractID, bidderID, dateBid, amount);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(bidID, new HashMap<Long, ContractBid>());
     listCheck.get(bidID).put(contractID, existing);
 
     existing = new ContractBid(bidID, contractID + 10, bidderID, dateBid, amount);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.get(bidID).put(contractID + 10, existing);
 
     existing = new ContractBid(bidID + 10, contractID, bidderID, dateBid, amount);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(bidID + 10, new HashMap<Long, ContractBid>());
     listCheck.get(bidID + 10).put(contractID, existing);
 
     existing = new ContractBid(bidID + 10, contractID + 10, bidderID, dateBid, amount);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.get(bidID + 10).put(contractID + 10, existing);
 
     // Associated with different account
     existing = new ContractBid(bidID, contractID, bidderID, dateBid, amount);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new ContractBid(bidID + 5, contractID, bidderID, dateBid, amount);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new ContractBid(bidID + 3, contractID, bidderID, dateBid, amount);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all contacts are returned
     List<ContractBid> result = ContractBid.getAllBids(testAccount, 8888L, 10, -1);
@@ -159,44 +159,44 @@ public class ContractBidTest extends AbstractModelTester<ContractBid> {
 
     existing = new ContractBid(bidID, contractID, bidderID, dateBid, amount);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(bidID, existing);
 
     existing = new ContractBid(bidID + 10, contractID, bidderID, dateBid, amount);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(bidID + 10, existing);
 
     existing = new ContractBid(bidID + 20, contractID, bidderID, dateBid, amount);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(bidID + 20, existing);
 
     existing = new ContractBid(bidID + 30, contractID, bidderID, dateBid, amount);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(bidID + 30, existing);
 
     // Associated with different account
     existing = new ContractBid(bidID, contractID, bidderID, dateBid, amount);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Associated with a different contract
     existing = new ContractBid(bidID, contractID + 1, bidderID, dateBid, amount);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new ContractBid(bidID + 5, contractID, bidderID, dateBid, amount);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new ContractBid(bidID + 3, contractID, bidderID, dateBid, amount);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all contacts are returned
     List<ContractBid> result = ContractBid.getAllBidsByContractID(testAccount, 8888L, contractID, 10, -1);

@@ -89,31 +89,31 @@ public class CharacterMedalTest extends AbstractModelTester<CharacterMedal> {
 
     existing = new CharacterMedal(description, medalID, title, corporationID, issued, issuerID, reason, status);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(medalID, new HashMap<Long, CharacterMedal>());
     listCheck.get(medalID).put(issued, existing);
 
     existing = new CharacterMedal(description, medalID + 1, title, corporationID, issued + 1, issuerID, reason, status);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(medalID + 1, new HashMap<Long, CharacterMedal>());
     listCheck.get(medalID + 1).put(issued + 1, existing);
 
     // Associated with different account
     existing = new CharacterMedal(description, medalID + 2, title, corporationID, issued + 2, issuerID, reason, status);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new CharacterMedal(description, medalID + 3, title, corporationID, issued + 3, issuerID, reason, status);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new CharacterMedal(description, medalID + 4, title, corporationID, issued + 3, issuerID, reason, status);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     List<CharacterMedal> result = CharacterMedal.getAllMedals(testAccount, 8888L);
     Assert.assertEquals(listCheck.size(), result.size());

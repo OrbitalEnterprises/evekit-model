@@ -135,14 +135,14 @@ public class CustomsOfficeTest extends AbstractModelTester<CustomsOffice> {
         itemID, solarSystemID, solarSystemName, reinforceHour, allowAlliance, allowStandings, standingLevel, taxRateAlliance, taxRateCorp, taxRateStandingHigh,
         taxRateStandingGood, taxRateStandingNeutral, taxRateStandingBad, taxRateStandingHorrible);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
 
     listCheck.put(itemID, existing);
     existing = new CustomsOffice(
         itemID + 1, solarSystemID, solarSystemName, reinforceHour, allowAlliance, allowStandings, standingLevel, taxRateAlliance, taxRateCorp,
         taxRateStandingHigh, taxRateStandingGood, taxRateStandingNeutral, taxRateStandingBad, taxRateStandingHorrible);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(itemID + 1, existing);
 
     // Associated with different account
@@ -150,14 +150,14 @@ public class CustomsOfficeTest extends AbstractModelTester<CustomsOffice> {
         itemID + 2, solarSystemID, solarSystemName, reinforceHour, allowAlliance, allowStandings, standingLevel, taxRateAlliance, taxRateCorp,
         taxRateStandingHigh, taxRateStandingGood, taxRateStandingNeutral, taxRateStandingBad, taxRateStandingHorrible);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new CustomsOffice(
         itemID + 3, solarSystemID, solarSystemName, reinforceHour, allowAlliance, allowStandings, standingLevel, taxRateAlliance, taxRateCorp,
         taxRateStandingHigh, taxRateStandingGood, taxRateStandingNeutral, taxRateStandingBad, taxRateStandingHorrible);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new CustomsOffice(
@@ -165,7 +165,7 @@ public class CustomsOfficeTest extends AbstractModelTester<CustomsOffice> {
         taxRateStandingHigh, taxRateStandingGood, taxRateStandingNeutral, taxRateStandingBad, taxRateStandingHorrible);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     List<CustomsOffice> result = CustomsOffice.getAll(testAccount, 8888L);
     Assert.assertEquals(listCheck.size(), result.size());

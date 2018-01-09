@@ -73,29 +73,29 @@ public class ImplantTest extends AbstractModelTester<Implant> {
 
     existing = new Implant(typeID, typeName);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(typeID, existing);
 
     existing = new Implant(typeID + 10, typeName + " 1");
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(typeID + 10, existing);
 
     // Associated with different account
     existing = new Implant(typeID, typeName);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new Implant(typeID + 3, typeName + " 3");
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new Implant(typeID + 4, typeName + " 4");
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     List<Implant> result = Implant.getAll(testAccount, 8888L);
     Assert.assertEquals(listCheck.size(), result.size());

@@ -1,18 +1,16 @@
 package enterprises.orbital.evekit.model.common;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import enterprises.orbital.evekit.TestBase;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AbstractModelTester;
 import enterprises.orbital.evekit.model.CachedData;
-import enterprises.orbital.evekit.model.common.KillAttacker;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class KillAttackerTest extends AbstractModelTester<KillAttacker> {
 
@@ -140,28 +138,28 @@ public class KillAttackerTest extends AbstractModelTester<KillAttacker> {
         killID, attackerCharacterID, allianceID, allianceName, attackerCharacterName, attackerCorporationID, attackerCorporationName, damageDone, factionID,
         factionName, securityStatus, shipTypeID, weaponTypeID, finalBlow);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(attackerCharacterID, existing);
 
     existing = new KillAttacker(
         killID, attackerCharacterID + 10, allianceID, allianceName, attackerCharacterName, attackerCorporationID, attackerCorporationName, damageDone,
         factionID, factionName, securityStatus, shipTypeID, weaponTypeID, finalBlow);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(attackerCharacterID + 10, existing);
 
     existing = new KillAttacker(
         killID, attackerCharacterID + 20, allianceID, allianceName, attackerCharacterName, attackerCorporationID, attackerCorporationName, damageDone,
         factionID, factionName, securityStatus, shipTypeID, weaponTypeID, finalBlow);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(attackerCharacterID + 20, existing);
 
     existing = new KillAttacker(
         killID, attackerCharacterID + 30, allianceID, allianceName, attackerCharacterName, attackerCorporationID, attackerCorporationName, damageDone,
         factionID, factionName, securityStatus, shipTypeID, weaponTypeID, finalBlow);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(attackerCharacterID + 30, existing);
 
     // Associated with different account
@@ -169,21 +167,21 @@ public class KillAttackerTest extends AbstractModelTester<KillAttacker> {
         killID, attackerCharacterID, allianceID, allianceName, attackerCharacterName, attackerCorporationID, attackerCorporationName, damageDone, factionID,
         factionName, securityStatus, shipTypeID, weaponTypeID, finalBlow);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Associated with a different kill
     existing = new KillAttacker(
         killID + 1, attackerCharacterID, allianceID, allianceName, attackerCharacterName, attackerCorporationID, attackerCorporationName, damageDone, factionID,
         factionName, securityStatus, shipTypeID, weaponTypeID, finalBlow);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new KillAttacker(
         killID, attackerCharacterID + 5, allianceID, allianceName, attackerCharacterName, attackerCorporationID, attackerCorporationName, damageDone, factionID,
         factionName, securityStatus, shipTypeID, weaponTypeID, finalBlow);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new KillAttacker(
@@ -191,7 +189,7 @@ public class KillAttackerTest extends AbstractModelTester<KillAttacker> {
         factionName, securityStatus, shipTypeID, weaponTypeID, finalBlow);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all contacts are returned
     List<KillAttacker> result = KillAttacker.getAllKillAttackers(testAccount, 8888L, killID, 10, -1);

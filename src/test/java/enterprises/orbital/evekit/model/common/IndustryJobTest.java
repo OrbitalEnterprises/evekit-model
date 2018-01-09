@@ -229,7 +229,7 @@ public class IndustryJobTest extends AbstractModelTester<IndustryJob> {
         blueprintLocationID, outputLocationID, runs, cost, teamID, licensedRuns, probability, productTypeID, productTypeName, status, timeInSeconds, startDate,
         endDate, pauseDate, completedDate, completedCharacterID, successfulRuns);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(jobID, existing);
 
     existing = new IndustryJob(
@@ -237,7 +237,7 @@ public class IndustryJobTest extends AbstractModelTester<IndustryJob> {
         blueprintTypeName, blueprintLocationID, outputLocationID, runs, cost, teamID, licensedRuns, probability, productTypeID, productTypeName, status,
         timeInSeconds, startDate + 10, endDate, pauseDate, completedDate, completedCharacterID, successfulRuns);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(jobID + 10, existing);
 
     existing = new IndustryJob(
@@ -245,7 +245,7 @@ public class IndustryJobTest extends AbstractModelTester<IndustryJob> {
         blueprintTypeName, blueprintLocationID, outputLocationID, runs, cost, teamID, licensedRuns, probability, productTypeID, productTypeName, status,
         timeInSeconds, startDate + 20, endDate, pauseDate, completedDate, completedCharacterID, successfulRuns);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(jobID + 20, existing);
 
     existing = new IndustryJob(
@@ -253,7 +253,7 @@ public class IndustryJobTest extends AbstractModelTester<IndustryJob> {
         blueprintTypeName, blueprintLocationID, outputLocationID, runs, cost, teamID, licensedRuns, probability, productTypeID, productTypeName, status,
         timeInSeconds, startDate + 30, endDate, pauseDate, completedDate, completedCharacterID, successfulRuns);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(jobID + 30, existing);
 
     // Associated with different account
@@ -262,7 +262,7 @@ public class IndustryJobTest extends AbstractModelTester<IndustryJob> {
         blueprintLocationID, outputLocationID, runs, cost, teamID, licensedRuns, probability, productTypeID, productTypeName, status, timeInSeconds, startDate,
         endDate, pauseDate, completedDate, completedCharacterID, successfulRuns);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new IndustryJob(
@@ -270,7 +270,7 @@ public class IndustryJobTest extends AbstractModelTester<IndustryJob> {
         blueprintTypeName, blueprintLocationID, outputLocationID, runs, cost, teamID, licensedRuns, probability, productTypeID, productTypeName, status,
         timeInSeconds, startDate, endDate, pauseDate, completedDate, completedCharacterID, successfulRuns);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new IndustryJob(
@@ -279,7 +279,7 @@ public class IndustryJobTest extends AbstractModelTester<IndustryJob> {
         timeInSeconds, startDate, endDate, pauseDate, completedDate, completedCharacterID, successfulRuns);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all jobsare returned
     List<IndustryJob> result = IndustryJob.getAllForward(testAccount, 8888L, 10, 0);
@@ -320,7 +320,7 @@ public class IndustryJobTest extends AbstractModelTester<IndustryJob> {
         blueprintLocationID, outputLocationID, runs, cost, teamID, licensedRuns, probability, productTypeID, productTypeName, status, timeInSeconds, startDate,
         endDate, pauseDate, completedDate, completedCharacterID, successfulRuns);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(jobID, existing);
 
     existing = new IndustryJob(
@@ -328,7 +328,7 @@ public class IndustryJobTest extends AbstractModelTester<IndustryJob> {
         blueprintTypeName, blueprintLocationID, outputLocationID, runs, cost, teamID, licensedRuns, probability, productTypeID, productTypeName, status,
         timeInSeconds, startDate + 10, endDate, pauseDate, completedDate, completedCharacterID, successfulRuns);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(jobID + 10, existing);
 
     existing = new IndustryJob(
@@ -336,7 +336,7 @@ public class IndustryJobTest extends AbstractModelTester<IndustryJob> {
         blueprintTypeName, blueprintLocationID, outputLocationID, runs, cost, teamID, licensedRuns, probability, productTypeID, productTypeName, status,
         timeInSeconds, startDate + 20, endDate, pauseDate, completedDate, completedCharacterID, successfulRuns);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(jobID + 20, existing);
 
     existing = new IndustryJob(
@@ -344,7 +344,7 @@ public class IndustryJobTest extends AbstractModelTester<IndustryJob> {
         blueprintTypeName, blueprintLocationID, outputLocationID, runs, cost, teamID, licensedRuns, probability, productTypeID, productTypeName, status,
         timeInSeconds, startDate + 30, endDate, pauseDate, completedDate, completedCharacterID, successfulRuns);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(jobID + 30, existing);
 
     // Associated with different account
@@ -353,7 +353,7 @@ public class IndustryJobTest extends AbstractModelTester<IndustryJob> {
         blueprintLocationID, outputLocationID, runs, cost, teamID, licensedRuns, probability, productTypeID, productTypeName, status, timeInSeconds, startDate,
         endDate, pauseDate, completedDate, completedCharacterID, successfulRuns);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new IndustryJob(
@@ -361,7 +361,7 @@ public class IndustryJobTest extends AbstractModelTester<IndustryJob> {
         blueprintTypeName, blueprintLocationID, outputLocationID, runs, cost, teamID, licensedRuns, probability, productTypeID, productTypeName, status,
         timeInSeconds, startDate, endDate, pauseDate, completedDate, completedCharacterID, successfulRuns);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new IndustryJob(
@@ -370,7 +370,7 @@ public class IndustryJobTest extends AbstractModelTester<IndustryJob> {
         timeInSeconds, startDate, endDate, pauseDate, completedDate, completedCharacterID, successfulRuns);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all jobsare returned
     List<IndustryJob> result = IndustryJob.getAllBackward(testAccount, 8888L, 10, Long.MAX_VALUE);
@@ -413,7 +413,7 @@ public class IndustryJobTest extends AbstractModelTester<IndustryJob> {
         blueprintLocationID, outputLocationID, runs, cost, teamID, licensedRuns, probability, productTypeID, productTypeName, status, timeInSeconds, startDate,
         endDate, pauseDate, 0, completedCharacterID, successfulRuns);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(jobID, existing);
 
     existing = new IndustryJob(
@@ -421,7 +421,7 @@ public class IndustryJobTest extends AbstractModelTester<IndustryJob> {
         blueprintTypeName, blueprintLocationID, outputLocationID, runs, cost, teamID, licensedRuns, probability, productTypeID, productTypeName, status,
         timeInSeconds, startDate + 10, endDate, pauseDate, 0, completedCharacterID, successfulRuns);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(jobID + 10, existing);
 
     existing = new IndustryJob(
@@ -429,7 +429,7 @@ public class IndustryJobTest extends AbstractModelTester<IndustryJob> {
         blueprintTypeName, blueprintLocationID, outputLocationID, runs, cost, teamID, licensedRuns, probability, productTypeID, productTypeName, status,
         timeInSeconds, startDate + 20, endDate, pauseDate, 0, completedCharacterID, successfulRuns);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(jobID + 20, existing);
 
     existing = new IndustryJob(
@@ -437,7 +437,7 @@ public class IndustryJobTest extends AbstractModelTester<IndustryJob> {
         blueprintTypeName, blueprintLocationID, outputLocationID, runs, cost, teamID, licensedRuns, probability, productTypeID, productTypeName, status,
         timeInSeconds, startDate + 30, endDate, pauseDate, 0, completedCharacterID, successfulRuns);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(jobID + 30, existing);
 
     // Associated with different account
@@ -446,7 +446,7 @@ public class IndustryJobTest extends AbstractModelTester<IndustryJob> {
         blueprintLocationID, outputLocationID, runs, cost, teamID, licensedRuns, probability, productTypeID, productTypeName, status, timeInSeconds, startDate,
         endDate, pauseDate, 0, completedCharacterID, successfulRuns);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Complete
     existing = new IndustryJob(
@@ -454,7 +454,7 @@ public class IndustryJobTest extends AbstractModelTester<IndustryJob> {
         blueprintTypeName, blueprintLocationID, outputLocationID, runs, cost, teamID, licensedRuns, probability, productTypeID, productTypeName, status,
         timeInSeconds, startDate, endDate, pauseDate, completedDate + 1, completedCharacterID, successfulRuns);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new IndustryJob(
@@ -462,7 +462,7 @@ public class IndustryJobTest extends AbstractModelTester<IndustryJob> {
         blueprintTypeName, blueprintLocationID, outputLocationID, runs, cost, teamID, licensedRuns, probability, productTypeID, productTypeName, status,
         timeInSeconds, startDate, endDate, pauseDate, 0, completedCharacterID, successfulRuns);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new IndustryJob(
@@ -471,7 +471,7 @@ public class IndustryJobTest extends AbstractModelTester<IndustryJob> {
         timeInSeconds, startDate, endDate, pauseDate, 0, completedCharacterID, successfulRuns);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all jobsare returned
     List<IndustryJob> result = IndustryJob.getAllForward(testAccount, 8888L, 10, 0);

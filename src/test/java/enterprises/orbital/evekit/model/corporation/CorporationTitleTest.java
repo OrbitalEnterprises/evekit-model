@@ -148,33 +148,33 @@ public class CorporationTitleTest extends AbstractModelTester<CorporationTitle> 
     existing = new CorporationTitle(titleID, titleName);
     populate(existing);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(titleID, existing);
 
     existing = new CorporationTitle(titleID + 1, titleName);
     populate(existing);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(titleID + 1, existing);
 
     // Associated with different account
     existing = new CorporationTitle(titleID + 2, titleName);
     populate(existing);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new CorporationTitle(titleID + 3, titleName);
     populate(existing);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new CorporationTitle(titleID + 4, titleName);
     populate(existing);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     List<CorporationTitle> result = CorporationTitle.getAll(testAccount, 8888L);
     Assert.assertEquals(listCheck.size(), result.size());

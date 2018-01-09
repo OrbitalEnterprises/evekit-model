@@ -168,7 +168,7 @@ public class StarbaseDetailTest extends AbstractModelTester<StarbaseDetail> {
         onAggressionEnabled, onAggressionStanding, onCorporationWarEnabled, onCorporationWarStanding, onStandingDropEnabled, onStandingDropStanding,
         onStatusDropEnabled, onStatusDropStanding);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(itemID, existing);
 
     existing = new StarbaseDetail(
@@ -176,7 +176,7 @@ public class StarbaseDetailTest extends AbstractModelTester<StarbaseDetail> {
         onAggressionEnabled, onAggressionStanding, onCorporationWarEnabled, onCorporationWarStanding, onStandingDropEnabled, onStandingDropStanding,
         onStatusDropEnabled, onStatusDropStanding);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(itemID + 1, existing);
 
     // Associated with different account
@@ -185,7 +185,7 @@ public class StarbaseDetailTest extends AbstractModelTester<StarbaseDetail> {
         onAggressionEnabled, onAggressionStanding, onCorporationWarEnabled, onCorporationWarStanding, onStandingDropEnabled, onStandingDropStanding,
         onStatusDropEnabled, onStatusDropStanding);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new StarbaseDetail(
@@ -193,7 +193,7 @@ public class StarbaseDetailTest extends AbstractModelTester<StarbaseDetail> {
         onAggressionEnabled, onAggressionStanding, onCorporationWarEnabled, onCorporationWarStanding, onStandingDropEnabled, onStandingDropStanding,
         onStatusDropEnabled, onStatusDropStanding);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new StarbaseDetail(
@@ -202,7 +202,7 @@ public class StarbaseDetailTest extends AbstractModelTester<StarbaseDetail> {
         onStatusDropEnabled, onStatusDropStanding);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     List<StarbaseDetail> result = StarbaseDetail.getAll(testAccount, 8888L);
     Assert.assertEquals(listCheck.size(), result.size());

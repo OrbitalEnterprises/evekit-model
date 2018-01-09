@@ -139,28 +139,28 @@ public class MemberTrackingTest extends AbstractModelTester<MemberTracking> {
         characterID, base, baseID, grantableRoles, location, locationID, logoffDateTime, logonDateTime, name, roles, shipType, shipTypeID, startDateTime,
         title);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(characterID, existing);
 
     existing = new MemberTracking(
         characterID + 10, base, baseID, grantableRoles, location, locationID, logoffDateTime, logonDateTime, name, roles, shipType, shipTypeID, startDateTime,
         title);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(characterID + 10, existing);
 
     existing = new MemberTracking(
         characterID + 20, base, baseID, grantableRoles, location, locationID, logoffDateTime, logonDateTime, name, roles, shipType, shipTypeID, startDateTime,
         title);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(characterID + 20, existing);
 
     existing = new MemberTracking(
         characterID + 30, base, baseID, grantableRoles, location, locationID, logoffDateTime, logonDateTime, name, roles, shipType, shipTypeID, startDateTime,
         title);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(characterID + 30, existing);
 
     // Associated with different account
@@ -168,14 +168,14 @@ public class MemberTrackingTest extends AbstractModelTester<MemberTracking> {
         characterID, base, baseID, grantableRoles, location, locationID, logoffDateTime, logonDateTime, name, roles, shipType, shipTypeID, startDateTime,
         title);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new MemberTracking(
         characterID + 5, base, baseID, grantableRoles, location, locationID, logoffDateTime, logonDateTime, name, roles, shipType, shipTypeID, startDateTime,
         title);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new MemberTracking(
@@ -183,7 +183,7 @@ public class MemberTrackingTest extends AbstractModelTester<MemberTracking> {
         title);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all member security are returned
     List<MemberTracking> result = MemberTracking.getAll(testAccount, 8888L, 10, 0);

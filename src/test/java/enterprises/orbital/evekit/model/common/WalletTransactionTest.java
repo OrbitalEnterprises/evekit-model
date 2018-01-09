@@ -152,28 +152,28 @@ public class WalletTransactionTest extends AbstractModelTester<WalletTransaction
         accountKey, transactionID, date, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType, transactionFor,
         journalTransactionID, clientTypeID, characterID, characterName);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(transactionID, existing);
 
     existing = new WalletTransaction(
         accountKey, transactionID + 10, date + 10, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
         transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(transactionID + 10, existing);
 
     existing = new WalletTransaction(
         accountKey, transactionID + 20, date + 20, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
         transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(transactionID + 20, existing);
 
     existing = new WalletTransaction(
         accountKey, transactionID + 30, date + 30, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
         transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(transactionID + 30, existing);
 
     // Associated with different account
@@ -181,14 +181,14 @@ public class WalletTransactionTest extends AbstractModelTester<WalletTransaction
         accountKey, transactionID, date, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType, transactionFor,
         journalTransactionID, clientTypeID, characterID, characterName);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new WalletTransaction(
         accountKey, transactionID + 5, date + 5, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
         transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new WalletTransaction(
@@ -196,7 +196,7 @@ public class WalletTransactionTest extends AbstractModelTester<WalletTransaction
         transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all transactions are returned
     List<WalletTransaction> result = WalletTransaction.getAllForward(testAccount, 8888L, 10, 0);
@@ -236,28 +236,28 @@ public class WalletTransactionTest extends AbstractModelTester<WalletTransaction
         accountKey, transactionID, date, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType, transactionFor,
         journalTransactionID, clientTypeID, characterID, characterName);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(transactionID, existing);
 
     existing = new WalletTransaction(
         accountKey, transactionID + 10, date + 10, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
         transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(transactionID + 10, existing);
 
     existing = new WalletTransaction(
         accountKey, transactionID + 20, date + 20, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
         transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(transactionID + 20, existing);
 
     existing = new WalletTransaction(
         accountKey, transactionID + 30, date + 30, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
         transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(transactionID + 30, existing);
 
     // Associated with different account
@@ -265,14 +265,14 @@ public class WalletTransactionTest extends AbstractModelTester<WalletTransaction
         accountKey, transactionID, date, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType, transactionFor,
         journalTransactionID, clientTypeID, characterID, characterName);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new WalletTransaction(
         accountKey, transactionID + 5, date + 5, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
         transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new WalletTransaction(
@@ -280,7 +280,7 @@ public class WalletTransactionTest extends AbstractModelTester<WalletTransaction
         transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all transactions sare returned
     List<WalletTransaction> result = WalletTransaction.getAllBackward(testAccount, 8888L, 10, Long.MAX_VALUE);
@@ -319,28 +319,28 @@ public class WalletTransactionTest extends AbstractModelTester<WalletTransaction
         accountKey, transactionID, date, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType, transactionFor,
         journalTransactionID, clientTypeID, characterID, characterName);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(transactionID, existing);
 
     existing = new WalletTransaction(
         accountKey, transactionID + 10, date + 10, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
         transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(transactionID + 10, existing);
 
     existing = new WalletTransaction(
         accountKey, transactionID + 20, date + 20, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
         transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(transactionID + 20, existing);
 
     existing = new WalletTransaction(
         accountKey, transactionID + 30, date + 30, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
         transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(transactionID + 30, existing);
 
     // Associated with different account
@@ -348,26 +348,26 @@ public class WalletTransactionTest extends AbstractModelTester<WalletTransaction
         accountKey, transactionID, date, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType, transactionFor,
         journalTransactionID, clientTypeID, characterID, characterName);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Out of the specified range
     existing = new WalletTransaction(
         accountKey, transactionID - 10, date - 10, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
         transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
     existing = new WalletTransaction(
         accountKey, transactionID + 40, date + 40, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
         transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new WalletTransaction(
         accountKey, transactionID + 5, date + 5, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
         transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new WalletTransaction(
@@ -375,7 +375,7 @@ public class WalletTransactionTest extends AbstractModelTester<WalletTransaction
         transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all entries are returned in ascending order
     List<WalletTransaction> result = WalletTransaction.getRange(testAccount, 8888L, 10, date, date + 30, true);

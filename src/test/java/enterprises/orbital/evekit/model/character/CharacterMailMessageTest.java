@@ -121,44 +121,44 @@ public class CharacterMailMessageTest extends AbstractModelTester<CharacterMailM
 
     existing = makeMessage(messageID, senderName, sentDate, msgRead);
     existing.setup(testAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
     listCheck.add(messageID);
 
     existing = makeMessage(messageID + 10, senderName + " 2", sentDate + 10, msgRead);
     existing.setup(testAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
     listCheck.add(messageID + 10);
 
     existing = makeMessage(messageID + 20, senderName + " 3", sentDate + 20, msgRead);
     existing.setup(testAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
     listCheck.add(messageID + 20);
 
     existing = makeMessage(messageID + 30, senderName + " 4", sentDate + 30, msgRead);
     existing.setup(testAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
     listCheck.add(messageID + 30);
 
     // Associated with different account
     existing = makeMessage(messageID, senderName, sentDate, msgRead);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = makeMessage(messageID + 5, senderName + " 0.5", sentDate + 5, msgRead);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = makeMessage(messageID + 3, senderName + " 0.3", sentDate + 3, msgRead);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Unread at given time
     existing = makeMessage(messageID + 40, senderName + " 5", sentDate + 40, false);
     existing.setup(testAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
     listCheck.add(messageID + 40);
 
     // Verify only unread message is returned

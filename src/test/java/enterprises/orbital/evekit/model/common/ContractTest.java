@@ -172,28 +172,28 @@ public class ContractTest extends AbstractModelTester<Contract> {
         contractID, issuerID, issuerCorpID, assigneeID, acceptorID, startStationID, endStationID, type, status, title, forCorp, availability, dateIssued,
         dateExpired, dateAccepted, numDays, dateCompleted, price, reward, collateral, buyout, volume);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(contractID, existing);
 
     existing = new Contract(
         contractID + 10, issuerID, issuerCorpID, assigneeID, acceptorID, startStationID, endStationID, type, status, title, forCorp, availability, dateIssued,
         dateExpired, dateAccepted, numDays, dateCompleted, price, reward, collateral, buyout, volume);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(contractID + 10, existing);
 
     existing = new Contract(
         contractID + 20, issuerID, issuerCorpID, assigneeID, acceptorID, startStationID, endStationID, type, status, title, forCorp, availability, dateIssued,
         dateExpired, dateAccepted, numDays, dateCompleted, price, reward, collateral, buyout, volume);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(contractID + 20, existing);
 
     existing = new Contract(
         contractID + 30, issuerID, issuerCorpID, assigneeID, acceptorID, startStationID, endStationID, type, status, title, forCorp, availability, dateIssued,
         dateExpired, dateAccepted, numDays, dateCompleted, price, reward, collateral, buyout, volume);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(contractID + 30, existing);
 
     // Associated with different account
@@ -201,14 +201,14 @@ public class ContractTest extends AbstractModelTester<Contract> {
         contractID, issuerID, issuerCorpID, assigneeID, acceptorID, startStationID, endStationID, type, status, title, forCorp, availability, dateIssued,
         dateExpired, dateAccepted, numDays, dateCompleted, price, reward, collateral, buyout, volume);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new Contract(
         contractID + 5, issuerID, issuerCorpID, assigneeID, acceptorID, startStationID, endStationID, type, status, title, forCorp, availability, dateIssued,
         dateExpired, dateAccepted, numDays, dateCompleted, price, reward, collateral, buyout, volume);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new Contract(
@@ -216,7 +216,7 @@ public class ContractTest extends AbstractModelTester<Contract> {
         dateExpired, dateAccepted, numDays, dateCompleted, price, reward, collateral, buyout, volume);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all contacts are returned
     List<Contract> result = Contract.getAllContracts(testAccount, 8888L, 10, 0);
@@ -257,28 +257,28 @@ public class ContractTest extends AbstractModelTester<Contract> {
         contractID, issuerID, issuerCorpID, assigneeID, acceptorID, startStationID, endStationID, type, status, title, forCorp, availability, threshold,
         dateExpired, dateAccepted, 1, dateCompleted, price, reward, collateral, buyout, volume);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(contractID, existing);
 
     existing = new Contract(
         contractID + 10, issuerID, issuerCorpID, assigneeID, acceptorID, startStationID, endStationID, type, status, title, forCorp, availability, threshold,
         dateExpired, dateAccepted, 1, dateCompleted, price, reward, collateral, buyout, volume);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(contractID + 10, existing);
 
     existing = new Contract(
         contractID + 20, issuerID, issuerCorpID, assigneeID, acceptorID, startStationID, endStationID, type, status, title, forCorp, availability, threshold,
         dateExpired, dateAccepted, 1, dateCompleted, price, reward, collateral, buyout, volume);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(contractID + 20, existing);
 
     existing = new Contract(
         contractID + 30, issuerID, issuerCorpID, assigneeID, acceptorID, startStationID, endStationID, type, status, title, forCorp, availability, threshold,
         dateExpired, dateAccepted, 1, dateCompleted, price, reward, collateral, buyout, volume);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(contractID + 30, existing);
 
     // Associated with different account
@@ -286,21 +286,21 @@ public class ContractTest extends AbstractModelTester<Contract> {
         contractID, issuerID, issuerCorpID, assigneeID, acceptorID, startStationID, endStationID, type, status, title, forCorp, availability, threshold,
         dateExpired, dateAccepted, 1, dateCompleted, price, reward, collateral, buyout, volume);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Contract with unretrievable items
     existing = new Contract(
         contractID + 40, issuerID, issuerCorpID, assigneeID, acceptorID, startStationID, endStationID, type, status, title, forCorp, availability,
         threshold - 90000000, dateExpired, dateAccepted, 1, dateCompleted, price, reward, collateral, buyout, volume);
     existing.setup(testAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new Contract(
         contractID + 5, issuerID, issuerCorpID, assigneeID, acceptorID, startStationID, endStationID, type, status, title, forCorp, availability, threshold,
         dateExpired, dateAccepted, 1, dateCompleted, price, reward, collateral, buyout, volume);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new Contract(
@@ -308,7 +308,7 @@ public class ContractTest extends AbstractModelTester<Contract> {
         dateExpired, dateAccepted, 1, dateCompleted, price, reward, collateral, buyout, volume);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all contacts are returned
     List<Contract> result = Contract.getAllItemRetrievableContracts(testAccount, 8888L, 10, 0, threshold);

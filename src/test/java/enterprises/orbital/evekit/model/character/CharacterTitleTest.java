@@ -73,29 +73,29 @@ public class CharacterTitleTest extends AbstractModelTester<CharacterTitle> {
 
     existing = new CharacterTitle(titleID, titleName);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(titleID, existing);
 
     existing = new CharacterTitle(titleID + 10, titleName + " 1");
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(titleID + 10, existing);
 
     // Associated with different account
     existing = new CharacterTitle(titleID, titleName);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new CharacterTitle(titleID + 3, titleName + " 3");
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new CharacterTitle(titleID + 4, titleName + " 4");
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     List<CharacterTitle> result = CharacterTitle.getAllTitles(testAccount, 8888L);
     Assert.assertEquals(listCheck.size(), result.size());

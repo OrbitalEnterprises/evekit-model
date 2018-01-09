@@ -75,29 +75,29 @@ public class RoleTest extends AbstractModelTester<Role> {
 
     existing = new Role(roleID, roleDescription, roleName);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(roleID, existing);
 
     existing = new Role(roleID + 1, roleDescription, roleName);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(roleID + 1, existing);
 
     // Associated with different account
     existing = new Role(roleID + 2, roleDescription, roleName);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new Role(roleID + 3, roleDescription, roleName);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new Role(roleID + 4, roleDescription, roleName);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     List<Role> result = Role.getAll(testAccount, 8888L);
     Assert.assertEquals(listCheck.size(), result.size());

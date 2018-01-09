@@ -124,7 +124,7 @@ public class PlanetaryRouteTest extends AbstractModelTester<PlanetaryRoute> {
     existing = new PlanetaryRoute(
         planetID, routeID, sourcePinID, destinationPinID, contentTypeID, contentTypeName, quantity, waypoint1, waypoint2, waypoint3, waypoint4, waypoint5);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(planetID, new HashMap<Long, PlanetaryRoute>());
     listCheck.get(planetID).put(routeID, existing);
 
@@ -132,7 +132,7 @@ public class PlanetaryRouteTest extends AbstractModelTester<PlanetaryRoute> {
         planetID + 10, routeID + 10, sourcePinID, destinationPinID, contentTypeID, contentTypeName, quantity, waypoint1, waypoint2, waypoint3, waypoint4,
         waypoint5);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(planetID + 10, new HashMap<Long, PlanetaryRoute>());
     listCheck.get(planetID + 10).put(routeID + 10, existing);
 
@@ -140,14 +140,14 @@ public class PlanetaryRouteTest extends AbstractModelTester<PlanetaryRoute> {
     existing = new PlanetaryRoute(
         planetID, routeID, sourcePinID, destinationPinID, contentTypeID, contentTypeName, quantity, waypoint1, waypoint2, waypoint3, waypoint4, waypoint5);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new PlanetaryRoute(
         planetID + 3, routeID + 3, sourcePinID, destinationPinID, contentTypeID, contentTypeName, quantity, waypoint1, waypoint2, waypoint3, waypoint4,
         waypoint5);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new PlanetaryRoute(
@@ -155,7 +155,7 @@ public class PlanetaryRouteTest extends AbstractModelTester<PlanetaryRoute> {
         waypoint5);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     List<PlanetaryRoute> result = PlanetaryRoute.getAllPlanetaryRoutes(testAccount, 8888L);
     Assert.assertEquals(listCheck.size(), result.size());
@@ -181,34 +181,34 @@ public class PlanetaryRouteTest extends AbstractModelTester<PlanetaryRoute> {
     existing = new PlanetaryRoute(
         planetID, routeID, sourcePinID, destinationPinID, contentTypeID, contentTypeName, quantity, waypoint1, waypoint2, waypoint3, waypoint4, waypoint5);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(planetID, new HashMap<Long, PlanetaryRoute>());
     listCheck.get(planetID).put(routeID, existing);
 
     existing = new PlanetaryRoute(
         planetID, routeID + 10, sourcePinID, destinationPinID, contentTypeID, contentTypeName, quantity, waypoint1, waypoint2, waypoint3, waypoint4, waypoint5);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.get(planetID).put(routeID + 10, existing);
 
     // Associated with different account
     existing = new PlanetaryRoute(
         planetID, routeID, sourcePinID, destinationPinID, contentTypeID, contentTypeName, quantity, waypoint1, waypoint2, waypoint3, waypoint4, waypoint5);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Associated with different planet
     existing = new PlanetaryRoute(
         planetID + 10, routeID, sourcePinID, destinationPinID, contentTypeID, contentTypeName, quantity, waypoint1, waypoint2, waypoint3, waypoint4, waypoint5);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new PlanetaryRoute(
         planetID + 3, routeID + 3, sourcePinID, destinationPinID, contentTypeID, contentTypeName, quantity, waypoint1, waypoint2, waypoint3, waypoint4,
         waypoint5);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new PlanetaryRoute(
@@ -216,7 +216,7 @@ public class PlanetaryRouteTest extends AbstractModelTester<PlanetaryRoute> {
         waypoint5);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     List<PlanetaryRoute> result = PlanetaryRoute.getAllPlanetaryRoutes(testAccount, 8888L);
     Assert.assertEquals(listCheck.get(planetID).size(), result.size());

@@ -80,34 +80,34 @@ public class CharacterMailMessageBodyTest extends AbstractModelTester<CharacterM
 
     existing = new CharacterMailMessageBody(messageID, retrieved, body);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.add(messageID);
 
     existing = new CharacterMailMessageBody(messageID + 10, retrieved, body + " 2");
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.add(messageID + 10);
 
     // Live but already retrieved
     existing = new CharacterMailMessageBody(messageID + 20, true, body + " 3");
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Associated with different account
     existing = new CharacterMailMessageBody(messageID + 30, retrieved, body + " 4");
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new CharacterMailMessageBody(messageID + 40, retrieved, body + " 5");
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new CharacterMailMessageBody(messageID + 50, retrieved, body + " 6");
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     List<Long> result = CharacterMailMessageBody.getUnretrievedMessageIDs(testAccount, 8888L);
     Assert.assertEquals(listCheck.size(), result.size());

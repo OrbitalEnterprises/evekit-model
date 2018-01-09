@@ -87,29 +87,29 @@ public class OutpostServiceDetailTest extends AbstractModelTester<OutpostService
 
     existing = new OutpostServiceDetail(stationID, serviceName, ownerID, minStanding, surchargePerBadStanding, discountPerGoodStanding);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(stationID, existing);
 
     existing = new OutpostServiceDetail(stationID + 1, serviceName, ownerID, minStanding, surchargePerBadStanding, discountPerGoodStanding);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(stationID + 1, existing);
 
     // Associated with different account
     existing = new OutpostServiceDetail(stationID + 2, serviceName, ownerID, minStanding, surchargePerBadStanding, discountPerGoodStanding);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new OutpostServiceDetail(stationID + 3, serviceName, ownerID, minStanding, surchargePerBadStanding, discountPerGoodStanding);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new OutpostServiceDetail(stationID + 4, serviceName, ownerID, minStanding, surchargePerBadStanding, discountPerGoodStanding);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     List<OutpostServiceDetail> result = OutpostServiceDetail.getAll(testAccount, 8888L);
     Assert.assertEquals(listCheck.size(), result.size());
@@ -132,34 +132,34 @@ public class OutpostServiceDetailTest extends AbstractModelTester<OutpostService
 
     existing = new OutpostServiceDetail(stationID, serviceName, ownerID, minStanding, surchargePerBadStanding, discountPerGoodStanding);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(serviceName, existing);
 
     existing = new OutpostServiceDetail(stationID, serviceName + " 1", ownerID, minStanding, surchargePerBadStanding, discountPerGoodStanding);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(serviceName + " 1", existing);
 
     // Associated with different account
     existing = new OutpostServiceDetail(stationID, serviceName, ownerID, minStanding, surchargePerBadStanding, discountPerGoodStanding);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Associated with a different service
     existing = new OutpostServiceDetail(stationID + 1, serviceName, ownerID, minStanding, surchargePerBadStanding, discountPerGoodStanding);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new OutpostServiceDetail(stationID, serviceName + " 2", ownerID, minStanding, surchargePerBadStanding, discountPerGoodStanding);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new OutpostServiceDetail(stationID, serviceName + " 3", ownerID, minStanding, surchargePerBadStanding, discountPerGoodStanding);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     List<OutpostServiceDetail> result = OutpostServiceDetail.getAll(testAccount, 8888L);
     Assert.assertEquals(listCheck.size(), result.size());

@@ -75,31 +75,31 @@ public class JumpCloneImplantTest extends AbstractModelTester<JumpCloneImplant> 
 
     existing = new JumpCloneImplant(jumpCloneID, typeID, typeName);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(jumpCloneID, new HashMap<Integer, JumpCloneImplant>());
     listCheck.get(jumpCloneID).put(typeID, existing);
 
     existing = new JumpCloneImplant(jumpCloneID + 10, typeID + 10, typeName + " 1");
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(jumpCloneID + 10, new HashMap<Integer, JumpCloneImplant>());
     listCheck.get(jumpCloneID + 10).put(typeID + 10, existing);
 
     // Associated with different account
     existing = new JumpCloneImplant(jumpCloneID, typeID, typeName);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new JumpCloneImplant(jumpCloneID + 3, typeID + 3, typeName + " 3");
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new JumpCloneImplant(jumpCloneID + 4, typeID + 4, typeName + " 4");
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     List<JumpCloneImplant> result = JumpCloneImplant.getAll(testAccount, 8888L);
     Assert.assertEquals(listCheck.size(), result.size());

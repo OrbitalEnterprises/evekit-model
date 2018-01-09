@@ -1,5 +1,6 @@
 package enterprises.orbital.evekit.model;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import org.junit.Assert;
@@ -16,7 +17,7 @@ public class AbstractModelTester<A extends CachedData> extends AbstractAccountBa
   public interface ModelRetriever<A> {
     public A getModel(
                       SynchronizedEveAccount account,
-                      long time);
+                      long time) throws IOException;
   }
 
   public interface CtorVariants<A> {
@@ -35,6 +36,7 @@ public class AbstractModelTester<A extends CachedData> extends AbstractAccountBa
   // 4) Test other non-standard retrieval variants
   // @formatter:on
 
+  @SuppressWarnings("Duplicates")
   protected void runBasicTests(
                                ClassUnderTestConstructor<A> ctor,
                                CtorVariants<A> vars,
@@ -60,7 +62,7 @@ public class AbstractModelTester<A extends CachedData> extends AbstractAccountBa
   protected void runGetLifelineTest(
                                     ClassUnderTestConstructor<A> eolMaker,
                                     ClassUnderTestConstructor<A> liveMaker,
-                                    ModelRetriever<A> modelGetter) {
+                                    ModelRetriever<A> modelGetter) throws IOException {
     A eol, live;
     long t1 = TestBase.getRandomInt(10000000) + 5000L;
     long t2 = t1 + TestBase.getRandomInt(10000) + 5000L;
@@ -69,8 +71,8 @@ public class AbstractModelTester<A extends CachedData> extends AbstractAccountBa
     live = liveMaker.getCUT();
     live.setup(testAccount, t2);
     eol.evolve(live, t2);
-    eol = CachedData.updateData(eol);
-    live = CachedData.updateData(live);
+    eol = CachedData.update(eol);
+    live = CachedData.update(live);
     Assert.assertNotNull(ModelTypeMap.retrieve(eol.getCid()));
     Assert.assertNotNull(ModelTypeMap.retrieve(live.getCid()));
 

@@ -80,34 +80,34 @@ public class CharacterNotificationBodyTest extends AbstractModelTester<Character
 
     existing = new CharacterNotificationBody(notificationID, false, text, missing);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.add(notificationID);
 
     existing = new CharacterNotificationBody(notificationID + 10, false, text + " 2", missing);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.add(notificationID + 10);
 
     // Live but already retrieved
     existing = new CharacterNotificationBody(notificationID + 20, true, text + " 3", missing);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Associated with different account
     existing = new CharacterNotificationBody(notificationID + 30, false, text + " 4", missing);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new CharacterNotificationBody(notificationID + 40, false, text + " 5", missing);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new CharacterNotificationBody(notificationID + 50, false, text + " 6", missing);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     List<Long> result = CharacterNotificationBody.getUnretrievedNotificationIDs(testAccount, 8888L);
     Assert.assertEquals(listCheck.size(), result.size());

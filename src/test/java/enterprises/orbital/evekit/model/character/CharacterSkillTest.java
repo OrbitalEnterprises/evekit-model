@@ -81,39 +81,39 @@ public class CharacterSkillTest extends AbstractModelTester<CharacterSkill> {
 
     existing = new CharacterSkill(typeID, level, skillpoints, published);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(typeID, existing);
 
     existing = new CharacterSkill(typeID + 10, level + 10, skillpoints + 10, published);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(typeID + 10, existing);
 
     existing = new CharacterSkill(typeID + 20, level + 20, skillpoints + 20, published);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(typeID + 20, existing);
 
     existing = new CharacterSkill(typeID + 30, level + 30, skillpoints + 30, published);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(typeID + 30, existing);
 
     // Associated with different account
     existing = new CharacterSkill(typeID, level, skillpoints, published);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new CharacterSkill(typeID + 5, level + 5, skillpoints + 5, published);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new CharacterSkill(typeID + 3, level + 3, skillpoints + 3, published);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all skillss are returned
     List<CharacterSkill> result = CharacterSkill.getAll(testAccount, 8888L, 10, 0);

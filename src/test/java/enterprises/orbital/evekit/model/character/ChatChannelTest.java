@@ -87,34 +87,34 @@ public class ChatChannelTest extends AbstractModelTester<ChatChannel> {
 
     existing = new ChatChannel(channelID, ownerID, ownerName, displayName, comparisonKey, hasPassword, motd);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(channelID, existing);
 
     existing = new ChatChannel(channelID + 10, ownerID, ownerName, displayName, comparisonKey, hasPassword, motd);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(channelID + 10, existing);
 
     existing = new ChatChannel(channelID + 20, ownerID, ownerName, displayName, comparisonKey, hasPassword, motd);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(channelID + 20, existing);
 
     // Associated with different account
     existing = new ChatChannel(channelID, ownerID, ownerName, displayName, comparisonKey, hasPassword, motd);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new ChatChannel(channelID + 5, ownerID, ownerName, displayName, comparisonKey, hasPassword, motd);
     existing.setup(testAccount, 9999L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
 
     // EOL before the given time
     existing = new ChatChannel(channelID + 3, ownerID, ownerName, displayName, comparisonKey, hasPassword, motd);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all channels are returned
     List<ChatChannel> result = ChatChannel.getAllChatChannels(testAccount, 8888L);

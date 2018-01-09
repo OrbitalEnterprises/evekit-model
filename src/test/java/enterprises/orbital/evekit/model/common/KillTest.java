@@ -1,18 +1,16 @@
 package enterprises.orbital.evekit.model.common;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import enterprises.orbital.evekit.TestBase;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AbstractModelTester;
 import enterprises.orbital.evekit.model.CachedData;
-import enterprises.orbital.evekit.model.common.Kill;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class KillTest extends AbstractModelTester<Kill> {
 
@@ -80,39 +78,39 @@ public class KillTest extends AbstractModelTester<Kill> {
 
     existing = new Kill(killID, killTime, moonID, solarSystemID);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(killID, existing);
 
     existing = new Kill(killID + 10, killTime + 10, moonID, solarSystemID);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(killID + 10, existing);
 
     existing = new Kill(killID + 20, killTime + 20, moonID, solarSystemID);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(killID + 20, existing);
 
     existing = new Kill(killID + 30, killTime + 30, moonID, solarSystemID);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(killID + 30, existing);
 
     // Associated with different account
     existing = new Kill(killID, killTime, moonID, solarSystemID);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new Kill(killID + 5, killTime, moonID, solarSystemID);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new Kill(killID + 3, killTime, moonID, solarSystemID);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all jobsare returned
     List<Kill> result = Kill.getKillsForward(testAccount, 8888L, 10, 0);
@@ -150,39 +148,39 @@ public class KillTest extends AbstractModelTester<Kill> {
 
     existing = new Kill(killID, killTime, moonID, solarSystemID);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(killID, existing);
 
     existing = new Kill(killID + 10, killTime + 10, moonID, solarSystemID);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(killID + 10, existing);
 
     existing = new Kill(killID + 20, killTime + 20, moonID, solarSystemID);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(killID + 20, existing);
 
     existing = new Kill(killID + 30, killTime + 30, moonID, solarSystemID);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(killID + 30, existing);
 
     // Associated with different account
     existing = new Kill(killID, killTime, moonID, solarSystemID);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new Kill(killID + 5, killTime, moonID, solarSystemID);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new Kill(killID + 3, killTime, moonID, solarSystemID);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all jobsare returned
     List<Kill> result = Kill.getKillsBackward(testAccount, 8888L, 10, Long.MAX_VALUE);

@@ -120,33 +120,33 @@ public class PlanetaryColonyTest extends AbstractModelTester<PlanetaryColony> {
     existing = new PlanetaryColony(
         planetID, solarSystemID, solarSystemName, planetName, planetTypeID, planetTypeName, ownerID, ownerName, lastUpdate, upgradeLevel, numberOfPins);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(planetID, existing);
 
     existing = new PlanetaryColony(
         planetID + 10, solarSystemID, solarSystemName, planetName, planetTypeID, planetTypeName, ownerID, ownerName, lastUpdate, upgradeLevel, numberOfPins);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(planetID + 10, existing);
 
     // Associated with different account
     existing = new PlanetaryColony(
         planetID, solarSystemID, solarSystemName, planetName, planetTypeID, planetTypeName, ownerID, ownerName, lastUpdate, upgradeLevel, numberOfPins);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new PlanetaryColony(
         planetID + 3, solarSystemID, solarSystemName, planetName, planetTypeID, planetTypeName, ownerID, ownerName, lastUpdate, upgradeLevel, numberOfPins);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new PlanetaryColony(
         planetID + 4, solarSystemID, solarSystemName, planetName, planetTypeID, planetTypeName, ownerID, ownerName, lastUpdate, upgradeLevel, numberOfPins);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     List<PlanetaryColony> result = PlanetaryColony.getAllPlanetaryColonies(testAccount, 8888L);
     Assert.assertEquals(listCheck.size(), result.size());

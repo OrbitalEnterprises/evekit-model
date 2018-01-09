@@ -51,7 +51,6 @@ import enterprises.orbital.evekit.model.character.ResearchAgent;
 import enterprises.orbital.evekit.model.character.SkillInQueue;
 import enterprises.orbital.evekit.model.character.UpcomingCalendarEvent;
 import enterprises.orbital.evekit.model.common.AccountBalance;
-import enterprises.orbital.evekit.model.common.AccountStatus;
 import enterprises.orbital.evekit.model.common.Asset;
 import enterprises.orbital.evekit.model.common.Blueprint;
 import enterprises.orbital.evekit.model.common.Contact;
@@ -99,7 +98,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
 
   @Test
   public void testSetupFn() {
-    AccountBalance cut = new AccountBalance(25, 35, BigDecimal.TEN);
+    AccountBalance cut = new AccountBalance(25, BigDecimal.TEN);
     byte[] tstMsk = AccountAccessMask.createMask(AccountAccessMask.ACCESS_ACCOUNT_BALANCE);
     long start = 8675L;
     cut.setup(testAccount, start);
@@ -111,12 +110,12 @@ public class CachedDataTest extends AbstractAccountBasedTest {
 
   @Test
   public void testDupFn() {
-    AccountBalance cut = new AccountBalance(25, 35, BigDecimal.TEN);
+    AccountBalance cut = new AccountBalance(25, BigDecimal.TEN);
     byte[] tstMsk = AccountAccessMask.createMask(AccountAccessMask.ACCESS_ACCOUNT_BALANCE);
     long start = 8675L;
     cut.setup(testAccount, start);
 
-    AccountBalance dup = new AccountBalance(85, 95, BigDecimal.ONE);
+    AccountBalance dup = new AccountBalance(85, BigDecimal.ONE);
     byte[] tstMsk2 = AccountAccessMask.createMask(AccountAccessMask.ACCESS_BLUEPRINTS);
     long start2 = 777L;
     dup.setup(testAccount, start2);
@@ -132,12 +131,12 @@ public class CachedDataTest extends AbstractAccountBasedTest {
 
   @Test
   public void testEvolveFn() {
-    AccountBalance cut = new AccountBalance(25, 35, BigDecimal.TEN);
+    AccountBalance cut = new AccountBalance(25, BigDecimal.TEN);
     byte[] tstMsk = AccountAccessMask.createMask(AccountAccessMask.ACCESS_ACCOUNT_BALANCE);
     long start = 8675L;
     cut.setup(testAccount, start);
 
-    AccountBalance dup = new AccountBalance(85, 95, BigDecimal.ONE);
+    AccountBalance dup = new AccountBalance(85, BigDecimal.ONE);
     byte[] tstMsk2 = AccountAccessMask.createMask(AccountAccessMask.ACCESS_BLUEPRINTS);
     long start2 = 777L;
     dup.setup(testAccount, start2);
@@ -170,7 +169,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created Implants");
     count = TestBase.getRandomInt(5) + 1;
@@ -180,7 +179,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created Jump Clones");
     count = TestBase.getRandomInt(5) + 1;
@@ -190,7 +189,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created Jump Clone Implants");
     count = TestBase.getRandomInt(1000) + 1;
@@ -201,7 +200,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created CalendarEventAttendees");
     count = 1;
@@ -211,7 +210,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created Capsuleers");
     count = TestBase.getRandomInt(100) + 50;
@@ -223,7 +222,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created CharacterContactNotifications");
     count = TestBase.getRandomInt(100) + 50;
@@ -242,7 +241,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created CharacterMailMessages");
     count = TestBase.getRandomInt(100) + 50;
@@ -253,7 +252,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created CharacterMailMessageBodies");
     count = TestBase.getRandomInt(10) + 5;
@@ -266,7 +265,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created CharacterMedals");
     count = TestBase.getRandomInt(100) + 50;
@@ -278,7 +277,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created CharacterNotifications");
     count = TestBase.getRandomInt(100) + 50;
@@ -290,7 +289,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created CharacterNotificationBodies");
     count = TestBase.getRandomInt(10) + 5;
@@ -301,7 +300,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created CharacterRoles");
     count = 1;
@@ -317,7 +316,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created CharacterSheets");
     count = 1;
@@ -328,7 +327,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created CharacterSheetBalance");
     count = 1;
@@ -339,7 +338,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created CharacterSheetJump");
     count = 1;
@@ -350,7 +349,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created CharacterSheetClone");
     count = TestBase.getRandomInt(1000) + 200;
@@ -361,7 +360,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created CharacterSkills");
     count = 1;
@@ -374,7 +373,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created CharacterSkillInTraining");
     count = TestBase.getRandomInt(10) + 5;
@@ -385,7 +384,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created CharacterTitles");
     count = TestBase.getRandomInt(50) + 50;
@@ -398,7 +397,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created ChatChannels");
     count = TestBase.getRandomInt(50) + 50;
@@ -415,7 +414,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created ChatChannelMembers");
     count = TestBase.getRandomInt(1000) + 200;
@@ -426,7 +425,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created MailingLists");
     count = TestBase.getRandomInt(10) + 5;
@@ -440,7 +439,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created PlanetaryColonies");
     count = TestBase.getRandomInt(10) + 5;
@@ -454,7 +453,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created PlanetaryPins");
     count = TestBase.getRandomInt(10) + 5;
@@ -466,7 +465,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created PlanetaryLinks");
     count = TestBase.getRandomInt(10) + 5;
@@ -480,20 +479,20 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created PlanetaryRoutes");
     count = TestBase.getRandomInt(10) + 5;
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
       CachedData next = new ResearchAgent(
-          TestBase.getRandomInt(), TestBase.getRandomDouble(1000), TestBase.getRandomDouble(1000), TestBase.getRandomDouble(1000), TestBase.getRandomLong(),
+          TestBase.getRandomInt(), TestBase.getRandomDouble(1000), TestBase.getRandomDouble(1000), TestBase.getRandomLong(),
           TestBase.getRandomInt());
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created ResearchData");
     count = TestBase.getRandomInt(10) + 5;
@@ -506,7 +505,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created SkillInQueue");
     count = TestBase.getRandomInt(10) + 5;
@@ -519,35 +518,20 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created UpcomingCalendarEvent");
     count = TestBase.getRandomInt(10) + 5;
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
-      CachedData next = new AccountBalance(TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomBigDecimal(100000000));
+      CachedData next = new AccountBalance(TestBase.getRandomInt(), TestBase.getRandomBigDecimal(100000000));
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created AccountBalance");
-    count = 1;
-    for (int i = 0; i < count; i++) {
-      int sel = TestBase.getRandomInt(5);
-      AccountStatus next = new AccountStatus(TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomInt(), TestBase.getRandomInt());
-      int mct = TestBase.getRandomInt(3) + 3;
-      for (int j = 0; j < mct; j++) {
-        next.getMultiCharacterTraining().add(TestBase.getRandomLong());
-      }
-      for (int j = 0; j < sel; j++) {
-        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
-      }
-      next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
-    }
-    System.out.println("Created AccountStatus");
 
     // Create assets with multiple levels of containment. This is necessary to test proper bottom up deleting of assets.
     count = TestBase.getRandomInt(1000) + 200;
@@ -565,7 +549,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         assetParents.add((Asset) next);
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     int maxContained = TestBase.getRandomInt(1000) + 200;
     int currentContained = 0;
@@ -583,7 +567,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
           child.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
         }
         child.setup(testAccount, testTime);
-        child = CachedData.updateData(child);
+        child = CachedData.update(child);
       }
     }
     System.out.println("Created Assets");
@@ -598,7 +582,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created Contacts");
 
@@ -610,7 +594,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created ContactLabels");
 
@@ -624,7 +608,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created Blueprints");
 
@@ -638,7 +622,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created Locations");
 
@@ -652,7 +636,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created ContractItems");
 
@@ -669,7 +653,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created Contracts");
 
@@ -682,7 +666,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created ContractBids");
 
@@ -697,7 +681,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created FacWarStats");
 
@@ -715,7 +699,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created IndustryJobsV2");
 
@@ -727,7 +711,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created Kills");
 
@@ -742,7 +726,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created KillAttackers");
 
@@ -762,7 +746,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         killItemParents.add((KillItem) next);
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     maxContained = TestBase.getRandomInt(1000) + 500;
     currentContained = 0;
@@ -780,7 +764,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
           child.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
         }
         child.setup(testAccount, testTime);
-        child = CachedData.updateData(child);
+        child = CachedData.update(child);
       }
     }
     System.out.println("Created KillItems");
@@ -796,7 +780,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created KillVictims");
 
@@ -809,7 +793,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created Locations");
 
@@ -825,7 +809,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created MarketOrders");
 
@@ -837,7 +821,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created Standings");
 
@@ -853,7 +837,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created WalletJournals");
 
@@ -869,7 +853,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created WalletTransactions");
 
@@ -884,7 +868,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created ContainerLogs");
 
@@ -896,7 +880,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created Corporations");
 
@@ -909,7 +893,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created CorporationMedals");
 
@@ -923,7 +907,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created Facilities");
 
@@ -938,7 +922,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created Customs Offices");
 
@@ -952,7 +936,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created CorporationMemberMedals");
 
@@ -969,7 +953,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created CorporationSheets");
 
@@ -1005,7 +989,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created CorporationTitles");
 
@@ -1017,7 +1001,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created Divisions");
 
@@ -1029,7 +1013,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created Fuels");
 
@@ -1068,7 +1052,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created MemberSecuritys");
 
@@ -1088,7 +1072,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created MemberSecurityLogs");
 
@@ -1103,7 +1087,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created MemberTrackings");
 
@@ -1115,7 +1099,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created Roles");
 
@@ -1127,7 +1111,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created SecurityRoles");
 
@@ -1139,7 +1123,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created SecurityTitles");
 
@@ -1153,7 +1137,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created Shareholders");
 
@@ -1167,7 +1151,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created Starbases");
 
@@ -1183,7 +1167,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
-      next = CachedData.updateData(next);
+      next = CachedData.update(next);
     }
     System.out.println("Created StarbaseDetails");
 

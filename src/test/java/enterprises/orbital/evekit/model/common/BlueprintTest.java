@@ -94,39 +94,39 @@ public class BlueprintTest extends AbstractModelTester<Blueprint> {
 
     existing = new Blueprint(itemID, locationID, typeID, typeName, flagID, quantity, timeEfficiency, materialEfficiency, runs);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(itemID, existing);
 
     existing = new Blueprint(itemID + 10, locationID, typeID, typeName, flagID, quantity, timeEfficiency, materialEfficiency, runs);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(itemID + 10, existing);
 
     existing = new Blueprint(itemID + 20, locationID, typeID, typeName, flagID, quantity, timeEfficiency, materialEfficiency, runs);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(itemID + 20, existing);
 
     existing = new Blueprint(itemID + 30, locationID, typeID, typeName, flagID, quantity, timeEfficiency, materialEfficiency, runs);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(itemID + 30, existing);
 
     // Associated with different account
     existing = new Blueprint(itemID, locationID, typeID, typeName, flagID, quantity, timeEfficiency, materialEfficiency, runs);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new Blueprint(itemID + 5, locationID, typeID, typeName, flagID, quantity, timeEfficiency, materialEfficiency, runs);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new Blueprint(itemID + 3, locationID, typeID, typeName, flagID, quantity, timeEfficiency, materialEfficiency, runs);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all blueprints are returned
     List<Blueprint> result = Blueprint.getAllBlueprints(testAccount, 8888L, 10, 0);

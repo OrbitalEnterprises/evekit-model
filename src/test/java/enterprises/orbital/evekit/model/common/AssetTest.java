@@ -91,39 +91,39 @@ public class AssetTest extends AbstractModelTester<Asset> {
 
     existing = new Asset(itemID, locationID, typeID, quantity, flag, singleton, rawQuantity, container);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(itemID, existing);
 
     existing = new Asset(itemID + 10, locationID, typeID, quantity, flag, singleton, rawQuantity, container);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(itemID + 10, existing);
 
     existing = new Asset(itemID + 20, locationID, typeID, quantity, flag, singleton, rawQuantity, container);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(itemID + 20, existing);
 
     existing = new Asset(itemID + 30, locationID, typeID, quantity, flag, singleton, rawQuantity, container);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(itemID + 30, existing);
 
     // Associated with different account
     existing = new Asset(itemID, locationID, typeID, quantity, flag, singleton, rawQuantity, container);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new Asset(itemID + 5, locationID, typeID, quantity, flag, singleton, rawQuantity, container);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new Asset(itemID + 3, locationID, typeID, quantity, flag, singleton, rawQuantity, container);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all assets are returned
     List<Asset> result = Asset.getAllAssets(testAccount, 8888L, 10, 0);
@@ -161,48 +161,48 @@ public class AssetTest extends AbstractModelTester<Asset> {
 
     existing = new Asset(itemID, locationID, typeID, quantity, flag, singleton, rawQuantity, container);
     existing.setup(testAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     existing = new Asset(itemID + 10, locationID, typeID, quantity, flag, singleton, rawQuantity, itemID);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(itemID + 10, existing);
 
     existing = new Asset(itemID + 20, locationID, typeID, quantity, flag, singleton, rawQuantity, itemID);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(itemID + 20, existing);
 
     existing = new Asset(itemID + 30, locationID, typeID, quantity, flag, singleton, rawQuantity, itemID);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(itemID + 30, existing);
 
     existing = new Asset(itemID + 40, locationID, typeID, quantity, flag, singleton, rawQuantity, itemID);
     existing.setup(testAccount, 7777L);
-    existing = CachedData.updateData(existing);
+    existing = CachedData.update(existing);
     listCheck.put(itemID + 40, existing);
 
     // Contained by a different asset
     existing = new Asset(itemID + 45, locationID, typeID, quantity, flag, singleton, rawQuantity, itemID + 10);
     existing.setup(testAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Associated with different account
     existing = new Asset(itemID + 10, locationID, typeID, quantity, flag, singleton, rawQuantity, itemID);
     existing.setup(otherAccount, 7777L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Not live at the given time
     existing = new Asset(itemID + 5, locationID, typeID, quantity, flag, singleton, rawQuantity, itemID);
     existing.setup(testAccount, 9999L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // EOL before the given time
     existing = new Asset(itemID + 3, locationID, typeID, quantity, flag, singleton, rawQuantity, itemID);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
-    CachedData.updateData(existing);
+    CachedData.update(existing);
 
     // Verify all contained assets are returned
     List<Asset> result = Asset.getContainedAssets(testAccount, itemID, 8888L, 10, 0);
