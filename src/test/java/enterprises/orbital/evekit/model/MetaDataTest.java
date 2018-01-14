@@ -25,7 +25,7 @@ public class MetaDataTest {
     OrbitalProperties.addPropertyFile("ModelTest.properties");
     PersistentProperty.setProvider(new DBPropertyProvider(OrbitalProperties.getGlobalProperty(EveKitUserAccountProvider.USER_ACCOUNT_PU_PROP)));
     userAccount = EveKitUserAccount.createNewUserAccount(true, true);
-    testAccount = SynchronizedEveAccount.createSynchronizedEveAccount(userAccount, "testaccount", true, true);
+    testAccount = SynchronizedEveAccount.createSynchronizedEveAccount(userAccount, "testaccount", true);
   }
 
   @After
