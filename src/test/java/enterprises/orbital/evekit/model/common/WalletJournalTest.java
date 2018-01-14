@@ -1,139 +1,185 @@
 package enterprises.orbital.evekit.model.common;
 
+import enterprises.orbital.evekit.TestBase;
+import enterprises.orbital.evekit.account.AccountAccessMask;
+import enterprises.orbital.evekit.model.AbstractModelTester;
+import enterprises.orbital.evekit.model.CachedData;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-import enterprises.orbital.evekit.TestBase;
-import enterprises.orbital.evekit.account.AccountAccessMask;
-import enterprises.orbital.evekit.account.SynchronizedEveAccount;
-import enterprises.orbital.evekit.model.AbstractModelTester;
-import enterprises.orbital.evekit.model.CachedData;
-
 public class WalletJournalTest extends AbstractModelTester<WalletJournal> {
 
-  final int                                      accountKey    = TestBase.getRandomInt(100000000);
-  final long                                     refID         = TestBase.getRandomInt(100000000);
-  final long                                     date          = TestBase.getRandomInt(100000000);
-  final int                                      refTypeID     = TestBase.getRandomInt(100000000);
-  final String                                   ownerName1    = "test owner name 1";
-  final long                                     ownerID1      = TestBase.getRandomInt(100000000);
-  final String                                   ownerName2    = "test owner name 2";
-  final long                                     ownerID2      = TestBase.getRandomInt(100000000);
-  final String                                   argName1      = "test arg name 1";
-  final long                                     argID1        = TestBase.getRandomInt(100000000);
-  final BigDecimal                               amount        = TestBase.getRandomBigDecimal(100000000);
-  final BigDecimal                               balance       = TestBase.getRandomBigDecimal(100000000);
-  final String                                   reason        = "test reason";
-  final long                                     taxReceiverID = TestBase.getRandomInt(100000000);
-  final BigDecimal                               taxAmount     = TestBase.getRandomBigDecimal(100000000);
-  final int                                      owner1TypeID  = TestBase.getRandomInt(100000000);
-  final int                                      owner2TypeID  = TestBase.getRandomInt(100000000);
+  private final int division = TestBase.getRandomInt(100000000);
+  private final long refID = TestBase.getRandomInt(100000000);
+  private final long date = TestBase.getRandomInt(100000000);
+  private final String refType = TestBase.getRandomText(50);
+  private final int firstPartyID = TestBase.getRandomInt();
+  private final String firstPartyType = TestBase.getRandomText(50);
+  private final int secondPartyID = TestBase.getRandomInt();
+  private final String secondPartyType = TestBase.getRandomText(50);
+  private final String argName1 = "test arg name 1";
+  private final long argID1 = TestBase.getRandomInt(100000000);
+  private final BigDecimal amount = TestBase.getRandomBigDecimal(100000000);
+  private final BigDecimal balance = TestBase.getRandomBigDecimal(100000000);
+  private final String reason = "test reason";
+  private final int taxReceiverID = TestBase.getRandomInt(100000000);
+  private final BigDecimal taxAmount = TestBase.getRandomBigDecimal(100000000);
+  private final long locationID = TestBase.getRandomLong();
+  private final long transactionID = TestBase.getRandomLong();
+  private final String npcName = TestBase.getRandomText(50);
+  private final int npcID = TestBase.getRandomInt();
+  private final int destroyedShipTypeID = TestBase.getRandomInt();
+  private final int characterID = TestBase.getRandomInt();
+  private final int corporationID = TestBase.getRandomInt();
+  private final int allianceID = TestBase.getRandomInt();
+  private final int jobID = TestBase.getRandomInt();
+  private final int contractID = TestBase.getRandomInt();
+  private final int systemID = TestBase.getRandomInt();
+  private final int planetID = TestBase.getRandomInt();
 
-  final ClassUnderTestConstructor<WalletJournal> eol           = new ClassUnderTestConstructor<WalletJournal>() {
+  final ClassUnderTestConstructor<WalletJournal> eol = () -> new WalletJournal(division, refID, date, refType,
+                                                                               firstPartyID, firstPartyType,
+                                                                               secondPartyID, secondPartyType, argName1,
+                                                                               argID1, amount, balance, reason,
+                                                                               taxReceiverID, taxAmount, locationID,
+                                                                               transactionID, npcName, npcID,
+                                                                               destroyedShipTypeID, characterID,
+                                                                               corporationID, allianceID, jobID,
+                                                                               contractID, systemID, planetID);
 
-                                                                 @Override
-                                                                 public WalletJournal getCUT() {
-                                                                   return new WalletJournal(
-                                                                       accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1,
-                                                                       argID1, amount, balance, reason, taxReceiverID, taxAmount, owner1TypeID, owner2TypeID);
-                                                                 }
-
-                                                               };
-
-  final ClassUnderTestConstructor<WalletJournal> live          = new ClassUnderTestConstructor<WalletJournal>() {
-                                                                 @Override
-                                                                 public WalletJournal getCUT() {
-                                                                   return new WalletJournal(
-                                                                       accountKey, refID, date, refTypeID + 1, ownerName1, ownerID1, ownerName2, ownerID2,
-                                                                       argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount, owner1TypeID,
-                                                                       owner2TypeID);
-                                                                 }
-
-                                                               };
+  final ClassUnderTestConstructor<WalletJournal> live = () -> new WalletJournal(division, refID, date, refType,
+                                                                                firstPartyID + 1, firstPartyType,
+                                                                                secondPartyID, secondPartyType,
+                                                                                argName1, argID1, amount, balance,
+                                                                                reason, taxReceiverID, taxAmount,
+                                                                                locationID, transactionID, npcName,
+                                                                                npcID, destroyedShipTypeID, characterID,
+                                                                                corporationID, allianceID, jobID,
+                                                                                contractID, systemID, planetID);
 
   @Test
   public void testBasic() throws Exception {
 
-    runBasicTests(eol, new CtorVariants<WalletJournal>() {
-
-      @Override
-      public WalletJournal[] getVariants() {
-        return new WalletJournal[] {
-            new WalletJournal(
-                accountKey + 1, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-                taxAmount, owner1TypeID, owner2TypeID),
-            new WalletJournal(
-                accountKey, refID + 1, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-                taxAmount, owner1TypeID, owner2TypeID),
-            new WalletJournal(
-                accountKey, refID, date + 1, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-                taxAmount, owner1TypeID, owner2TypeID),
-            new WalletJournal(
-                accountKey, refID, date, refTypeID + 1, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-                taxAmount, owner1TypeID, owner2TypeID),
-            new WalletJournal(
-                accountKey, refID, date, refTypeID, ownerName1 + " 1", ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-                taxAmount, owner1TypeID, owner2TypeID),
-            new WalletJournal(
-                accountKey, refID, date, refTypeID, ownerName1, ownerID1 + 1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-                taxAmount, owner1TypeID, owner2TypeID),
-            new WalletJournal(
-                accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2 + " 1", ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-                taxAmount, owner1TypeID, owner2TypeID),
-            new WalletJournal(
-                accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2 + 1, argName1, argID1, amount, balance, reason, taxReceiverID,
-                taxAmount, owner1TypeID, owner2TypeID),
-            new WalletJournal(
-                accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1 + " 1", argID1, amount, balance, reason, taxReceiverID,
-                taxAmount, owner1TypeID, owner2TypeID),
-            new WalletJournal(
-                accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1 + 1, amount, balance, reason, taxReceiverID,
-                taxAmount, owner1TypeID, owner2TypeID),
-            new WalletJournal(
-                accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount.add(BigDecimal.TEN), balance, reason,
-                taxReceiverID, taxAmount, owner1TypeID, owner2TypeID),
-            new WalletJournal(
-                accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance.add(BigDecimal.TEN), reason,
-                taxReceiverID, taxAmount, owner1TypeID, owner2TypeID),
-            new WalletJournal(
-                accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason + " 1", taxReceiverID,
-                taxAmount, owner1TypeID, owner2TypeID),
-            new WalletJournal(
-                accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID + 1,
-                taxAmount, owner1TypeID, owner2TypeID),
-            new WalletJournal(
-                accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-                taxAmount.add(BigDecimal.TEN), owner1TypeID, owner2TypeID),
-            new WalletJournal(
-                accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-                taxAmount, owner1TypeID + 1, owner2TypeID),
-            new WalletJournal(
-                accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-                taxAmount, owner1TypeID, owner2TypeID + 1)
-        };
-      }
-
-    }, AccountAccessMask.createMask(AccountAccessMask.ACCESS_WALLET_JOURNAL));
+    runBasicTests(eol, () -> new WalletJournal[]{
+            new WalletJournal(division + 1, refID, date, refType, firstPartyID, firstPartyType, secondPartyID,
+                              secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                              locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                              corporationID, allianceID, jobID, contractID, systemID, planetID),
+            new WalletJournal(division, refID + 1, date, refType, firstPartyID, firstPartyType, secondPartyID,
+                              secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                              locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                              corporationID, allianceID, jobID, contractID, systemID, planetID),
+            new WalletJournal(division, refID, date + 1, refType, firstPartyID, firstPartyType, secondPartyID,
+                              secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                              locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                              corporationID, allianceID, jobID, contractID, systemID, planetID),
+            new WalletJournal(division, refID, date, refType + "1", firstPartyID, firstPartyType, secondPartyID,
+                              secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                              locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                              corporationID, allianceID, jobID, contractID, systemID, planetID),
+            new WalletJournal(division, refID, date, refType, firstPartyID + 1, firstPartyType, secondPartyID,
+                              secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                              locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                              corporationID, allianceID, jobID, contractID, systemID, planetID),
+            new WalletJournal(division, refID, date, refType, firstPartyID, firstPartyType + "1", secondPartyID,
+                              secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                              locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                              corporationID, allianceID, jobID, contractID, systemID, planetID),
+            new WalletJournal(division, refID, date, refType, firstPartyID, firstPartyType, secondPartyID + 1,
+                              secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                              locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                              corporationID, allianceID, jobID, contractID, systemID, planetID),
+            new WalletJournal(division, refID, date, refType, firstPartyID, firstPartyType, secondPartyID,
+                              secondPartyType + "1", argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                              locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                              corporationID, allianceID, jobID, contractID, systemID, planetID),
+            new WalletJournal(division, refID, date, refType, firstPartyID, firstPartyType, secondPartyID,
+                              secondPartyType, argName1 + "1", argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                              locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                              corporationID, allianceID, jobID, contractID, systemID, planetID),
+            new WalletJournal(division, refID, date, refType, firstPartyID, firstPartyType, secondPartyID,
+                              secondPartyType, argName1, argID1 + 1, amount, balance, reason, taxReceiverID, taxAmount,
+                              locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                              corporationID, allianceID, jobID, contractID, systemID, planetID),
+            new WalletJournal(division, refID, date, refType, firstPartyID, firstPartyType, secondPartyID,
+                              secondPartyType, argName1, argID1, amount.add(BigDecimal.ONE), balance, reason, taxReceiverID, taxAmount,
+                              locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                              corporationID, allianceID, jobID, contractID, systemID, planetID),
+            new WalletJournal(division, refID, date, refType, firstPartyID, firstPartyType, secondPartyID,
+                              secondPartyType, argName1, argID1, amount, balance.add(BigDecimal.ONE), reason, taxReceiverID, taxAmount,
+                              locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                              corporationID, allianceID, jobID, contractID, systemID, planetID),
+            new WalletJournal(division, refID, date, refType, firstPartyID, firstPartyType, secondPartyID,
+                              secondPartyType, argName1, argID1, amount, balance, reason + "1", taxReceiverID, taxAmount,
+                              locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                              corporationID, allianceID, jobID, contractID, systemID, planetID),
+            new WalletJournal(division, refID, date, refType, firstPartyID, firstPartyType, secondPartyID,
+                              secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID + 1, taxAmount,
+                              locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                              corporationID, allianceID, jobID, contractID, systemID, planetID),
+            new WalletJournal(division, refID, date, refType, firstPartyID, firstPartyType, secondPartyID,
+                              secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount.add(BigDecimal.ONE),
+                              locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                              corporationID, allianceID, jobID, contractID, systemID, planetID),
+            new WalletJournal(division, refID, date, refType, firstPartyID, firstPartyType, secondPartyID,
+                              secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                              locationID + 1, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                              corporationID, allianceID, jobID, contractID, systemID, planetID),
+            new WalletJournal(division, refID, date, refType, firstPartyID, firstPartyType, secondPartyID,
+                              secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                              locationID, transactionID + 1, npcName, npcID, destroyedShipTypeID, characterID,
+                              corporationID, allianceID, jobID, contractID, systemID, planetID),
+            new WalletJournal(division, refID, date, refType, firstPartyID, firstPartyType, secondPartyID,
+                              secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                              locationID, transactionID, npcName + "1", npcID, destroyedShipTypeID, characterID,
+                              corporationID, allianceID, jobID, contractID, systemID, planetID),
+            new WalletJournal(division, refID, date, refType, firstPartyID, firstPartyType, secondPartyID,
+                              secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                              locationID, transactionID, npcName, npcID + 1, destroyedShipTypeID, characterID,
+                              corporationID, allianceID, jobID, contractID, systemID, planetID),
+            new WalletJournal(division, refID, date, refType, firstPartyID, firstPartyType, secondPartyID,
+                              secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                              locationID, transactionID, npcName, npcID, destroyedShipTypeID + 1, characterID,
+                              corporationID, allianceID, jobID, contractID, systemID, planetID),
+            new WalletJournal(division, refID, date, refType, firstPartyID, firstPartyType, secondPartyID,
+                              secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                              locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID + 1,
+                              corporationID, allianceID, jobID, contractID, systemID, planetID),
+            new WalletJournal(division, refID, date, refType, firstPartyID, firstPartyType, secondPartyID,
+                              secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                              locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                              corporationID + 1, allianceID, jobID, contractID, systemID, planetID),
+            new WalletJournal(division, refID, date, refType, firstPartyID, firstPartyType, secondPartyID,
+                              secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                              locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                              corporationID, allianceID + 1, jobID, contractID, systemID, planetID),
+            new WalletJournal(division, refID, date, refType, firstPartyID, firstPartyType, secondPartyID,
+                              secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                              locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                              corporationID, allianceID, jobID + 1, contractID, systemID, planetID),
+            new WalletJournal(division, refID, date, refType, firstPartyID, firstPartyType, secondPartyID,
+                              secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                              locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                              corporationID, allianceID, jobID, contractID + 1, systemID, planetID),
+            new WalletJournal(division, refID, date, refType, firstPartyID, firstPartyType, secondPartyID,
+                              secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                              locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                              corporationID, allianceID, jobID, contractID, systemID + 1, planetID),
+            new WalletJournal(division, refID, date, refType, firstPartyID, firstPartyType, secondPartyID,
+                              secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                              locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                              corporationID, allianceID, jobID, contractID, systemID, planetID + 1)
+        }, AccountAccessMask.createMask(AccountAccessMask.ACCESS_WALLET_JOURNAL));
   }
 
   @Test
   public void testGetLifeline() throws Exception {
-
-    runGetLifelineTest(eol, live, new ModelRetriever<WalletJournal>() {
-
-      @Override
-      public WalletJournal getModel(
-                                    SynchronizedEveAccount account,
-                                    long time) {
-        return WalletJournal.get(account, time, accountKey, refID);
-      }
-
-    });
+    runGetLifelineTest(eol, live, (account, time) -> WalletJournal.get(account, time, division, refID));
   }
 
   @Test
@@ -145,54 +191,61 @@ public class WalletJournalTest extends AbstractModelTester<WalletJournal> {
     // - max results limitation
     // - continuation ID
     WalletJournal existing;
-    Map<Long, WalletJournal> listCheck = new HashMap<Long, WalletJournal>();
+    Map<Long, WalletJournal> listCheck = new HashMap<>();
 
-    existing = new WalletJournal(
-        accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
-        owner1TypeID, owner2TypeID);
+    existing = new WalletJournal(division, refID, date, refType, firstPartyID, firstPartyType, secondPartyID,
+                                 secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                                 locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                                 corporationID, allianceID, jobID, contractID, systemID, planetID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(refID, existing);
 
-    existing = new WalletJournal(
-        accountKey, refID + 10, date + 10, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount, owner1TypeID, owner2TypeID);
+    existing = new WalletJournal(division, refID + 10, date + 10, refType, firstPartyID, firstPartyType, secondPartyID,
+                                 secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                                 locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                                 corporationID, allianceID, jobID, contractID, systemID, planetID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(refID + 10, existing);
 
-    existing = new WalletJournal(
-        accountKey, refID + 20, date + 20, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount, owner1TypeID, owner2TypeID);
+    existing = new WalletJournal(division, refID + 20, date + 20, refType, firstPartyID, firstPartyType, secondPartyID,
+                                 secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                                 locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                                 corporationID, allianceID, jobID, contractID, systemID, planetID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(refID + 20, existing);
 
-    existing = new WalletJournal(
-        accountKey, refID + 30, date + 30, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount, owner1TypeID, owner2TypeID);
+    existing = new WalletJournal(division, refID + 30, date + 30, refType, firstPartyID, firstPartyType, secondPartyID,
+                                 secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                                 locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                                 corporationID, allianceID, jobID, contractID, systemID, planetID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(refID + 30, existing);
 
     // Associated with different account
-    existing = new WalletJournal(
-        accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
-        owner1TypeID, owner2TypeID);
+    existing = new WalletJournal(division, refID, date, refType, firstPartyID, firstPartyType, secondPartyID,
+                                 secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                                 locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                                 corporationID, allianceID, jobID, contractID, systemID, planetID);
     existing.setup(otherAccount, 7777L);
     CachedData.update(existing);
 
     // Not live at the given time
-    existing = new WalletJournal(
-        accountKey, refID + 5, date + 5, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount, owner1TypeID, owner2TypeID);
+    existing = new WalletJournal(division, refID + 5, date + 5, refType, firstPartyID, firstPartyType, secondPartyID,
+                                 secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                                 locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                                 corporationID, allianceID, jobID, contractID, systemID, planetID);
     existing.setup(testAccount, 9999L);
     CachedData.update(existing);
 
     // EOL before the given time
-    existing = new WalletJournal(
-        accountKey, refID + 3, date + 3, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount, owner1TypeID, owner2TypeID);
+    existing = new WalletJournal(division, refID + 3, date + 3, refType, firstPartyID, firstPartyType, secondPartyID,
+                                 secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                                 locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                                 corporationID, allianceID, jobID, contractID, systemID, planetID);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
     CachedData.update(existing);
@@ -229,54 +282,61 @@ public class WalletJournalTest extends AbstractModelTester<WalletJournal> {
     // - max results limitation
     // - continuation ID
     WalletJournal existing;
-    Map<Long, WalletJournal> listCheck = new HashMap<Long, WalletJournal>();
+    Map<Long, WalletJournal> listCheck = new HashMap<>();
 
-    existing = new WalletJournal(
-        accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
-        owner1TypeID, owner2TypeID);
+    existing = new WalletJournal(division, refID, date, refType, firstPartyID, firstPartyType, secondPartyID,
+                                 secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                                 locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                                 corporationID, allianceID, jobID, contractID, systemID, planetID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(refID, existing);
 
-    existing = new WalletJournal(
-        accountKey, refID + 10, date + 10, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount, owner1TypeID, owner2TypeID);
+    existing = new WalletJournal(division, refID + 10, date + 10, refType, firstPartyID, firstPartyType, secondPartyID,
+                                 secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                                 locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                                 corporationID, allianceID, jobID, contractID, systemID, planetID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(refID + 10, existing);
 
-    existing = new WalletJournal(
-        accountKey, refID + 20, date + 20, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount, owner1TypeID, owner2TypeID);
+    existing = new WalletJournal(division, refID + 20, date + 20, refType, firstPartyID, firstPartyType, secondPartyID,
+                                 secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                                 locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                                 corporationID, allianceID, jobID, contractID, systemID, planetID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(refID + 20, existing);
 
-    existing = new WalletJournal(
-        accountKey, refID + 30, date + 30, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount, owner1TypeID, owner2TypeID);
+    existing = new WalletJournal(division, refID + 30, date + 30, refType, firstPartyID, firstPartyType, secondPartyID,
+                                 secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                                 locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                                 corporationID, allianceID, jobID, contractID, systemID, planetID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(refID + 30, existing);
 
     // Associated with different account
-    existing = new WalletJournal(
-        accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
-        owner1TypeID, owner2TypeID);
+    existing = new WalletJournal(division, refID, date, refType, firstPartyID, firstPartyType, secondPartyID,
+                                 secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                                 locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                                 corporationID, allianceID, jobID, contractID, systemID, planetID);
     existing.setup(otherAccount, 7777L);
     CachedData.update(existing);
 
     // Not live at the given time
-    existing = new WalletJournal(
-        accountKey, refID + 5, date + 5, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount, owner1TypeID, owner2TypeID);
+    existing = new WalletJournal(division, refID + 5, date + 5, refType, firstPartyID, firstPartyType, secondPartyID,
+                                 secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                                 locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                                 corporationID, allianceID, jobID, contractID, systemID, planetID);
     existing.setup(testAccount, 9999L);
     CachedData.update(existing);
 
     // EOL before the given time
-    existing = new WalletJournal(
-        accountKey, refID + 3, date + 3, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount, owner1TypeID, owner2TypeID);
+    existing = new WalletJournal(division, refID + 3, date + 3, refType, firstPartyID, firstPartyType, secondPartyID,
+                                 secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                                 locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                                 corporationID, allianceID, jobID, contractID, systemID, planetID);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
     CachedData.update(existing);
@@ -312,66 +372,75 @@ public class WalletJournalTest extends AbstractModelTester<WalletJournal> {
     // Need to test:
     // - max results limitation
     WalletJournal existing;
-    Map<Long, WalletJournal> listCheck = new HashMap<Long, WalletJournal>();
+    Map<Long, WalletJournal> listCheck = new HashMap<>();
 
-    existing = new WalletJournal(
-        accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
-        owner1TypeID, owner2TypeID);
+    existing = new WalletJournal(division, refID, date, refType, firstPartyID, firstPartyType, secondPartyID,
+                                 secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                                 locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                                 corporationID, allianceID, jobID, contractID, systemID, planetID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(refID, existing);
 
-    existing = new WalletJournal(
-        accountKey, refID + 10, date + 10, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount, owner1TypeID, owner2TypeID);
+    existing = new WalletJournal(division, refID + 10, date + 10, refType, firstPartyID, firstPartyType, secondPartyID,
+                                 secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                                 locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                                 corporationID, allianceID, jobID, contractID, systemID, planetID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(refID + 10, existing);
 
-    existing = new WalletJournal(
-        accountKey, refID + 20, date + 20, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount, owner1TypeID, owner2TypeID);
+    existing = new WalletJournal(division, refID + 20, date + 20, refType, firstPartyID, firstPartyType, secondPartyID,
+                                 secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                                 locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                                 corporationID, allianceID, jobID, contractID, systemID, planetID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(refID + 20, existing);
 
-    existing = new WalletJournal(
-        accountKey, refID + 30, date + 30, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount, owner1TypeID, owner2TypeID);
+    existing = new WalletJournal(division, refID + 30, date + 30, refType, firstPartyID, firstPartyType, secondPartyID,
+                                 secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                                 locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                                 corporationID, allianceID, jobID, contractID, systemID, planetID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(refID + 30, existing);
 
     // Associated with different account
-    existing = new WalletJournal(
-        accountKey, refID, date, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
-        owner1TypeID, owner2TypeID);
+    existing = new WalletJournal(division, refID, date, refType, firstPartyID, firstPartyType, secondPartyID,
+                                 secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                                 locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                                 corporationID, allianceID, jobID, contractID, systemID, planetID);
     existing.setup(otherAccount, 7777L);
     CachedData.update(existing);
 
     // Out of the specified range
-    existing = new WalletJournal(
-        accountKey, refID - 10, date - 10, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount, owner1TypeID, owner2TypeID);
+    existing = new WalletJournal(division, refID - 10, date - 10, refType, firstPartyID, firstPartyType, secondPartyID,
+                                 secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                                 locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                                 corporationID, allianceID, jobID, contractID, systemID, planetID);
     existing.setup(otherAccount, 7777L);
     CachedData.update(existing);
-    existing = new WalletJournal(
-        accountKey, refID + 40, date + 40, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount, owner1TypeID, owner2TypeID);
+    existing = new WalletJournal(division, refID + 40, date + 40, refType, firstPartyID, firstPartyType, secondPartyID,
+                                 secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                                 locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                                 corporationID, allianceID, jobID, contractID, systemID, planetID);
     existing.setup(otherAccount, 7777L);
     CachedData.update(existing);
 
     // Not live at the given time
-    existing = new WalletJournal(
-        accountKey, refID + 5, date + 5, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount, owner1TypeID, owner2TypeID);
+    existing = new WalletJournal(division, refID + 5, date + 5, refType, firstPartyID, firstPartyType, secondPartyID,
+                                 secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                                 locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                                 corporationID, allianceID, jobID, contractID, systemID, planetID);
     existing.setup(testAccount, 9999L);
     CachedData.update(existing);
 
     // EOL before the given time
-    existing = new WalletJournal(
-        accountKey, refID + 3, date + 3, refTypeID, ownerName1, ownerID1, ownerName2, ownerID2, argName1, argID1, amount, balance, reason, taxReceiverID,
-        taxAmount, owner1TypeID, owner2TypeID);
+    existing = new WalletJournal(division, refID + 3, date + 3, refType, firstPartyID, firstPartyType, secondPartyID,
+                                 secondPartyType, argName1, argID1, amount, balance, reason, taxReceiverID, taxAmount,
+                                 locationID, transactionID, npcName, npcID, destroyedShipTypeID, characterID,
+                                 corporationID, allianceID, jobID, contractID, systemID, planetID);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
     CachedData.update(existing);

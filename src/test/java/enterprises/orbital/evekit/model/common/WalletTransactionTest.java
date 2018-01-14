@@ -1,140 +1,82 @@
 package enterprises.orbital.evekit.model.common;
 
+import enterprises.orbital.evekit.TestBase;
+import enterprises.orbital.evekit.account.AccountAccessMask;
+import enterprises.orbital.evekit.model.AbstractModelTester;
+import enterprises.orbital.evekit.model.CachedData;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-import enterprises.orbital.evekit.TestBase;
-import enterprises.orbital.evekit.account.AccountAccessMask;
-import enterprises.orbital.evekit.account.SynchronizedEveAccount;
-import enterprises.orbital.evekit.model.AbstractModelTester;
-import enterprises.orbital.evekit.model.CachedData;
-
 public class WalletTransactionTest extends AbstractModelTester<WalletTransaction> {
 
-  final int                                          accountKey           = TestBase.getRandomInt(100000000);
-  final long                                         transactionID        = TestBase.getRandomInt(100000000);
-  final long                                         date                 = TestBase.getRandomInt(100000000);
-  final int                                          quantity             = TestBase.getRandomInt(100000000);
-  final String                                       typeName             = "test type name";
-  final int                                          typeID               = TestBase.getRandomInt(100000000);
-  final BigDecimal                                   price                = TestBase.getRandomBigDecimal(100000000);
-  final long                                         clientID             = TestBase.getRandomInt(100000000);
-  final String                                       clientName           = "test client name";
-  final int                                          stationID            = TestBase.getRandomInt(100000000);
-  final String                                       stationName          = "test station name";
-  final String                                       transactionType      = "test transaction type";
-  final String                                       transactionFor       = "test transaction for";
-  final long                                         journalTransactionID = TestBase.getRandomInt(100000000);
-  final int                                          clientTypeID         = TestBase.getRandomInt(100000000);
-  final long                                         characterID          = TestBase.getRandomInt(100000000);
-  final String                                       characterName        = "test character name";
+  private final int division = TestBase.getRandomInt(100000000);
+  private final long transactionID = TestBase.getRandomInt(100000000);
+  private final long date = TestBase.getRandomInt(100000000);
+  private final int quantity = TestBase.getRandomInt(100000000);
+  private final int typeID = TestBase.getRandomInt(100000000);
+  private final BigDecimal price = TestBase.getRandomBigDecimal(100000000);
+  private final int clientID = TestBase.getRandomInt(100000000);
+  private final long locationID = TestBase.getRandomInt(100000000);
+  private final boolean isBuy = TestBase.getRandomBoolean();
+  private final boolean isPersonal = TestBase.getRandomBoolean();
+  private final long journalTransactionID = TestBase.getRandomInt(100000000);
 
-  final ClassUnderTestConstructor<WalletTransaction> eol                  = new ClassUnderTestConstructor<WalletTransaction>() {
-
-                                                                            @Override
-                                                                            public WalletTransaction getCUT() {
-                                                                              return new WalletTransaction(
-                                                                                  accountKey, transactionID, date, quantity, typeName, typeID, price, clientID,
-                                                                                  clientName, stationID, stationName, transactionType, transactionFor,
-                                                                                  journalTransactionID, clientTypeID, characterID, characterName);
-                                                                            }
-
-                                                                          };
-
-  final ClassUnderTestConstructor<WalletTransaction> live                 = new ClassUnderTestConstructor<WalletTransaction>() {
-                                                                            @Override
-                                                                            public WalletTransaction getCUT() {
-                                                                              return new WalletTransaction(
-                                                                                  accountKey, transactionID, date, quantity + 1, typeName, typeID, price,
-                                                                                  clientID, clientName, stationID, stationName, transactionType, transactionFor,
-                                                                                  journalTransactionID, clientTypeID, characterID, characterName);
-                                                                            }
-
-                                                                          };
+  private final ClassUnderTestConstructor<WalletTransaction> eol = () -> new WalletTransaction(
+      division, transactionID, date, quantity, typeID, price, clientID,
+      locationID, isBuy, isPersonal,
+      journalTransactionID);
+  private final ClassUnderTestConstructor<WalletTransaction> live = () -> new WalletTransaction(
+      division, transactionID, date, quantity + 1, typeID, price,
+      clientID, locationID, isBuy, isPersonal,
+      journalTransactionID);
 
   @Test
   public void testBasic() throws Exception {
-
-    runBasicTests(eol, new CtorVariants<WalletTransaction>() {
-
-      @Override
-      public WalletTransaction[] getVariants() {
-        return new WalletTransaction[] {
-            new WalletTransaction(
-                accountKey + 1, transactionID, date, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
-                transactionFor, journalTransactionID, clientTypeID, characterID, characterName),
-            new WalletTransaction(
-                accountKey, transactionID + 1, date, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
-                transactionFor, journalTransactionID, clientTypeID, characterID, characterName),
-            new WalletTransaction(
-                accountKey, transactionID, date + 1, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
-                transactionFor, journalTransactionID, clientTypeID, characterID, characterName),
-            new WalletTransaction(
-                accountKey, transactionID, date, quantity + 1, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
-                transactionFor, journalTransactionID, clientTypeID, characterID, characterName),
-            new WalletTransaction(
-                accountKey, transactionID, date, quantity, typeName + " 1", typeID, price, clientID, clientName, stationID, stationName, transactionType,
-                transactionFor, journalTransactionID, clientTypeID, characterID, characterName),
-            new WalletTransaction(
-                accountKey, transactionID, date, quantity, typeName, typeID + 1, price, clientID, clientName, stationID, stationName, transactionType,
-                transactionFor, journalTransactionID, clientTypeID, characterID, characterName),
-            new WalletTransaction(
-                accountKey, transactionID, date, quantity, typeName, typeID, price.add(BigDecimal.TEN), clientID, clientName, stationID, stationName,
-                transactionType, transactionFor, journalTransactionID, clientTypeID, characterID, characterName),
-            new WalletTransaction(
-                accountKey, transactionID, date, quantity, typeName, typeID, price, clientID + 1, clientName, stationID, stationName, transactionType,
-                transactionFor, journalTransactionID, clientTypeID, characterID, characterName),
-            new WalletTransaction(
-                accountKey, transactionID, date, quantity, typeName, typeID, price, clientID, clientName + " 1", stationID, stationName, transactionType,
-                transactionFor, journalTransactionID, clientTypeID, characterID, characterName),
-            new WalletTransaction(
-                accountKey, transactionID, date, quantity, typeName, typeID, price, clientID, clientName, stationID + 1, stationName, transactionType,
-                transactionFor, journalTransactionID, clientTypeID, characterID, characterName),
-            new WalletTransaction(
-                accountKey, transactionID, date, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName + " 1", transactionType,
-                transactionFor, journalTransactionID, clientTypeID, characterID, characterName),
-            new WalletTransaction(
-                accountKey, transactionID, date, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType + " 1",
-                transactionFor, journalTransactionID, clientTypeID, characterID, characterName),
-            new WalletTransaction(
-                accountKey, transactionID, date, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
-                transactionFor + " 1", journalTransactionID, clientTypeID, characterID, characterName),
-            new WalletTransaction(
-                accountKey, transactionID, date, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
-                transactionFor, journalTransactionID + 1, clientTypeID, characterID, characterName),
-            new WalletTransaction(
-                accountKey, transactionID, date, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
-                transactionFor, journalTransactionID, clientTypeID + 1, characterID, characterName),
-            new WalletTransaction(
-                accountKey, transactionID, date, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
-                transactionFor, journalTransactionID, clientTypeID, characterID + 1, characterName),
-            new WalletTransaction(
-                accountKey, transactionID, date, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
-                transactionFor, journalTransactionID, clientTypeID, characterID, characterName + " 1")
-        };
-      }
-
+    runBasicTests(eol, () -> new WalletTransaction[]{
+        new WalletTransaction(
+            division + 1, transactionID, date, quantity, typeID, price, clientID, locationID, isBuy, isPersonal,
+            journalTransactionID),
+        new WalletTransaction(
+            division, transactionID + 1, date, quantity, typeID, price, clientID, locationID, isBuy, isPersonal,
+            journalTransactionID),
+        new WalletTransaction(
+            division, transactionID, date + 1, quantity, typeID, price, clientID, locationID, isBuy, isPersonal,
+            journalTransactionID),
+        new WalletTransaction(
+            division, transactionID, date, quantity + 1, typeID, price, clientID, locationID, isBuy, isPersonal,
+            journalTransactionID),
+        new WalletTransaction(
+            division, transactionID, date, quantity, typeID + 1, price, clientID, locationID, isBuy, isPersonal,
+            journalTransactionID),
+        new WalletTransaction(
+            division, transactionID, date, quantity, typeID, price.add(BigDecimal.TEN), clientID, locationID, isBuy,
+            isPersonal, journalTransactionID),
+        new WalletTransaction(
+            division, transactionID, date, quantity, typeID, price, clientID + 1, locationID, isBuy, isPersonal,
+            journalTransactionID),
+        new WalletTransaction(
+            division, transactionID, date, quantity, typeID, price, clientID, locationID + 1, isBuy, isPersonal,
+            journalTransactionID),
+        new WalletTransaction(
+            division, transactionID, date, quantity, typeID, price, clientID, locationID, !isBuy, isPersonal,
+            journalTransactionID),
+        new WalletTransaction(
+            division, transactionID, date, quantity, typeID, price, clientID, locationID, isBuy, !isPersonal,
+            journalTransactionID),
+        new WalletTransaction(
+            division, transactionID, date, quantity, typeID, price, clientID, locationID, isBuy, isPersonal,
+            journalTransactionID + 1)
     }, AccountAccessMask.createMask(AccountAccessMask.ACCESS_WALLET_TRANSACTIONS));
   }
 
   @Test
   public void testGetLifeline() throws Exception {
-
-    runGetLifelineTest(eol, live, new ModelRetriever<WalletTransaction>() {
-
-      @Override
-      public WalletTransaction getModel(
-                                        SynchronizedEveAccount account,
-                                        long time) {
-        return WalletTransaction.get(account, time, transactionID);
-      }
-
-    });
+    runGetLifelineTest(eol, live, (account, time) -> WalletTransaction.get(account, time, division, transactionID));
   }
 
   @Test
@@ -146,54 +88,54 @@ public class WalletTransactionTest extends AbstractModelTester<WalletTransaction
     // - max results limitation
     // - continuation ID
     WalletTransaction existing;
-    Map<Long, WalletTransaction> listCheck = new HashMap<Long, WalletTransaction>();
+    Map<Long, WalletTransaction> listCheck = new HashMap<>();
 
     existing = new WalletTransaction(
-        accountKey, transactionID, date, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType, transactionFor,
-        journalTransactionID, clientTypeID, characterID, characterName);
+        division, transactionID, date, quantity, typeID, price, clientID, locationID, isBuy, isPersonal,
+        journalTransactionID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(transactionID, existing);
 
     existing = new WalletTransaction(
-        accountKey, transactionID + 10, date + 10, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
-        transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
+        division, transactionID + 10, date + 10, quantity, typeID, price, clientID, locationID, isBuy, isPersonal,
+        journalTransactionID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(transactionID + 10, existing);
 
     existing = new WalletTransaction(
-        accountKey, transactionID + 20, date + 20, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
-        transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
+        division, transactionID + 20, date + 20, quantity, typeID, price, clientID, locationID, isBuy, isPersonal,
+        journalTransactionID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(transactionID + 20, existing);
 
     existing = new WalletTransaction(
-        accountKey, transactionID + 30, date + 30, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
-        transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
+        division, transactionID + 30, date + 30, quantity, typeID, price, clientID, locationID, isBuy, isPersonal,
+        journalTransactionID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(transactionID + 30, existing);
 
     // Associated with different account
     existing = new WalletTransaction(
-        accountKey, transactionID, date, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType, transactionFor,
-        journalTransactionID, clientTypeID, characterID, characterName);
+        division, transactionID, date, quantity, typeID, price, clientID, locationID, isBuy, isPersonal,
+        journalTransactionID);
     existing.setup(otherAccount, 7777L);
     CachedData.update(existing);
 
     // Not live at the given time
     existing = new WalletTransaction(
-        accountKey, transactionID + 5, date + 5, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
-        transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
+        division, transactionID + 5, date + 5, quantity, typeID, price, clientID, locationID, isBuy, isPersonal,
+        journalTransactionID);
     existing.setup(testAccount, 9999L);
     CachedData.update(existing);
 
     // EOL before the given time
     existing = new WalletTransaction(
-        accountKey, transactionID + 3, date + 3, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
-        transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
+        division, transactionID + 3, date + 3, quantity, typeID, price, clientID, locationID, isBuy, isPersonal,
+        journalTransactionID);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
     CachedData.update(existing);
@@ -230,54 +172,54 @@ public class WalletTransactionTest extends AbstractModelTester<WalletTransaction
     // - max results limitation
     // - continuation ID
     WalletTransaction existing;
-    Map<Long, WalletTransaction> listCheck = new HashMap<Long, WalletTransaction>();
+    Map<Long, WalletTransaction> listCheck = new HashMap<>();
 
     existing = new WalletTransaction(
-        accountKey, transactionID, date, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType, transactionFor,
-        journalTransactionID, clientTypeID, characterID, characterName);
+        division, transactionID, date, quantity, typeID, price, clientID, locationID, isBuy, isPersonal,
+        journalTransactionID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(transactionID, existing);
 
     existing = new WalletTransaction(
-        accountKey, transactionID + 10, date + 10, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
-        transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
+        division, transactionID + 10, date + 10, quantity, typeID, price, clientID, locationID, isBuy, isPersonal,
+        journalTransactionID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(transactionID + 10, existing);
 
     existing = new WalletTransaction(
-        accountKey, transactionID + 20, date + 20, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
-        transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
+        division, transactionID + 20, date + 20, quantity, typeID, price, clientID, locationID, isBuy, isPersonal,
+        journalTransactionID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(transactionID + 20, existing);
 
     existing = new WalletTransaction(
-        accountKey, transactionID + 30, date + 30, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
-        transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
+        division, transactionID + 30, date + 30, quantity, typeID, price, clientID, locationID, isBuy, isPersonal,
+        journalTransactionID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(transactionID + 30, existing);
 
     // Associated with different account
     existing = new WalletTransaction(
-        accountKey, transactionID, date, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType, transactionFor,
-        journalTransactionID, clientTypeID, characterID, characterName);
+        division, transactionID, date, quantity, typeID, price, clientID, locationID, isBuy, isPersonal,
+        journalTransactionID);
     existing.setup(otherAccount, 7777L);
     CachedData.update(existing);
 
     // Not live at the given time
     existing = new WalletTransaction(
-        accountKey, transactionID + 5, date + 5, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
-        transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
+        division, transactionID + 5, date + 5, quantity, typeID, price, clientID, locationID, isBuy, isPersonal,
+        journalTransactionID);
     existing.setup(testAccount, 9999L);
     CachedData.update(existing);
 
     // EOL before the given time
     existing = new WalletTransaction(
-        accountKey, transactionID + 3, date + 3, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
-        transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
+        division, transactionID + 3, date + 3, quantity, typeID, price, clientID, locationID, isBuy, isPersonal,
+        journalTransactionID);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
     CachedData.update(existing);
@@ -313,66 +255,66 @@ public class WalletTransactionTest extends AbstractModelTester<WalletTransaction
     // Need to test:
     // - max results limitation
     WalletTransaction existing;
-    Map<Long, WalletTransaction> listCheck = new HashMap<Long, WalletTransaction>();
+    Map<Long, WalletTransaction> listCheck = new HashMap<>();
 
     existing = new WalletTransaction(
-        accountKey, transactionID, date, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType, transactionFor,
-        journalTransactionID, clientTypeID, characterID, characterName);
+        division, transactionID, date, quantity, typeID, price, clientID, locationID, isBuy, isPersonal,
+        journalTransactionID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(transactionID, existing);
 
     existing = new WalletTransaction(
-        accountKey, transactionID + 10, date + 10, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
-        transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
+        division, transactionID + 10, date + 10, quantity, typeID, price, clientID, locationID, isBuy, isPersonal,
+        journalTransactionID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(transactionID + 10, existing);
 
     existing = new WalletTransaction(
-        accountKey, transactionID + 20, date + 20, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
-        transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
+        division, transactionID + 20, date + 20, quantity, typeID, price, clientID, locationID, isBuy, isPersonal,
+        journalTransactionID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(transactionID + 20, existing);
 
     existing = new WalletTransaction(
-        accountKey, transactionID + 30, date + 30, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
-        transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
+        division, transactionID + 30, date + 30, quantity, typeID, price, clientID, locationID, isBuy, isPersonal,
+        journalTransactionID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(transactionID + 30, existing);
 
     // Associated with different account
     existing = new WalletTransaction(
-        accountKey, transactionID, date, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType, transactionFor,
-        journalTransactionID, clientTypeID, characterID, characterName);
+        division, transactionID, date, quantity, typeID, price, clientID, locationID, isBuy, isPersonal,
+        journalTransactionID);
     existing.setup(otherAccount, 7777L);
     CachedData.update(existing);
 
     // Out of the specified range
     existing = new WalletTransaction(
-        accountKey, transactionID - 10, date - 10, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
-        transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
+        division, transactionID - 10, date - 10, quantity, typeID, price, clientID, locationID, isBuy, isPersonal,
+        journalTransactionID);
     existing.setup(otherAccount, 7777L);
     CachedData.update(existing);
     existing = new WalletTransaction(
-        accountKey, transactionID + 40, date + 40, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
-        transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
+        division, transactionID + 40, date + 40, quantity, typeID, price, clientID, locationID, isBuy, isPersonal,
+        journalTransactionID);
     existing.setup(otherAccount, 7777L);
     CachedData.update(existing);
 
     // Not live at the given time
     existing = new WalletTransaction(
-        accountKey, transactionID + 5, date + 5, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
-        transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
+        division, transactionID + 5, date + 5, quantity, typeID, price, clientID, locationID, isBuy, isPersonal,
+        journalTransactionID);
     existing.setup(testAccount, 9999L);
     CachedData.update(existing);
 
     // EOL before the given time
     existing = new WalletTransaction(
-        accountKey, transactionID + 3, date + 3, quantity, typeName, typeID, price, clientID, clientName, stationID, stationName, transactionType,
-        transactionFor, journalTransactionID, clientTypeID, characterID, characterName);
+        division, transactionID + 3, date + 3, quantity, typeID, price, clientID, locationID, isBuy, isPersonal,
+        journalTransactionID);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
     CachedData.update(existing);
