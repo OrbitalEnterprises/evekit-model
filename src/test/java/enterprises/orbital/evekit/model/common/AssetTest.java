@@ -1,81 +1,50 @@
 package enterprises.orbital.evekit.model.common;
 
+import enterprises.orbital.evekit.TestBase;
+import enterprises.orbital.evekit.account.AccountAccessMask;
+import enterprises.orbital.evekit.model.AbstractModelTester;
+import enterprises.orbital.evekit.model.CachedData;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-import enterprises.orbital.evekit.TestBase;
-import enterprises.orbital.evekit.account.AccountAccessMask;
-import enterprises.orbital.evekit.account.SynchronizedEveAccount;
-import enterprises.orbital.evekit.model.AbstractModelTester;
-import enterprises.orbital.evekit.model.CachedData;
-
 public class AssetTest extends AbstractModelTester<Asset> {
 
-  final long                             itemID      = TestBase.getRandomInt(100000000);
-  final long                             locationID  = TestBase.getRandomInt(100000000);
-  final int                              typeID      = TestBase.getRandomInt(100000000);
-  final long                             quantity    = TestBase.getRandomInt(100000000);
-  final int                              flag        = TestBase.getRandomInt(100000000);
-  final boolean                          singleton   = false;
-  final long                             rawQuantity = TestBase.getRandomInt(100000000);
-  final long                             container   = TestBase.getRandomInt(100000000);
+  private final long itemID = TestBase.getRandomInt(100000000);
+  private final long locationID = TestBase.getRandomInt(100000000);
+  private final String locationType = TestBase.getRandomText(50);
+  private final String locationFlag = TestBase.getRandomText(50);
+  private final int typeID = TestBase.getRandomInt(100000000);
+  private final int quantity = TestBase.getRandomInt(100000000);
+  private final boolean singleton = false;
+  private final String blueprintType = TestBase.getRandomText(50);
 
-  final ClassUnderTestConstructor<Asset> eol         = new ClassUnderTestConstructor<Asset>() {
-
-                                                       @Override
-                                                       public Asset getCUT() {
-                                                         return new Asset(itemID, locationID, typeID, quantity, flag, singleton, rawQuantity, container);
-                                                       }
-
-                                                     };
-
-  final ClassUnderTestConstructor<Asset> live        = new ClassUnderTestConstructor<Asset>() {
-                                                       @Override
-                                                       public Asset getCUT() {
-                                                         return new Asset(itemID, locationID + 1, typeID, quantity, flag, singleton, rawQuantity, container);
-                                                       }
-
-                                                     };
+  private final ClassUnderTestConstructor<Asset> eol = () -> new Asset(itemID, locationID, locationType, locationFlag,
+                                                                       typeID, quantity, singleton, blueprintType);
+  private final ClassUnderTestConstructor<Asset> live = () -> new Asset(itemID, locationID + 1, locationType,
+                                                                        locationFlag, typeID, quantity, singleton,
+                                                                        blueprintType);
 
   @Test
   public void testBasic() throws Exception {
-
-    runBasicTests(eol, new CtorVariants<Asset>() {
-
-      @Override
-      public Asset[] getVariants() {
-        return new Asset[] {
-            new Asset(itemID + 1, locationID, typeID, quantity, flag, singleton, rawQuantity, container),
-            new Asset(itemID, locationID + 1, typeID, quantity, flag, singleton, rawQuantity, container),
-            new Asset(itemID, locationID, typeID + 1, quantity, flag, singleton, rawQuantity, container),
-            new Asset(itemID, locationID, typeID, quantity + 1, flag, singleton, rawQuantity, container),
-            new Asset(itemID, locationID, typeID, quantity, flag + 1, singleton, rawQuantity, container),
-            new Asset(itemID, locationID, typeID, quantity, flag, !singleton, rawQuantity, container),
-            new Asset(itemID, locationID, typeID, quantity, flag, singleton, rawQuantity + 1, container),
-            new Asset(itemID, locationID, typeID, quantity, flag, singleton, rawQuantity, container + 1)
-        };
-      }
-
+    runBasicTests(eol, () -> new Asset[]{
+        new Asset(itemID + 1, locationID, locationType, locationFlag, typeID, quantity, singleton, blueprintType),
+        new Asset(itemID, locationID + 1, locationType, locationFlag, typeID, quantity, singleton, blueprintType),
+        new Asset(itemID, locationID, locationType + "1", locationFlag, typeID, quantity, singleton, blueprintType),
+        new Asset(itemID, locationID, locationType, locationFlag + "1", typeID, quantity, singleton, blueprintType),
+        new Asset(itemID, locationID, locationType, locationFlag, typeID + 1, quantity, singleton, blueprintType),
+        new Asset(itemID, locationID, locationType, locationFlag, typeID, quantity + 1, singleton, blueprintType),
+        new Asset(itemID, locationID, locationType, locationFlag, typeID, quantity, !singleton, blueprintType),
+        new Asset(itemID, locationID, locationType, locationFlag, typeID, quantity, singleton, blueprintType + "1")
     }, AccountAccessMask.createMask(AccountAccessMask.ACCESS_ASSETS));
   }
 
   @Test
   public void testGetLifeline() throws Exception {
-
-    runGetLifelineTest(eol, live, new ModelRetriever<Asset>() {
-
-      @Override
-      public Asset getModel(
-                            SynchronizedEveAccount account,
-                            long time) {
-        return Asset.get(account, time, itemID);
-      }
-
-    });
+    runGetLifelineTest(eol, live, (account, time) -> Asset.get(account, time, itemID));
   }
 
   @Test
@@ -87,40 +56,45 @@ public class AssetTest extends AbstractModelTester<Asset> {
     // - max results limitation
     // - continuation ID
     Asset existing;
-    Map<Long, Asset> listCheck = new HashMap<Long, Asset>();
+    Map<Long, Asset> listCheck = new HashMap<>();
 
-    existing = new Asset(itemID, locationID, typeID, quantity, flag, singleton, rawQuantity, container);
+    existing = new Asset(itemID, locationID, locationType, locationFlag, typeID, quantity, singleton, blueprintType);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(itemID, existing);
 
-    existing = new Asset(itemID + 10, locationID, typeID, quantity, flag, singleton, rawQuantity, container);
+    existing = new Asset(itemID + 10, locationID, locationType, locationFlag, typeID, quantity, singleton,
+                         blueprintType);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(itemID + 10, existing);
 
-    existing = new Asset(itemID + 20, locationID, typeID, quantity, flag, singleton, rawQuantity, container);
+    existing = new Asset(itemID + 20, locationID, locationType, locationFlag, typeID, quantity, singleton,
+                         blueprintType);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(itemID + 20, existing);
 
-    existing = new Asset(itemID + 30, locationID, typeID, quantity, flag, singleton, rawQuantity, container);
+    existing = new Asset(itemID + 30, locationID, locationType, locationFlag, typeID, quantity, singleton,
+                         blueprintType);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(itemID + 30, existing);
 
     // Associated with different account
-    existing = new Asset(itemID, locationID, typeID, quantity, flag, singleton, rawQuantity, container);
+    existing = new Asset(itemID, locationID, locationType, locationFlag, typeID, quantity, singleton, blueprintType);
     existing.setup(otherAccount, 7777L);
     CachedData.update(existing);
 
     // Not live at the given time
-    existing = new Asset(itemID + 5, locationID, typeID, quantity, flag, singleton, rawQuantity, container);
+    existing = new Asset(itemID + 5, locationID, locationType, locationFlag, typeID, quantity, singleton,
+                         blueprintType);
     existing.setup(testAccount, 9999L);
     CachedData.update(existing);
 
     // EOL before the given time
-    existing = new Asset(itemID + 3, locationID, typeID, quantity, flag, singleton, rawQuantity, container);
+    existing = new Asset(itemID + 3, locationID, locationType, locationFlag, typeID, quantity, singleton,
+                         blueprintType);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
     CachedData.update(existing);
@@ -157,49 +131,50 @@ public class AssetTest extends AbstractModelTester<Asset> {
     // - max results limitation
     // - continuation ID
     Asset existing;
-    Map<Long, Asset> listCheck = new HashMap<Long, Asset>();
+    Map<Long, Asset> listCheck = new HashMap<>();
 
-    existing = new Asset(itemID, locationID, typeID, quantity, flag, singleton, rawQuantity, container);
+    existing = new Asset(itemID, locationID, locationType, locationFlag, typeID, quantity, singleton, blueprintType);
     existing.setup(testAccount, 7777L);
     CachedData.update(existing);
 
-    existing = new Asset(itemID + 10, locationID, typeID, quantity, flag, singleton, rawQuantity, itemID);
+    existing = new Asset(itemID + 10, itemID, locationType, locationFlag, typeID, quantity, singleton, blueprintType);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(itemID + 10, existing);
 
-    existing = new Asset(itemID + 20, locationID, typeID, quantity, flag, singleton, rawQuantity, itemID);
+    existing = new Asset(itemID + 20, itemID, locationType, locationFlag, typeID, quantity, singleton, blueprintType);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(itemID + 20, existing);
 
-    existing = new Asset(itemID + 30, locationID, typeID, quantity, flag, singleton, rawQuantity, itemID);
+    existing = new Asset(itemID + 30, itemID, locationType, locationFlag, typeID, quantity, singleton, blueprintType);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(itemID + 30, existing);
 
-    existing = new Asset(itemID + 40, locationID, typeID, quantity, flag, singleton, rawQuantity, itemID);
+    existing = new Asset(itemID + 40, itemID, locationType, locationFlag, typeID, quantity, singleton, blueprintType);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(itemID + 40, existing);
 
     // Contained by a different asset
-    existing = new Asset(itemID + 45, locationID, typeID, quantity, flag, singleton, rawQuantity, itemID + 10);
+    existing = new Asset(itemID + 45, itemID + 10, locationType, locationFlag, typeID, quantity, singleton,
+                         blueprintType);
     existing.setup(testAccount, 7777L);
     CachedData.update(existing);
 
     // Associated with different account
-    existing = new Asset(itemID + 10, locationID, typeID, quantity, flag, singleton, rawQuantity, itemID);
+    existing = new Asset(itemID + 10, itemID, locationType, locationFlag, typeID, quantity, singleton, blueprintType);
     existing.setup(otherAccount, 7777L);
     CachedData.update(existing);
 
     // Not live at the given time
-    existing = new Asset(itemID + 5, locationID, typeID, quantity, flag, singleton, rawQuantity, itemID);
+    existing = new Asset(itemID + 5, itemID, locationType, locationFlag, typeID, quantity, singleton, blueprintType);
     existing.setup(testAccount, 9999L);
     CachedData.update(existing);
 
     // EOL before the given time
-    existing = new Asset(itemID + 3, locationID, typeID, quantity, flag, singleton, rawQuantity, itemID);
+    existing = new Asset(itemID + 3, itemID, locationType, locationFlag, typeID, quantity, singleton, blueprintType);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
     CachedData.update(existing);

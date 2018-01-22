@@ -1,129 +1,89 @@
 package enterprises.orbital.evekit.model.common;
 
+import enterprises.orbital.evekit.TestBase;
+import enterprises.orbital.evekit.account.AccountAccessMask;
+import enterprises.orbital.evekit.model.AbstractModelTester;
+import enterprises.orbital.evekit.model.CachedData;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-import enterprises.orbital.evekit.TestBase;
-import enterprises.orbital.evekit.account.AccountAccessMask;
-import enterprises.orbital.evekit.account.SynchronizedEveAccount;
-import enterprises.orbital.evekit.model.AbstractModelTester;
-import enterprises.orbital.evekit.model.CachedData;
-import enterprises.orbital.evekit.model.common.MarketOrder;
-
 public class MarketOrderTest extends AbstractModelTester<MarketOrder> {
 
-  final long                                   orderID      = TestBase.getRandomInt(100000000);
-  final int                                    accountKey   = TestBase.getRandomInt(100000000);
-  final boolean                                bid          = false;
-  final long                                   charID       = TestBase.getRandomInt(100000000);
-  final int                                    duration     = TestBase.getRandomInt(100000000);
-  final BigDecimal                             escrow       = TestBase.getRandomBigDecimal(100000000);
-  final long                                   issued       = TestBase.getRandomInt(100000000);
-  final int                                    minVolume    = TestBase.getRandomInt(100000000);
-  final int                                    orderState   = TestBase.getRandomInt(100000000);
-  final BigDecimal                             price        = TestBase.getRandomBigDecimal(100000000);
-  final int                                    orderRange   = TestBase.getRandomInt(100000000);
-  final long                                   stationID    = TestBase.getRandomInt(100000000);
-  final int                                    typeID       = TestBase.getRandomInt(100000000);
-  final int                                    volEntered   = TestBase.getRandomInt(100000000);
-  final int                                    volRemaining = TestBase.getRandomInt(100000000);
+  private final long orderID = TestBase.getRandomInt(100000000);
+  private final int walletDivision = TestBase.getRandomInt(100000000);
+  private final boolean bid = false;
+  private final long charID = TestBase.getRandomInt(100000000);
+  private final int duration = TestBase.getRandomInt(100000000);
+  private final BigDecimal escrow = TestBase.getRandomBigDecimal(100000000);
+  private final long issued = TestBase.getRandomInt(100000000);
+  private final int minVolume = TestBase.getRandomInt(100000000);
+  private final String orderState = TestBase.getRandomText(50);
+  private final BigDecimal price = TestBase.getRandomBigDecimal(100000000);
+  private final String orderRange = TestBase.getRandomText(50);
+  private final int typeID = TestBase.getRandomInt(100000000);
+  private final int volEntered = TestBase.getRandomInt(100000000);
+  private final int volRemaining = TestBase.getRandomInt(100000000);
+  private final int regionID = TestBase.getRandomInt();
+  private final long locationID = TestBase.getRandomLong();
+  private final boolean isCorp = TestBase.getRandomBoolean();
 
-  final ClassUnderTestConstructor<MarketOrder> eol          = new ClassUnderTestConstructor<MarketOrder>() {
+  private final ClassUnderTestConstructor<MarketOrder> eol = () -> new MarketOrder(
+      orderID, walletDivision, bid, charID, duration, escrow, issued, minVolume, orderState, price,
+      orderRange, typeID, volEntered, volRemaining, regionID, locationID, isCorp);
 
-                                                              @Override
-                                                              public MarketOrder getCUT() {
-                                                                return new MarketOrder(
-                                                                    orderID, accountKey, bid, charID, duration, escrow, issued, minVolume, orderState, price,
-                                                                    orderRange, stationID, typeID, volEntered, volRemaining);
-                                                              }
-
-                                                            };
-
-  final ClassUnderTestConstructor<MarketOrder> live         = new ClassUnderTestConstructor<MarketOrder>() {
-                                                              @Override
-                                                              public MarketOrder getCUT() {
-                                                                return new MarketOrder(
-                                                                    orderID, accountKey + 1, bid, charID, duration, escrow, issued, minVolume, orderState,
-                                                                    price, orderRange, stationID, typeID, volEntered, volRemaining);
-                                                              }
-
-                                                            };
+  private final ClassUnderTestConstructor<MarketOrder> live = () -> new MarketOrder(
+      orderID, walletDivision + 1, bid, charID, duration, escrow, issued, minVolume, orderState,
+      price, orderRange, typeID, volEntered, volRemaining, regionID, locationID, isCorp);
 
   @Test
   public void testBasic() throws Exception {
-
-    runBasicTests(eol, new CtorVariants<MarketOrder>() {
-
-      @Override
-      public MarketOrder[] getVariants() {
-        return new MarketOrder[] {
-            new MarketOrder(
-                orderID + 1, accountKey, bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange, stationID, typeID, volEntered,
-                volRemaining),
-            new MarketOrder(
-                orderID, accountKey + 1, bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange, stationID, typeID, volEntered,
-                volRemaining),
-            new MarketOrder(
-                orderID, accountKey, !bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange, stationID, typeID, volEntered,
-                volRemaining),
-            new MarketOrder(
-                orderID, accountKey, bid, charID + 1, duration, escrow, issued, minVolume, orderState, price, orderRange, stationID, typeID, volEntered,
-                volRemaining),
-            new MarketOrder(
-                orderID, accountKey, bid, charID, duration + 1, escrow, issued, minVolume, orderState, price, orderRange, stationID, typeID, volEntered,
-                volRemaining),
-            new MarketOrder(
-                orderID, accountKey, bid, charID, duration, escrow.add(BigDecimal.ONE), issued, minVolume, orderState, price, orderRange, stationID, typeID,
-                volEntered, volRemaining),
-            new MarketOrder(
-                orderID, accountKey, bid, charID, duration, escrow, issued + 1, minVolume, orderState, price, orderRange, stationID, typeID, volEntered,
-                volRemaining),
-            new MarketOrder(
-                orderID, accountKey, bid, charID, duration, escrow, issued, minVolume + 1, orderState, price, orderRange, stationID, typeID, volEntered,
-                volRemaining),
-            new MarketOrder(
-                orderID, accountKey, bid, charID, duration, escrow, issued, minVolume, orderState + 1, price, orderRange, stationID, typeID, volEntered,
-                volRemaining),
-            new MarketOrder(
-                orderID, accountKey, bid, charID, duration, escrow, issued, minVolume, orderState, price.add(BigDecimal.ONE), orderRange, stationID, typeID,
-                volEntered, volRemaining),
-            new MarketOrder(
-                orderID, accountKey, bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange + 1, stationID, typeID, volEntered,
-                volRemaining),
-            new MarketOrder(
-                orderID, accountKey, bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange, stationID + 1, typeID, volEntered,
-                volRemaining),
-            new MarketOrder(
-                orderID, accountKey, bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange, stationID, typeID + 1, volEntered,
-                volRemaining),
-            new MarketOrder(
-                orderID, accountKey, bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange, stationID, typeID, volEntered + 1,
-                volRemaining),
-            new MarketOrder(
-                orderID, accountKey, bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange, stationID, typeID, volEntered,
-                volRemaining + 1),
-        };
-      }
-
+    runBasicTests(eol, () -> new MarketOrder[]{
+        new MarketOrder(orderID + 1, walletDivision, bid, charID, duration, escrow, issued, minVolume, orderState,
+                        price, orderRange, typeID, volEntered, volRemaining, regionID, locationID, isCorp),
+        new MarketOrder(orderID, walletDivision + 1, bid, charID, duration, escrow, issued, minVolume, orderState,
+                        price, orderRange, typeID, volEntered, volRemaining, regionID, locationID, isCorp),
+        new MarketOrder(orderID, walletDivision, !bid, charID, duration, escrow, issued, minVolume, orderState, price,
+                        orderRange, typeID, volEntered, volRemaining, regionID, locationID, isCorp),
+        new MarketOrder(orderID, walletDivision, bid, charID + 1, duration, escrow, issued, minVolume, orderState,
+                        price, orderRange, typeID, volEntered, volRemaining, regionID, locationID, isCorp),
+        new MarketOrder(orderID, walletDivision, bid, charID, duration + 1, escrow, issued, minVolume, orderState,
+                        price, orderRange, typeID, volEntered, volRemaining, regionID, locationID, isCorp),
+        new MarketOrder(orderID, walletDivision, bid, charID, duration, escrow.add(BigDecimal.ONE), issued, minVolume,
+                        orderState, price, orderRange, typeID, volEntered, volRemaining, regionID, locationID, isCorp),
+        new MarketOrder(orderID, walletDivision, bid, charID, duration, escrow, issued + 1, minVolume, orderState,
+                        price, orderRange, typeID, volEntered, volRemaining, regionID, locationID, isCorp),
+        new MarketOrder(orderID, walletDivision, bid, charID, duration, escrow, issued, minVolume + 1, orderState,
+                        price, orderRange, typeID, volEntered, volRemaining, regionID, locationID, isCorp),
+        new MarketOrder(orderID, walletDivision, bid, charID, duration, escrow, issued, minVolume, orderState + "1",
+                        price, orderRange, typeID, volEntered, volRemaining, regionID, locationID, isCorp),
+        new MarketOrder(orderID, walletDivision, bid, charID, duration, escrow, issued, minVolume, orderState,
+                        price.add(BigDecimal.ONE), orderRange, typeID, volEntered, volRemaining, regionID, locationID,
+                        isCorp),
+        new MarketOrder(orderID, walletDivision, bid, charID, duration, escrow, issued, minVolume, orderState, price,
+                        orderRange + "1", typeID, volEntered, volRemaining, regionID, locationID, isCorp),
+        new MarketOrder(orderID, walletDivision, bid, charID, duration, escrow, issued, minVolume, orderState, price,
+                        orderRange, typeID + 1, volEntered, volRemaining, regionID, locationID, isCorp),
+        new MarketOrder(orderID, walletDivision, bid, charID, duration, escrow, issued, minVolume, orderState, price,
+                        orderRange, typeID, volEntered + 1, volRemaining, regionID, locationID, isCorp),
+        new MarketOrder(orderID, walletDivision, bid, charID, duration, escrow, issued, minVolume, orderState, price,
+                        orderRange, typeID, volEntered, volRemaining + 1, regionID, locationID, isCorp),
+        new MarketOrder(orderID, walletDivision, bid, charID, duration, escrow, issued, minVolume, orderState, price,
+                        orderRange, typeID, volEntered, volRemaining, regionID + 1, locationID, isCorp),
+        new MarketOrder(orderID, walletDivision, bid, charID, duration, escrow, issued, minVolume, orderState, price,
+                        orderRange, typeID, volEntered, volRemaining, regionID, locationID + 1, isCorp),
+        new MarketOrder(orderID, walletDivision, bid, charID, duration, escrow, issued, minVolume, orderState, price,
+                        orderRange, typeID, volEntered, volRemaining, regionID, locationID, !isCorp)
     }, AccountAccessMask.createMask(AccountAccessMask.ACCESS_MARKET_ORDERS));
   }
 
   @Test
   public void testGetLifeline() throws Exception {
-
-    runGetLifelineTest(eol, live, new ModelRetriever<MarketOrder>() {
-
-      @Override
-      public MarketOrder getModel(SynchronizedEveAccount account, long time) {
-        return MarketOrder.get(account, time, orderID);
-      }
-
-    });
+    runGetLifelineTest(eol, live, (account, time) -> MarketOrder.get(account, time, orderID));
   }
 
   @Test
@@ -135,50 +95,58 @@ public class MarketOrderTest extends AbstractModelTester<MarketOrder> {
     // - max results limitation
     // - continuation ID
     MarketOrder existing;
-    Map<Long, MarketOrder> listCheck = new HashMap<Long, MarketOrder>();
+    Map<Long, MarketOrder> listCheck = new HashMap<>();
 
     existing = new MarketOrder(
-        orderID, accountKey, bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange, stationID, typeID, volEntered, volRemaining);
+        orderID, walletDivision, bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange,
+        typeID, volEntered, volRemaining, regionID, locationID, isCorp);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(orderID, existing);
 
     existing = new MarketOrder(
-        orderID + 10, accountKey, bid, charID, duration, escrow, issued + 10, minVolume, orderState, price, orderRange, stationID, typeID, volEntered,
-        volRemaining);
+        orderID + 10, walletDivision, bid, charID, duration, escrow, issued + 10, minVolume, orderState, price,
+        orderRange, typeID, volEntered,
+        volRemaining, regionID, locationID, isCorp);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(orderID + 10, existing);
 
     existing = new MarketOrder(
-        orderID + 20, accountKey, bid, charID, duration, escrow, issued + 20, minVolume, orderState, price, orderRange, stationID, typeID, volEntered,
-        volRemaining);
+        orderID + 20, walletDivision, bid, charID, duration, escrow, issued + 20, minVolume, orderState, price,
+        orderRange, typeID, volEntered,
+        volRemaining, regionID, locationID, isCorp);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(orderID + 20, existing);
 
     existing = new MarketOrder(
-        orderID + 30, accountKey, bid, charID, duration, escrow, issued + 30, minVolume, orderState, price, orderRange, stationID, typeID, volEntered,
-        volRemaining);
+        orderID + 30, walletDivision, bid, charID, duration, escrow, issued + 30, minVolume, orderState, price,
+        orderRange, typeID, volEntered,
+        volRemaining, regionID, locationID, isCorp);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(orderID + 30, existing);
 
     // Associated with different account
     existing = new MarketOrder(
-        orderID, accountKey, bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange, stationID, typeID, volEntered, volRemaining);
+        orderID, walletDivision, bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange,
+        typeID, volEntered, volRemaining,
+        regionID, locationID, isCorp);
     existing.setup(otherAccount, 7777L);
     CachedData.update(existing);
 
     // Not live at the given time
     existing = new MarketOrder(
-        orderID + 5, accountKey, bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange, stationID, typeID, volEntered, volRemaining);
+        orderID + 5, walletDivision, bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange,
+        typeID, volEntered, volRemaining, regionID, locationID, isCorp);
     existing.setup(testAccount, 9999L);
     CachedData.update(existing);
 
     // EOL before the given time
     existing = new MarketOrder(
-        orderID + 3, accountKey, bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange, stationID, typeID, volEntered, volRemaining);
+        orderID + 3, walletDivision, bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange,
+        typeID, volEntered, volRemaining, regionID, locationID, isCorp);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
     CachedData.update(existing);
@@ -215,50 +183,57 @@ public class MarketOrderTest extends AbstractModelTester<MarketOrder> {
     // - max results limitation
     // - continuation ID
     MarketOrder existing;
-    Map<Long, MarketOrder> listCheck = new HashMap<Long, MarketOrder>();
+    Map<Long, MarketOrder> listCheck = new HashMap<>();
 
     existing = new MarketOrder(
-        orderID, accountKey, bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange, stationID, typeID, volEntered, volRemaining);
+        orderID, walletDivision, bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange,
+        typeID, volEntered, volRemaining, regionID, locationID, isCorp);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(orderID, existing);
 
     existing = new MarketOrder(
-        orderID + 10, accountKey, bid, charID, duration, escrow, issued + 10, minVolume, orderState, price, orderRange, stationID, typeID, volEntered,
-        volRemaining);
+        orderID + 10, walletDivision, bid, charID, duration, escrow, issued + 10, minVolume, orderState, price,
+        orderRange, typeID, volEntered,
+        volRemaining, regionID, locationID, isCorp);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(orderID + 10, existing);
 
     existing = new MarketOrder(
-        orderID + 20, accountKey, bid, charID, duration, escrow, issued + 20, minVolume, orderState, price, orderRange, stationID, typeID, volEntered,
-        volRemaining);
+        orderID + 20, walletDivision, bid, charID, duration, escrow, issued + 20, minVolume, orderState, price,
+        orderRange, typeID, volEntered,
+        volRemaining, regionID, locationID, isCorp);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(orderID + 20, existing);
 
     existing = new MarketOrder(
-        orderID + 30, accountKey, bid, charID, duration, escrow, issued + 30, minVolume, orderState, price, orderRange, stationID, typeID, volEntered,
-        volRemaining);
+        orderID + 30, walletDivision, bid, charID, duration, escrow, issued + 30, minVolume, orderState, price,
+        orderRange, typeID, volEntered,
+        volRemaining, regionID, locationID, isCorp);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(orderID + 30, existing);
 
     // Associated with different account
     existing = new MarketOrder(
-        orderID, accountKey, bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange, stationID, typeID, volEntered, volRemaining);
+        orderID, walletDivision, bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange,
+        typeID, volEntered, volRemaining, regionID, locationID, isCorp);
     existing.setup(otherAccount, 7777L);
     CachedData.update(existing);
 
     // Not live at the given time
     existing = new MarketOrder(
-        orderID + 5, accountKey, bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange, stationID, typeID, volEntered, volRemaining);
+        orderID + 5, walletDivision, bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange,
+        typeID, volEntered, volRemaining, regionID, locationID, isCorp);
     existing.setup(testAccount, 9999L);
     CachedData.update(existing);
 
     // EOL before the given time
     existing = new MarketOrder(
-        orderID + 3, accountKey, bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange, stationID, typeID, volEntered, volRemaining);
+        orderID + 3, walletDivision, bid, charID, duration, escrow, issued, minVolume, orderState, price, orderRange,
+        typeID, volEntered, volRemaining, regionID, locationID, isCorp);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
     CachedData.update(existing);
@@ -297,60 +272,70 @@ public class MarketOrderTest extends AbstractModelTester<MarketOrder> {
     // - max results limitation
     // - continuation ID
     MarketOrder existing;
-    Map<Long, MarketOrder> listCheck = new HashMap<Long, MarketOrder>();
+    Map<Long, MarketOrder> listCheck = new HashMap<>();
 
     existing = new MarketOrder(
-        orderID, accountKey, bid, charID, duration, escrow, issued, minVolume, 0, price, orderRange, stationID, typeID, volEntered, volRemaining);
+        orderID, walletDivision, bid, charID, duration, escrow, issued, minVolume, "open", price, orderRange, typeID,
+        volEntered, volRemaining, regionID, locationID, isCorp);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(orderID, existing);
 
     existing = new MarketOrder(
-        orderID + 10, accountKey, bid, charID, duration, escrow, issued + 10, minVolume, 0, price, orderRange, stationID, typeID, volEntered, volRemaining);
+        orderID + 10, walletDivision, bid, charID, duration, escrow, issued + 10, minVolume, "open", price, orderRange,
+        typeID, volEntered, volRemaining, regionID, locationID, isCorp);
+
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(orderID + 10, existing);
 
     existing = new MarketOrder(
-        orderID + 20, accountKey, bid, charID, duration, escrow, issued + 20, minVolume, 0, price, orderRange, stationID, typeID, volEntered, volRemaining);
+        orderID + 20, walletDivision, bid, charID, duration, escrow, issued + 20, minVolume, "open", price, orderRange,
+        typeID, volEntered, volRemaining, regionID, locationID, isCorp);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(orderID + 20, existing);
 
     existing = new MarketOrder(
-        orderID + 30, accountKey, bid, charID, duration, escrow, issued + 30, minVolume, 0, price, orderRange, stationID, typeID, volEntered, volRemaining);
+        orderID + 30, walletDivision, bid, charID, duration, escrow, issued + 30, minVolume, "open", price, orderRange,
+        typeID, volEntered, volRemaining, regionID, locationID, isCorp);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(orderID + 30, existing);
 
     // Associated with different account
     existing = new MarketOrder(
-        orderID, accountKey, bid, charID, duration, escrow, issued, minVolume, 0, price, orderRange, stationID, typeID, volEntered, volRemaining);
+        orderID, walletDivision, bid, charID, duration, escrow, issued, minVolume, "open", price, orderRange, typeID,
+        volEntered, volRemaining, regionID, locationID, isCorp);
     existing.setup(otherAccount, 7777L);
     CachedData.update(existing);
 
     // Outside the duration bound
     existing = new MarketOrder(
-        orderID + 7, accountKey, bid, charID, duration, escrow, issued + 6 * 24 * 60 * 60 * 1000L, minVolume, 0, price, orderRange, stationID, typeID,
-        volEntered, volRemaining);
+        orderID + 7, walletDivision, bid, charID, duration, escrow, issued + 6 * 24 * 60 * 60 * 1000L, minVolume,
+        "open", price, orderRange, typeID,
+        volEntered, volRemaining, regionID, locationID, isCorp);
     existing.setup(testAccount, 9999L);
     CachedData.update(existing);
 
     // Non-zero order state
     existing = new MarketOrder(
-        orderID + 7, accountKey, bid, charID, duration, escrow, issued, minVolume, 1, price, orderRange, stationID, typeID, volEntered, volRemaining);
+        orderID + 7, walletDivision, bid, charID, duration, escrow, issued, minVolume, "closed", price, orderRange,
+        typeID, volEntered, volRemaining, regionID, locationID, isCorp);
     existing.setup(testAccount, 9999L);
     CachedData.update(existing);
 
     // Not live at the given time
     existing = new MarketOrder(
-        orderID + 5, accountKey, bid, charID, duration, escrow, issued, minVolume, 0, price, orderRange, stationID, typeID, volEntered, volRemaining);
+        orderID + 5, walletDivision, bid, charID, duration, escrow, issued, minVolume, "open", price, orderRange,
+        typeID, volEntered, volRemaining, regionID, locationID, isCorp);
     existing.setup(testAccount, 9999L);
     CachedData.update(existing);
 
     // EOL before the given time
     existing = new MarketOrder(
-        orderID + 3, accountKey, bid, charID, duration, escrow, issued, minVolume, 0, price, orderRange, stationID, typeID, volEntered, volRemaining);
+        orderID + 3, walletDivision, bid, charID, duration, escrow, issued, minVolume, "open", price, orderRange,
+        typeID, volEntered, volRemaining, regionID, locationID, isCorp);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
     CachedData.update(existing);

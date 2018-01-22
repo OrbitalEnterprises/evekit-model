@@ -1,84 +1,51 @@
 package enterprises.orbital.evekit.model.common;
 
+import enterprises.orbital.evekit.TestBase;
+import enterprises.orbital.evekit.account.AccountAccessMask;
+import enterprises.orbital.evekit.model.AbstractModelTester;
+import enterprises.orbital.evekit.model.CachedData;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-import enterprises.orbital.evekit.TestBase;
-import enterprises.orbital.evekit.account.AccountAccessMask;
-import enterprises.orbital.evekit.account.SynchronizedEveAccount;
-import enterprises.orbital.evekit.model.AbstractModelTester;
-import enterprises.orbital.evekit.model.CachedData;
-
 public class BlueprintTest extends AbstractModelTester<Blueprint> {
-  final long                                 itemID             = TestBase.getRandomInt(100000000);
-  final long                                 locationID         = TestBase.getRandomInt(100000000);
-  final int                                  typeID             = TestBase.getRandomInt(100000000);
-  final String                               typeName           = "test type name";
-  final int                                  flagID             = TestBase.getRandomInt(100000000);
-  final int                                  quantity           = TestBase.getRandomInt(100000000);
-  final int                                  timeEfficiency     = TestBase.getRandomInt(100000000);
-  final int                                  materialEfficiency = TestBase.getRandomInt(100000000);
-  final int                                  runs               = TestBase.getRandomInt(100000000);
+  private final long itemID = TestBase.getRandomInt(100000000);
+  private final long locationID = TestBase.getRandomInt(100000000);
+  private final String locationFlag = TestBase.getRandomText(50);
+  private final int typeID = TestBase.getRandomInt(100000000);
+  private final int quantity = TestBase.getRandomInt(100000000);
+  private final int timeEfficiency = TestBase.getRandomInt(100000000);
+  private final int materialEfficiency = TestBase.getRandomInt(100000000);
+  private final int runs = TestBase.getRandomInt(100000000);
 
-  final ClassUnderTestConstructor<Blueprint> eol                = new ClassUnderTestConstructor<Blueprint>() {
-
-                                                                  @Override
-                                                                  public Blueprint getCUT() {
-                                                                    return new Blueprint(
-                                                                        itemID, locationID, typeID, typeName, flagID, quantity, timeEfficiency,
-                                                                        materialEfficiency, runs);
-                                                                  }
-
-                                                                };
-
-  final ClassUnderTestConstructor<Blueprint> live               = new ClassUnderTestConstructor<Blueprint>() {
-                                                                  @Override
-                                                                  public Blueprint getCUT() {
-                                                                    return new Blueprint(
-                                                                        itemID, locationID + 1, typeID, typeName, flagID, quantity, timeEfficiency,
-                                                                        materialEfficiency, runs);
-                                                                  }
-
-                                                                };
+  private final ClassUnderTestConstructor<Blueprint> eol = () -> new Blueprint(
+      itemID, locationID, locationFlag, typeID, quantity, timeEfficiency,
+      materialEfficiency, runs);
+  private final ClassUnderTestConstructor<Blueprint> live = () -> new Blueprint(
+      itemID, locationID + 1, locationFlag, typeID, quantity, timeEfficiency,
+      materialEfficiency, runs);
 
   @Test
   public void testBasic() throws Exception {
-
-    runBasicTests(eol, new CtorVariants<Blueprint>() {
-
-      @Override
-      public Blueprint[] getVariants() {
-        return new Blueprint[] {
-            new Blueprint(itemID + 1, locationID, typeID, typeName, flagID, quantity, timeEfficiency, materialEfficiency, runs),
-            new Blueprint(itemID, locationID + 1, typeID, typeName, flagID, quantity, timeEfficiency, materialEfficiency, runs),
-            new Blueprint(itemID, locationID, typeID + 1, typeName, flagID, quantity, timeEfficiency, materialEfficiency, runs),
-            new Blueprint(itemID, locationID, typeID, typeName + " 1", flagID, quantity, timeEfficiency, materialEfficiency, runs),
-            new Blueprint(itemID, locationID, typeID, typeName, flagID + 1, quantity, timeEfficiency, materialEfficiency, runs),
-            new Blueprint(itemID, locationID, typeID, typeName, flagID, quantity + 1, timeEfficiency, materialEfficiency, runs),
-            new Blueprint(itemID, locationID, typeID, typeName, flagID, quantity, timeEfficiency + 1, materialEfficiency, runs),
-            new Blueprint(itemID, locationID, typeID, typeName, flagID, quantity, timeEfficiency, materialEfficiency + 1, runs),
-            new Blueprint(itemID, locationID, typeID, typeName, flagID, quantity, timeEfficiency, materialEfficiency, runs + 1)
-        };
-      }
-
+    runBasicTests(eol, () -> new Blueprint[]{
+        new Blueprint(itemID + 1, locationID, locationFlag, typeID, quantity, timeEfficiency, materialEfficiency, runs),
+        new Blueprint(itemID, locationID + 1, locationFlag, typeID, quantity, timeEfficiency, materialEfficiency, runs),
+        new Blueprint(itemID, locationID, locationFlag + "1", typeID, quantity, timeEfficiency, materialEfficiency,
+                      runs),
+        new Blueprint(itemID, locationID, locationFlag, typeID + 1, quantity, timeEfficiency, materialEfficiency, runs),
+        new Blueprint(itemID, locationID, locationFlag, typeID, quantity + 1, timeEfficiency, materialEfficiency, runs),
+        new Blueprint(itemID, locationID, locationFlag, typeID, quantity, timeEfficiency + 1, materialEfficiency, runs),
+        new Blueprint(itemID, locationID, locationFlag, typeID, quantity, timeEfficiency, materialEfficiency + 1, runs),
+        new Blueprint(itemID, locationID, locationFlag, typeID, quantity, timeEfficiency, materialEfficiency, runs + 1)
     }, AccountAccessMask.createMask(AccountAccessMask.ACCESS_BLUEPRINTS));
   }
 
   @Test
   public void testGetLifeline() throws Exception {
-
-    runGetLifelineTest(eol, live, new ModelRetriever<Blueprint>() {
-
-      @Override
-      public Blueprint getModel(SynchronizedEveAccount account, long time) {
-        return Blueprint.get(account, time, itemID);
-      }
-
-    });
+    runGetLifelineTest(eol, live, (account, time) -> Blueprint.get(account, time, itemID));
   }
 
   @Test
@@ -90,40 +57,47 @@ public class BlueprintTest extends AbstractModelTester<Blueprint> {
     // - max results limitation
     // - continuation ID
     Blueprint existing;
-    Map<Long, Blueprint> listCheck = new HashMap<Long, Blueprint>();
+    Map<Long, Blueprint> listCheck = new HashMap<>();
 
-    existing = new Blueprint(itemID, locationID, typeID, typeName, flagID, quantity, timeEfficiency, materialEfficiency, runs);
+    existing = new Blueprint(itemID, locationID, locationFlag, typeID, quantity, timeEfficiency, materialEfficiency,
+                             runs);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(itemID, existing);
 
-    existing = new Blueprint(itemID + 10, locationID, typeID, typeName, flagID, quantity, timeEfficiency, materialEfficiency, runs);
+    existing = new Blueprint(itemID + 10, locationID, locationFlag, typeID, quantity, timeEfficiency,
+                             materialEfficiency, runs);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(itemID + 10, existing);
 
-    existing = new Blueprint(itemID + 20, locationID, typeID, typeName, flagID, quantity, timeEfficiency, materialEfficiency, runs);
+    existing = new Blueprint(itemID + 20, locationID, locationFlag, typeID, quantity, timeEfficiency,
+                             materialEfficiency, runs);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(itemID + 20, existing);
 
-    existing = new Blueprint(itemID + 30, locationID, typeID, typeName, flagID, quantity, timeEfficiency, materialEfficiency, runs);
+    existing = new Blueprint(itemID + 30, locationID, locationFlag, typeID, quantity, timeEfficiency,
+                             materialEfficiency, runs);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(itemID + 30, existing);
 
     // Associated with different account
-    existing = new Blueprint(itemID, locationID, typeID, typeName, flagID, quantity, timeEfficiency, materialEfficiency, runs);
+    existing = new Blueprint(itemID, locationID, locationFlag, typeID, quantity, timeEfficiency, materialEfficiency,
+                             runs);
     existing.setup(otherAccount, 7777L);
     CachedData.update(existing);
 
     // Not live at the given time
-    existing = new Blueprint(itemID + 5, locationID, typeID, typeName, flagID, quantity, timeEfficiency, materialEfficiency, runs);
+    existing = new Blueprint(itemID + 5, locationID, locationFlag, typeID, quantity, timeEfficiency, materialEfficiency,
+                             runs);
     existing.setup(testAccount, 9999L);
     CachedData.update(existing);
 
     // EOL before the given time
-    existing = new Blueprint(itemID + 3, locationID, typeID, typeName, flagID, quantity, timeEfficiency, materialEfficiency, runs);
+    existing = new Blueprint(itemID + 3, locationID, locationFlag, typeID, quantity, timeEfficiency, materialEfficiency,
+                             runs);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
     CachedData.update(existing);

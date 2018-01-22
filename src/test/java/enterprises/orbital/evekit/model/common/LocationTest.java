@@ -1,71 +1,40 @@
 package enterprises.orbital.evekit.model.common;
 
+import enterprises.orbital.evekit.TestBase;
+import enterprises.orbital.evekit.account.AccountAccessMask;
+import enterprises.orbital.evekit.model.AbstractModelTester;
+import enterprises.orbital.evekit.model.CachedData;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-import enterprises.orbital.evekit.TestBase;
-import enterprises.orbital.evekit.account.AccountAccessMask;
-import enterprises.orbital.evekit.account.SynchronizedEveAccount;
-import enterprises.orbital.evekit.model.AbstractModelTester;
-import enterprises.orbital.evekit.model.CachedData;
-
 public class LocationTest extends AbstractModelTester<Location> {
-  final long                                itemID   = TestBase.getRandomInt(100000000);
-  final String                              itemName = "test item name";
-  final double                              x        = TestBase.getRandomDouble(100000000);
-  final double                              y        = TestBase.getRandomDouble(100000000);
-  final double                              z        = TestBase.getRandomDouble(100000000);
+  private final long itemID = TestBase.getRandomInt(100000000);
+  private final String itemName = "test item name";
+  private final double x = TestBase.getRandomDouble(100000000);
+  private final double y = TestBase.getRandomDouble(100000000);
+  private final double z = TestBase.getRandomDouble(100000000);
 
-  final ClassUnderTestConstructor<Location> eol      = new ClassUnderTestConstructor<Location>() {
-
-                                                       @Override
-                                                       public Location getCUT() {
-                                                         return new Location(itemID, itemName, x, y, z);
-                                                       }
-
-                                                     };
-
-  final ClassUnderTestConstructor<Location> live     = new ClassUnderTestConstructor<Location>() {
-                                                       @Override
-                                                       public Location getCUT() {
-                                                         return new Location(itemID, itemName, x + 1, y, z);
-                                                       }
-
-                                                     };
+  private final ClassUnderTestConstructor<Location> eol = () -> new Location(itemID, itemName, x, y, z);
+  private final ClassUnderTestConstructor<Location> live = () -> new Location(itemID, itemName, x + 1, y, z);
 
   @Test
   public void testBasic() throws Exception {
-
-    runBasicTests(eol, new CtorVariants<Location>() {
-
-      @Override
-      public Location[] getVariants() {
-        return new Location[] {
-            new Location(itemID + 1, itemName, x, y, z), new Location(itemID, itemName + "x", x, y, z), new Location(itemID, itemName, x + 1, y, z),
-            new Location(itemID, itemName, x, y + 1, z), new Location(itemID, itemName, x, y, z + 1)
-        };
-      }
-
+    runBasicTests(eol, () -> new Location[]{
+        new Location(itemID + 1, itemName, x, y, z), new Location(itemID, itemName + "x", x, y, z), new Location(itemID,
+                                                                                                                 itemName,
+                                                                                                                 x + 1,
+                                                                                                                 y, z),
+        new Location(itemID, itemName, x, y + 1, z), new Location(itemID, itemName, x, y, z + 1)
     }, AccountAccessMask.createMask(AccountAccessMask.ACCESS_LOCATIONS));
   }
 
   @Test
   public void testGetLifeline() throws Exception {
-
-    runGetLifelineTest(eol, live, new ModelRetriever<Location>() {
-
-      @Override
-      public Location getModel(
-                               SynchronizedEveAccount account,
-                               long time) {
-        return Location.get(account, time, itemID);
-      }
-
-    });
+    runGetLifelineTest(eol, live, (account, time) -> Location.get(account, time, itemID));
   }
 
   @Test
@@ -77,7 +46,7 @@ public class LocationTest extends AbstractModelTester<Location> {
     // - max results limitation
     // - continuation ID
     Location existing;
-    Map<Long, Location> itemCheck = new HashMap<Long, Location>();
+    Map<Long, Location> itemCheck = new HashMap<>();
 
     existing = new Location(itemID, itemName, x, y, z);
     existing.setup(testAccount, 7777L);
