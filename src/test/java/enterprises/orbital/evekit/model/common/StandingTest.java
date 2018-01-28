@@ -15,7 +15,7 @@ public class StandingTest extends AbstractModelTester<Standing> {
 
   private final String standingEntity = "test standing entity";
   private final int fromID = TestBase.getRandomInt(100000000);
-  private final double standing = TestBase.getRandomDouble(100000000);
+  private final float standing = TestBase.getRandomFloat(10);
 
   private final ClassUnderTestConstructor<Standing> eol = () -> new Standing(standingEntity, fromID, standing);
 

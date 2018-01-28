@@ -9,8 +9,8 @@ import org.junit.Test;
 
 public class ResearchAgentTest extends AbstractModelTester<ResearchAgent> {
   private final int agentID = TestBase.getRandomInt(100000000);
-  private final double pointsPerDay = TestBase.getRandomDouble(10000);
-  private final double remainderPoints = TestBase.getRandomDouble(10000);
+  private final float pointsPerDay = TestBase.getRandomFloat(10000);
+  private final float remainderPoints = TestBase.getRandomFloat(10000);
   private final long researchStartDate = TestBase.getRandomInt(100000000);
   private final int skillTypeID = TestBase.getRandomInt(100000000);
 

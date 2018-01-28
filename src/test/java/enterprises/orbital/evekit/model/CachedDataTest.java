@@ -415,7 +415,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
       CachedData next = new ResearchAgent(
-          TestBase.getRandomInt(), TestBase.getRandomDouble(1000), TestBase.getRandomDouble(1000), TestBase.getRandomLong(),
+          TestBase.getRandomInt(), TestBase.getRandomFloat(1000), TestBase.getRandomFloat(1000), TestBase.getRandomLong(),
           TestBase.getRandomInt());
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
@@ -561,7 +561,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
       CachedData next = new ContractItem(
-          TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomInt(),
+          TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt(),
           TestBase.getRandomBoolean(), TestBase.getRandomBoolean());
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
@@ -575,7 +575,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
       CachedData next = new Contract(
-          TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomLong(),
+          TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt(),
           TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomText(50), TestBase.getRandomText(50), TestBase.getRandomText(50),
           TestBase.getRandomBoolean(), TestBase.getRandomText(50), TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomLong(),
           TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomBigDecimal(100000000), TestBase.getRandomBigDecimal(100000000),
@@ -592,7 +592,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
       CachedData next = new ContractBid(
-          TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomBigDecimal(100000000));
+          TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomBigDecimal(100000000));
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
@@ -620,12 +620,12 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
       CachedData next = new IndustryJob(
-          TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomText(50), TestBase.getRandomLong(), TestBase.getRandomInt(),
-          TestBase.getRandomText(50), TestBase.getRandomLong(), TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomInt(),
-          TestBase.getRandomText(50), TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomInt(), TestBase.getRandomBigDecimal(100000000),
-          TestBase.getRandomLong(), TestBase.getRandomInt(), TestBase.getRandomDouble(100000000), TestBase.getRandomInt(), TestBase.getRandomText(50),
-          TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomLong(),
-          TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomInt());
+          TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomLong(),
+          TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomInt(),
+          TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomInt(), TestBase.getRandomBigDecimal(100000000),
+          TestBase.getRandomInt(), (float) TestBase.getRandomDouble(1), TestBase.getRandomInt(), TestBase.getRandomText(50),
+          TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomLong(),
+          TestBase.getRandomLong(), TestBase.getRandomInt(), TestBase.getRandomInt());
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
@@ -747,7 +747,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     count = TestBase.getRandomInt(1000) + 200;
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
-      CachedData next = new Standing(TestBase.getRandomText(30), TestBase.getRandomInt(), TestBase.getRandomDouble(10));
+      CachedData next = new Standing(TestBase.getRandomText(30), TestBase.getRandomInt(), TestBase.getRandomFloat(10));
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }

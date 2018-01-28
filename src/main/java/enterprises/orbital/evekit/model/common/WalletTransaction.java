@@ -52,7 +52,6 @@ import java.util.logging.Logger;
         name = "WalletTransaction.getRangeDesc",
         query = "SELECT c FROM WalletTransaction c where c.owner = :owner and c.date >= :mindate and c.date <= :maxdate and c.lifeStart <= :point and c.lifeEnd > :point order by c.date desc"),
 })
-// 1 hour cache time - API caches for 30 minutes
 public class WalletTransaction extends CachedData {
   private static final Logger log = Logger.getLogger(WalletTransaction.class.getName());
   private static final byte[] MASK = AccountAccessMask.createMask(AccountAccessMask.ACCESS_WALLET_TRANSACTIONS);

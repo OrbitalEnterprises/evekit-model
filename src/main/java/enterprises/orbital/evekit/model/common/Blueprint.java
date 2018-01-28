@@ -22,8 +22,7 @@ import java.util.logging.Logger;
     indexes = {
         @Index(
             name = "itemIDIndex",
-            columnList = "itemID",
-            unique = false)
+            columnList = "itemID")
     })
 @NamedQueries({
     @NamedQuery(

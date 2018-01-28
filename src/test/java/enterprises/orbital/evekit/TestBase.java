@@ -44,12 +44,12 @@ public class TestBase {
     }
   };
 
-  protected static Random             GEN             = new Random(
+  static Random             GEN             = new Random(
                                                           Long.parseLong(System.getProperty("test.seed", "0")) == 0 ? OrbitalProperties.getCurrentTime()
                                                               : Long.parseLong(System.getProperty("test.seed", "0")));
-  protected static final int          MAX_RANDOM      = 1 << 20;
-  protected static final Set<Long>    UNIQUE_LONGS    = new HashSet<Long>();
-  protected static final Set<Integer> UNIQUE_INTEGERS = new HashSet<Integer>();
+  static final int          MAX_RANDOM      = 1 << 20;
+  static final Set<Long>    UNIQUE_LONGS    = new HashSet<Long>();
+  static final Set<Integer> UNIQUE_INTEGERS = new HashSet<Integer>();
 
   public static void changeSeed(long seed) {
     GEN = new Random(seed);
@@ -86,6 +86,10 @@ public class TestBase {
       next = getRandomLong();
     }
     return next;
+  }
+
+  public static float getRandomFloat(float max) {
+    return GEN.nextFloat() * max;
   }
 
   public static double getRandomDouble(double max) {

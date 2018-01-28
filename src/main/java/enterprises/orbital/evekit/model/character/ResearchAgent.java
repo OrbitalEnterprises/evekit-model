@@ -25,8 +25,7 @@ import java.util.logging.Logger;
     indexes = {
         @Index(
             name = "agentIDIndex",
-            columnList = "agentID",
-            unique = false),
+            columnList = "agentID"),
     })
 @NamedQueries({
     @NamedQuery(
@@ -41,8 +40,8 @@ public class ResearchAgent extends CachedData {
   private static final Logger log = Logger.getLogger(ResearchAgent.class.getName());
   private static final byte[] MASK = AccountAccessMask.createMask(AccountAccessMask.ACCESS_RESEARCH);
   private int agentID;
-  private double pointsPerDay;
-  private double remainderPoints;
+  private float pointsPerDay;
+  private float remainderPoints;
   private long researchStartDate = -1;
   private int skillTypeID;
   @Transient
@@ -57,7 +56,7 @@ public class ResearchAgent extends CachedData {
   @SuppressWarnings("unused")
   protected ResearchAgent() {}
 
-  public ResearchAgent(int agentID, double pointsPerDay, double remainderPoints, long researchStartDate,
+  public ResearchAgent(int agentID, float pointsPerDay, float remainderPoints, long researchStartDate,
                        int skillTypeID) {
     super();
     this.agentID = agentID;
@@ -100,11 +99,11 @@ public class ResearchAgent extends CachedData {
     return agentID;
   }
 
-  public double getPointsPerDay() {
+  public float getPointsPerDay() {
     return pointsPerDay;
   }
 
-  public double getRemainderPoints() {
+  public float getRemainderPoints() {
     return remainderPoints;
   }
 
@@ -195,8 +194,8 @@ public class ResearchAgent extends CachedData {
                                         AttributeSelector.addLifelineSelector(qs, "c", at);
                                         // Constrain attributes
                                         AttributeSelector.addIntSelector(qs, "c", "agentID", agentID);
-                                        AttributeSelector.addDoubleSelector(qs, "c", "pointsPerDay", pointsPerDay);
-                                        AttributeSelector.addDoubleSelector(qs, "c", "remainderPoints", remainderPoints);
+                                        AttributeSelector.addFloatSelector(qs, "c", "pointsPerDay", pointsPerDay);
+                                        AttributeSelector.addFloatSelector(qs, "c", "remainderPoints", remainderPoints);
                                         AttributeSelector.addLongSelector(qs, "c", "researchStartDate", researchStartDate);
                                         AttributeSelector.addIntSelector(qs, "c", "skillTypeID", skillTypeID);
                                         // Set CID constraint and ordering

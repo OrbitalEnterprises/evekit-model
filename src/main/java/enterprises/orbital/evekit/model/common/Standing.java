@@ -44,12 +44,12 @@ public class Standing extends CachedData {
   private static final int DEFAULT_MAX_RESULTS = 1000;
   private String standingEntity;
   private int fromID;
-  private double standing;
+  private float standing;
 
   @SuppressWarnings("unused")
   protected Standing() {}
 
-  public Standing(String standingEntity, int fromID, double standing) {
+  public Standing(String standingEntity, int fromID, float standing) {
     super();
     this.standingEntity = standingEntity;
     this.fromID = fromID;
@@ -92,7 +92,7 @@ public class Standing extends CachedData {
     return fromID;
   }
 
-  public double getStanding() {
+  public float getStanding() {
     return standing;
   }
 
@@ -277,7 +277,7 @@ public class Standing extends CachedData {
                                         AttributeSelector.addStringSelector(qs, "c", "standingEntity", standingEntity,
                                                                             p);
                                         AttributeSelector.addIntSelector(qs, "c", "fromID", fromID);
-                                        AttributeSelector.addDoubleSelector(qs, "c", "standing", standing);
+                                        AttributeSelector.addFloatSelector(qs, "c", "standing", standing);
                                         // Set CID constraint and ordering
                                         setCIDOrdering(qs, contid, reverse);
                                         // Return result

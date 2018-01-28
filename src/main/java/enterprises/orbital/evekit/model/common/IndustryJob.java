@@ -1,28 +1,9 @@
 package enterprises.orbital.evekit.model.common;
 
-import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Index;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.NoResultException;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-import javax.persistence.TypedQuery;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import enterprises.orbital.base.OrbitalProperties;
 import enterprises.orbital.base.PersistentProperty;
-import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
@@ -31,22 +12,28 @@ import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.persistence.*;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 @Entity
 @Table(
     name = "evekit_data_industry_job",
     indexes = {
         @Index(
             name = "jobIDIndex",
-            columnList = "jobID",
-            unique = false),
+            columnList = "jobID"),
         @Index(
             name = "startDateIndex",
-            columnList = "startDate",
-            unique = false),
+            columnList = "startDate"),
         @Index(
             name = "completedDateIndex",
-            columnList = "completedDate",
-            unique = false),
+            columnList = "completedDate"),
     })
 @NamedQueries({
     @NamedQuery(
@@ -58,46 +45,36 @@ import io.swagger.annotations.ApiModelProperty;
     @NamedQuery(
         name = "IndustryJob.getByStartDateBackward",
         query = "SELECT c FROM IndustryJob c where c.owner = :owner and c.startDate < :contid and c.lifeStart <= :point and c.lifeEnd > :point order by c.startDate desc"),
-    @NamedQuery(
-        name = "IndustryJob.getIncomplete",
-        query = "SELECT c FROM IndustryJob c where c.owner = :owner and c.completedDate = -1 and c.startDate > :contid and c.lifeStart <= :point and c.lifeEnd > :point order by c.startDate asc"),
 })
 // 1 hour cache time - API caches for 15 minutes
 public class IndustryJob extends CachedData {
-  private static final Logger log                 = Logger.getLogger(IndustryJob.class.getName());
-  private static final byte[] MASK                = AccountAccessMask.createMask(AccountAccessMask.ACCESS_INDUSTRY_JOBS);
-  private static final int    DEFAULT_MAX_RESULTS = 1000;
-  private long                jobID;
-  private long                installerID;
-  private String              installerName;
-  private long                facilityID;
-  private int                 solarSystemID;
-  private String              solarSystemName;
-  private long                stationID;
-  private int                 activityID;
-  private long                blueprintID;
-  private int                 blueprintTypeID;
-  private String              blueprintTypeName;
-  private long                blueprintLocationID;
-  private long                outputLocationID;
-  private int                 runs;
+  private static final Logger log = Logger.getLogger(IndustryJob.class.getName());
+  private static final byte[] MASK = AccountAccessMask.createMask(AccountAccessMask.ACCESS_INDUSTRY_JOBS);
+  private int jobID;
+  private int installerID;
+  private long facilityID;
+  private long stationID;
+  private int activityID;
+  private long blueprintID;
+  private int blueprintTypeID;
+  private long blueprintLocationID;
+  private long outputLocationID;
+  private int runs;
   @Column(
       precision = 19,
       scale = 2)
-  private BigDecimal          cost;
-  private long                teamID;
-  private int                 licensedRuns;
-  private double              probability;
-  private int                 productTypeID;
-  private String              productTypeName;
-  private int                 status;
-  private int                 timeInSeconds;
-  private long                startDate           = -1;
-  private long                endDate             = -1;
-  private long                pauseDate           = -1;
-  private long                completedDate       = -1;
-  private long                completedCharacterID;
-  private int                 successfulRuns;
+  private BigDecimal cost;
+  private int licensedRuns;
+  private float probability;
+  private int productTypeID;
+  private String status;
+  private int timeInSeconds;
+  private long startDate = -1;
+  private long endDate = -1;
+  private long pauseDate = -1;
+  private long completedDate = -1;
+  private int completedCharacterID;
+  private int successfulRuns;
   @Transient
   @ApiModelProperty(
       value = "startDate Date")
@@ -105,7 +82,7 @@ public class IndustryJob extends CachedData {
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
       pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-  private Date                startDateDate;
+  private Date startDateDate;
   @Transient
   @ApiModelProperty(
       value = "endDate Date")
@@ -113,7 +90,7 @@ public class IndustryJob extends CachedData {
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
       pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-  private Date                endDateDate;
+  private Date endDateDate;
   @Transient
   @ApiModelProperty(
       value = "pauseDate Date")
@@ -121,7 +98,7 @@ public class IndustryJob extends CachedData {
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
       pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-  private Date                pauseDateDate;
+  private Date pauseDateDate;
   @Transient
   @ApiModelProperty(
       value = "completedDate Date")
@@ -129,36 +106,32 @@ public class IndustryJob extends CachedData {
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
       pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-  private Date                completedDateDate;
+  private Date completedDateDate;
 
   @SuppressWarnings("unused")
   protected IndustryJob() {}
 
-  public IndustryJob(long jobID, long installerID, String installerName, long facilityID, int solarSystemID, String solarSystemName, long stationID,
-                     int activityID, long blueprintID, int blueprintTypeID, String blueprintTypeName, long blueprintLocationID, long outputLocationID, int runs,
-                     BigDecimal cost, long teamID, int licensedRuns, double probability, int productTypeID, String productTypeName, int status,
-                     int timeInSeconds, long startDate, long endDate, long pauseDate, long completedDate, long completedCharacterID, int successfulRuns) {
+  public IndustryJob(int jobID, int installerID, long facilityID, long stationID,
+                     int activityID, long blueprintID, int blueprintTypeID, long blueprintLocationID,
+                     long outputLocationID, int runs,
+                     BigDecimal cost, int licensedRuns, float probability, int productTypeID, String status,
+                     int timeInSeconds, long startDate, long endDate, long pauseDate, long completedDate,
+                     int completedCharacterID, int successfulRuns) {
     super();
     this.jobID = jobID;
     this.installerID = installerID;
-    this.installerName = installerName;
     this.facilityID = facilityID;
-    this.solarSystemID = solarSystemID;
-    this.solarSystemName = solarSystemName;
     this.stationID = stationID;
     this.activityID = activityID;
     this.blueprintID = blueprintID;
     this.blueprintTypeID = blueprintTypeID;
-    this.blueprintTypeName = blueprintTypeName;
     this.blueprintLocationID = blueprintLocationID;
     this.outputLocationID = outputLocationID;
     this.runs = runs;
     this.cost = cost;
-    this.teamID = teamID;
     this.licensedRuns = licensedRuns;
     this.probability = probability;
     this.productTypeID = productTypeID;
-    this.productTypeName = productTypeName;
     this.status = status;
     this.timeInSeconds = timeInSeconds;
     this.startDate = startDate;
@@ -172,6 +145,7 @@ public class IndustryJob extends CachedData {
   /**
    * Update transient date values for readability.
    */
+  @SuppressWarnings("Duplicates")
   @Override
   public void prepareTransient() {
     fixDates();
@@ -186,16 +160,15 @@ public class IndustryJob extends CachedData {
    */
   @Override
   public boolean equivalent(
-                            CachedData sup) {
+      CachedData sup) {
     if (!(sup instanceof IndustryJob)) return false;
     IndustryJob other = (IndustryJob) sup;
-    return jobID == other.jobID && installerID == other.installerID && nullSafeObjectCompare(installerName, other.installerName)
-        && facilityID == other.facilityID && solarSystemID == other.solarSystemID && nullSafeObjectCompare(solarSystemName, other.solarSystemName)
-        && stationID == other.stationID && activityID == other.activityID && blueprintID == other.blueprintID && blueprintTypeID == other.blueprintTypeID
-        && nullSafeObjectCompare(blueprintTypeName, other.blueprintTypeName) && blueprintLocationID == other.blueprintLocationID
-        && outputLocationID == other.outputLocationID && runs == other.runs && nullSafeObjectCompare(cost, other.cost) && teamID == other.teamID
+    return jobID == other.jobID && installerID == other.installerID && facilityID == other.facilityID
+        && stationID == other.stationID && activityID == other.activityID && blueprintID == other.blueprintID
+        && blueprintTypeID == other.blueprintTypeID && blueprintLocationID == other.blueprintLocationID
+        && outputLocationID == other.outputLocationID && runs == other.runs && nullSafeObjectCompare(cost, other.cost)
         && licensedRuns == other.licensedRuns && probability == other.probability && productTypeID == other.productTypeID
-        && nullSafeObjectCompare(productTypeName, other.productTypeName) && status == other.status && timeInSeconds == other.timeInSeconds
+        && nullSafeObjectCompare(status, other.status) && timeInSeconds == other.timeInSeconds
         && startDate == other.startDate && endDate == other.endDate && pauseDate == other.pauseDate && completedDate == other.completedDate
         && completedCharacterID == other.completedCharacterID && successfulRuns == other.successfulRuns;
   }
@@ -208,28 +181,16 @@ public class IndustryJob extends CachedData {
     return MASK;
   }
 
-  public long getJobID() {
+  public int getJobID() {
     return jobID;
   }
 
-  public long getInstallerID() {
+  public int getInstallerID() {
     return installerID;
-  }
-
-  public String getInstallerName() {
-    return installerName;
   }
 
   public long getFacilityID() {
     return facilityID;
-  }
-
-  public int getSolarSystemID() {
-    return solarSystemID;
-  }
-
-  public String getSolarSystemName() {
-    return solarSystemName;
   }
 
   public long getStationID() {
@@ -248,10 +209,6 @@ public class IndustryJob extends CachedData {
     return blueprintTypeID;
   }
 
-  public String getBlueprintTypeName() {
-    return blueprintTypeName;
-  }
-
   public long getBlueprintLocationID() {
     return blueprintLocationID;
   }
@@ -268,10 +225,6 @@ public class IndustryJob extends CachedData {
     return cost;
   }
 
-  public long getTeamID() {
-    return teamID;
-  }
-
   public int getLicensedRuns() {
     return licensedRuns;
   }
@@ -284,11 +237,7 @@ public class IndustryJob extends CachedData {
     return productTypeID;
   }
 
-  public String getProductTypeName() {
-    return productTypeName;
-  }
-
-  public int getStatus() {
+  public String getStatus() {
     return status;
   }
 
@@ -312,7 +261,7 @@ public class IndustryJob extends CachedData {
     return completedDate;
   }
 
-  public long getCompletedCharacterID() {
+  public int getCompletedCharacterID() {
     return completedCharacterID;
   }
 
@@ -321,350 +270,198 @@ public class IndustryJob extends CachedData {
   }
 
   @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + activityID;
-    result = prime * result + (int) (blueprintID ^ (blueprintID >>> 32));
-    result = prime * result + (int) (blueprintLocationID ^ (blueprintLocationID >>> 32));
-    result = prime * result + blueprintTypeID;
-    result = prime * result + ((blueprintTypeName == null) ? 0 : blueprintTypeName.hashCode());
-    result = prime * result + (int) (completedCharacterID ^ (completedCharacterID >>> 32));
-    result = prime * result + (int) (completedDate ^ (completedDate >>> 32));
-    result = prime * result + ((cost == null) ? 0 : cost.hashCode());
-    result = prime * result + (int) (endDate ^ (endDate >>> 32));
-    result = prime * result + (int) (facilityID ^ (facilityID >>> 32));
-    result = prime * result + (int) (installerID ^ (installerID >>> 32));
-    result = prime * result + ((installerName == null) ? 0 : installerName.hashCode());
-    result = prime * result + (int) (jobID ^ (jobID >>> 32));
-    result = prime * result + licensedRuns;
-    result = prime * result + (int) (outputLocationID ^ (outputLocationID >>> 32));
-    result = prime * result + (int) (pauseDate ^ (pauseDate >>> 32));
-    long temp;
-    temp = Double.doubleToLongBits(probability);
-    result = prime * result + (int) (temp ^ (temp >>> 32));
-    result = prime * result + productTypeID;
-    result = prime * result + ((productTypeName == null) ? 0 : productTypeName.hashCode());
-    result = prime * result + runs;
-    result = prime * result + solarSystemID;
-    result = prime * result + ((solarSystemName == null) ? 0 : solarSystemName.hashCode());
-    result = prime * result + (int) (startDate ^ (startDate >>> 32));
-    result = prime * result + (int) (stationID ^ (stationID >>> 32));
-    result = prime * result + status;
-    result = prime * result + successfulRuns;
-    result = prime * result + (int) (teamID ^ (teamID >>> 32));
-    result = prime * result + timeInSeconds;
-    return result;
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    IndustryJob that = (IndustryJob) o;
+    return jobID == that.jobID &&
+        installerID == that.installerID &&
+        facilityID == that.facilityID &&
+        stationID == that.stationID &&
+        activityID == that.activityID &&
+        blueprintID == that.blueprintID &&
+        blueprintTypeID == that.blueprintTypeID &&
+        blueprintLocationID == that.blueprintLocationID &&
+        outputLocationID == that.outputLocationID &&
+        runs == that.runs &&
+        licensedRuns == that.licensedRuns &&
+        Double.compare(that.probability, probability) == 0 &&
+        productTypeID == that.productTypeID &&
+        timeInSeconds == that.timeInSeconds &&
+        startDate == that.startDate &&
+        endDate == that.endDate &&
+        pauseDate == that.pauseDate &&
+        completedDate == that.completedDate &&
+        completedCharacterID == that.completedCharacterID &&
+        successfulRuns == that.successfulRuns &&
+        Objects.equals(cost, that.cost) &&
+        Objects.equals(status, that.status) &&
+        Objects.equals(startDateDate, that.startDateDate) &&
+        Objects.equals(endDateDate, that.endDateDate) &&
+        Objects.equals(pauseDateDate, that.pauseDateDate) &&
+        Objects.equals(completedDateDate, that.completedDateDate);
   }
 
   @Override
-  public boolean equals(
-                        Object obj) {
-    if (this == obj) return true;
-    if (!super.equals(obj)) return false;
-    if (getClass() != obj.getClass()) return false;
-    IndustryJob other = (IndustryJob) obj;
-    if (activityID != other.activityID) return false;
-    if (blueprintID != other.blueprintID) return false;
-    if (blueprintLocationID != other.blueprintLocationID) return false;
-    if (blueprintTypeID != other.blueprintTypeID) return false;
-    if (blueprintTypeName == null) {
-      if (other.blueprintTypeName != null) return false;
-    } else if (!blueprintTypeName.equals(other.blueprintTypeName)) return false;
-    if (completedCharacterID != other.completedCharacterID) return false;
-    if (completedDate != other.completedDate) return false;
-    if (cost == null) {
-      if (other.cost != null) return false;
-    } else if (!cost.equals(other.cost)) return false;
-    if (endDate != other.endDate) return false;
-    if (facilityID != other.facilityID) return false;
-    if (installerID != other.installerID) return false;
-    if (installerName == null) {
-      if (other.installerName != null) return false;
-    } else if (!installerName.equals(other.installerName)) return false;
-    if (jobID != other.jobID) return false;
-    if (licensedRuns != other.licensedRuns) return false;
-    if (outputLocationID != other.outputLocationID) return false;
-    if (pauseDate != other.pauseDate) return false;
-    if (Double.doubleToLongBits(probability) != Double.doubleToLongBits(other.probability)) return false;
-    if (productTypeID != other.productTypeID) return false;
-    if (productTypeName == null) {
-      if (other.productTypeName != null) return false;
-    } else if (!productTypeName.equals(other.productTypeName)) return false;
-    if (runs != other.runs) return false;
-    if (solarSystemID != other.solarSystemID) return false;
-    if (solarSystemName == null) {
-      if (other.solarSystemName != null) return false;
-    } else if (!solarSystemName.equals(other.solarSystemName)) return false;
-    if (startDate != other.startDate) return false;
-    if (stationID != other.stationID) return false;
-    if (status != other.status) return false;
-    if (successfulRuns != other.successfulRuns) return false;
-    if (teamID != other.teamID) return false;
-    if (timeInSeconds != other.timeInSeconds) return false;
-    return true;
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), jobID, installerID, facilityID, stationID, activityID, blueprintID,
+                        blueprintTypeID, blueprintLocationID, outputLocationID, runs, cost, licensedRuns, probability,
+                        productTypeID, status, timeInSeconds, startDate, endDate, pauseDate, completedDate,
+                        completedCharacterID, successfulRuns, startDateDate, endDateDate, pauseDateDate,
+                        completedDateDate);
   }
 
   @Override
   public String toString() {
-    return "IndustryJob [jobID=" + jobID + ", installerID=" + installerID + ", installerName=" + installerName + ", facilityID=" + facilityID
-        + ", solarSystemID=" + solarSystemID + ", solarSystemName=" + solarSystemName + ", stationID=" + stationID + ", activityID=" + activityID
-        + ", blueprintID=" + blueprintID + ", blueprintTypeID=" + blueprintTypeID + ", blueprintTypeName=" + blueprintTypeName + ", blueprintLocationID="
-        + blueprintLocationID + ", outputLocationID=" + outputLocationID + ", runs=" + runs + ", cost=" + cost + ", teamID=" + teamID + ", licensedRuns="
-        + licensedRuns + ", probability=" + probability + ", productTypeID=" + productTypeID + ", productTypeName=" + productTypeName + ", status=" + status
-        + ", timeInSeconds=" + timeInSeconds + ", startDate=" + startDate + ", endDate=" + endDate + ", pauseDate=" + pauseDate + ", completedDate="
-        + completedDate + ", completedCharacterID=" + completedCharacterID + ", successfulRuns=" + successfulRuns + ", owner=" + owner + ", lifeStart="
-        + lifeStart + ", lifeEnd=" + lifeEnd + "]";
+    return "IndustryJob{" +
+        "jobID=" + jobID +
+        ", installerID=" + installerID +
+        ", facilityID=" + facilityID +
+        ", stationID=" + stationID +
+        ", activityID=" + activityID +
+        ", blueprintID=" + blueprintID +
+        ", blueprintTypeID=" + blueprintTypeID +
+        ", blueprintLocationID=" + blueprintLocationID +
+        ", outputLocationID=" + outputLocationID +
+        ", runs=" + runs +
+        ", cost=" + cost +
+        ", licensedRuns=" + licensedRuns +
+        ", probability=" + probability +
+        ", productTypeID=" + productTypeID +
+        ", status='" + status + '\'' +
+        ", timeInSeconds=" + timeInSeconds +
+        ", startDate=" + startDate +
+        ", endDate=" + endDate +
+        ", pauseDate=" + pauseDate +
+        ", completedDate=" + completedDate +
+        ", completedCharacterID=" + completedCharacterID +
+        ", successfulRuns=" + successfulRuns +
+        ", startDateDate=" + startDateDate +
+        ", endDateDate=" + endDateDate +
+        ", pauseDateDate=" + pauseDateDate +
+        ", completedDateDate=" + completedDateDate +
+        '}';
   }
 
   /**
    * Retrieve industry job with the given job ID live at the given time, or null if no such job exists.
-   * 
-   * @param owner
-   *          industry job owner
-   * @param time
-   *          time at which job must be live
-   * @param jobID
-   *          job ID
+   *
+   * @param owner industry job owner
+   * @param time  time at which job must be live
+   * @param jobID job ID
    * @return industry job with the given ID live at the given time, or null
    */
   public static IndustryJob get(
-                                final SynchronizedEveAccount owner,
-                                final long time,
-                                final long jobID) {
+      final SynchronizedEveAccount owner,
+      final long time,
+      final int jobID) throws IOException {
     try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<IndustryJob>() {
-        @Override
-        public IndustryJob run() throws Exception {
-          TypedQuery<IndustryJob> getter = EveKitUserAccountProvider.getFactory().getEntityManager().createNamedQuery("IndustryJob.getByJobID",
-                                                                                                                      IndustryJob.class);
-          getter.setParameter("owner", owner);
-          getter.setParameter("jobid", jobID);
-          getter.setParameter("point", time);
-          try {
-            return getter.getSingleResult();
-          } catch (NoResultException e) {
-            return null;
-          }
-        }
-      });
+      return EveKitUserAccountProvider.getFactory()
+                                      .runTransaction(() -> {
+                                        TypedQuery<IndustryJob> getter = EveKitUserAccountProvider.getFactory()
+                                                                                                  .getEntityManager()
+                                                                                                  .createNamedQuery(
+                                                                                                      "IndustryJob.getByJobID",
+                                                                                                      IndustryJob.class);
+                                        getter.setParameter("owner", owner);
+                                        getter.setParameter("jobid", jobID);
+                                        getter.setParameter("point", time);
+                                        try {
+                                          return getter.getSingleResult();
+                                        } catch (NoResultException e) {
+                                          return null;
+                                        }
+                                      });
     } catch (Exception e) {
+      if (e.getCause() instanceof IOException) throw (IOException) e.getCause();
       log.log(Level.SEVERE, "query error", e);
+      throw new IOException(e.getCause());
     }
-    return null;
-  }
-
-  /**
-   * List industry jobs live at the given time with startDate greater than "contid".
-   * 
-   * @param owner
-   *          industry jobs owner
-   * @param time
-   *          time at which industry jobs must be live
-   * @param maxresults
-   *          maximum number of industry jobs to retrieve
-   * @param contid
-   *          startDate (exclusive) from which to start returning industry jobs
-   * @return list of industry jobs live at the given time with startDate greater than "contid"
-   */
-  public static List<IndustryJob> getAllForward(
-                                                final SynchronizedEveAccount owner,
-                                                final long time,
-                                                int maxresults,
-                                                final long contid) {
-    final int maxr = OrbitalProperties.getNonzeroLimited(maxresults, (int) PersistentProperty
-        .getLongPropertyWithFallback(OrbitalProperties.getPropertyName(IndustryJob.class, "maxresults"), DEFAULT_MAX_RESULTS));
-    try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<IndustryJob>>() {
-        @Override
-        public List<IndustryJob> run() throws Exception {
-          TypedQuery<IndustryJob> getter = EveKitUserAccountProvider.getFactory().getEntityManager().createNamedQuery("IndustryJob.getByStartDateForward",
-                                                                                                                      IndustryJob.class);
-          getter.setParameter("owner", owner);
-          getter.setParameter("contid", contid);
-          getter.setParameter("point", time);
-          getter.setMaxResults(maxr);
-          return getter.getResultList();
-        }
-      });
-    } catch (Exception e) {
-      log.log(Level.SEVERE, "query error", e);
-    }
-    return Collections.emptyList();
-  }
-
-  /**
-   * List industry jobs live at the given time with startDate less than "contid".
-   * 
-   * @param owner
-   *          industry jobs owner
-   * @param time
-   *          time at which industry jobs must be live
-   * @param maxresults
-   *          maximum number of industry jobs to retrieve
-   * @param contid
-   *          startDate (exclusive) before which industry jobs will be returned
-   * @return list of industry jobs live at the given time with startDate less than "contid"
-   */
-  public static List<IndustryJob> getAllBackward(
-                                                 final SynchronizedEveAccount owner,
-                                                 final long time,
-                                                 int maxresults,
-                                                 final long contid) {
-    final int maxr = OrbitalProperties.getNonzeroLimited(maxresults, (int) PersistentProperty
-        .getLongPropertyWithFallback(OrbitalProperties.getPropertyName(IndustryJob.class, "maxresults"), DEFAULT_MAX_RESULTS));
-    try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<IndustryJob>>() {
-        @Override
-        public List<IndustryJob> run() throws Exception {
-          TypedQuery<IndustryJob> getter = EveKitUserAccountProvider.getFactory().getEntityManager().createNamedQuery("IndustryJob.getByStartDateBackward",
-                                                                                                                      IndustryJob.class);
-          getter.setParameter("owner", owner);
-          getter.setParameter("contid", contid);
-          getter.setParameter("point", time);
-          getter.setMaxResults(maxr);
-          return getter.getResultList();
-        }
-      });
-    } catch (Exception e) {
-      log.log(Level.SEVERE, "query error", e);
-    }
-    return Collections.emptyList();
-  }
-
-  /**
-   * List incomplete industry jobs live at the given time with startDate greater than "contid".
-   * 
-   * @param owner
-   *          industry jobs owner
-   * @param time
-   *          time at which industry jobs must be live
-   * @param maxresults
-   *          maximum number of industry jobs to retrieve
-   * @param contid
-   *          startDate (exclusive) after which industry jobs will be returned
-   * @return list of incomplete industry jobs live at the given time with startDate greater than "contid"
-   */
-  public static List<IndustryJob> getAllIncomplete(
-                                                   final SynchronizedEveAccount owner,
-                                                   final long time,
-                                                   int maxresults,
-                                                   final long contid) {
-    final int maxr = OrbitalProperties.getNonzeroLimited(maxresults, (int) PersistentProperty
-        .getLongPropertyWithFallback(OrbitalProperties.getPropertyName(IndustryJob.class, "maxresults"), DEFAULT_MAX_RESULTS));
-    try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<IndustryJob>>() {
-        @Override
-        public List<IndustryJob> run() throws Exception {
-          TypedQuery<IndustryJob> getter = EveKitUserAccountProvider.getFactory().getEntityManager().createNamedQuery("IndustryJob.getIncomplete",
-                                                                                                                      IndustryJob.class);
-          getter.setParameter("owner", owner);
-          getter.setParameter("contid", contid);
-          getter.setParameter("point", time);
-          getter.setMaxResults(maxr);
-          return getter.getResultList();
-        }
-      });
-    } catch (Exception e) {
-      log.log(Level.SEVERE, "query error", e);
-    }
-    return Collections.emptyList();
   }
 
   public static List<IndustryJob> accessQuery(
-                                              final SynchronizedEveAccount owner,
-                                              final long contid,
-                                              final int maxresults,
-                                              final boolean reverse,
-                                              final AttributeSelector at,
-                                              final AttributeSelector jobID,
-                                              final AttributeSelector installerID,
-                                              final AttributeSelector installerName,
-                                              final AttributeSelector facilityID,
-                                              final AttributeSelector solarSystemID,
-                                              final AttributeSelector solarSystemName,
-                                              final AttributeSelector stationID,
-                                              final AttributeSelector activityID,
-                                              final AttributeSelector blueprintID,
-                                              final AttributeSelector blueprintTypeID,
-                                              final AttributeSelector blueprintTypeName,
-                                              final AttributeSelector blueprintLocationID,
-                                              final AttributeSelector outputLocationID,
-                                              final AttributeSelector runs,
-                                              final AttributeSelector cost,
-                                              final AttributeSelector teamID,
-                                              final AttributeSelector licensedRuns,
-                                              final AttributeSelector probability,
-                                              final AttributeSelector productTypeID,
-                                              final AttributeSelector productTypeName,
-                                              final AttributeSelector status,
-                                              final AttributeSelector timeInSeconds,
-                                              final AttributeSelector startDate,
-                                              final AttributeSelector endDate,
-                                              final AttributeSelector pauseDate,
-                                              final AttributeSelector completedDate,
-                                              final AttributeSelector completedCharacterID,
-                                              final AttributeSelector successfulRuns) {
+      final SynchronizedEveAccount owner,
+      final long contid,
+      final int maxresults,
+      final boolean reverse,
+      final AttributeSelector at,
+      final AttributeSelector jobID,
+      final AttributeSelector installerID,
+      final AttributeSelector facilityID,
+      final AttributeSelector stationID,
+      final AttributeSelector activityID,
+      final AttributeSelector blueprintID,
+      final AttributeSelector blueprintTypeID,
+      final AttributeSelector blueprintLocationID,
+      final AttributeSelector outputLocationID,
+      final AttributeSelector runs,
+      final AttributeSelector cost,
+      final AttributeSelector licensedRuns,
+      final AttributeSelector probability,
+      final AttributeSelector productTypeID,
+      final AttributeSelector status,
+      final AttributeSelector timeInSeconds,
+      final AttributeSelector startDate,
+      final AttributeSelector endDate,
+      final AttributeSelector pauseDate,
+      final AttributeSelector completedDate,
+      final AttributeSelector completedCharacterID,
+      final AttributeSelector successfulRuns) throws IOException {
     try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<IndustryJob>>() {
-        @Override
-        public List<IndustryJob> run() throws Exception {
-          StringBuilder qs = new StringBuilder();
-          qs.append("SELECT c FROM IndustryJob c WHERE ");
-          // Constrain to specified owner
-          qs.append("c.owner = :owner");
-          // Constrain lifeline
-          AttributeSelector.addLifelineSelector(qs, "c", at);
-          // Constrain attributes
-          AttributeParameters p = new AttributeParameters("att");
-          AttributeSelector.addLongSelector(qs, "c", "jobID", jobID);
-          AttributeSelector.addLongSelector(qs, "c", "installerID", installerID);
-          AttributeSelector.addStringSelector(qs, "c", "installerName", installerName, p);
-          AttributeSelector.addLongSelector(qs, "c", "facilityID", facilityID);
-          AttributeSelector.addIntSelector(qs, "c", "solarSystemID", solarSystemID);
-          AttributeSelector.addStringSelector(qs, "c", "solarSystemName", solarSystemName, p);
-          AttributeSelector.addLongSelector(qs, "c", "stationID", stationID);
-          AttributeSelector.addIntSelector(qs, "c", "activityID", activityID);
-          AttributeSelector.addLongSelector(qs, "c", "blueprintID", blueprintID);
-          AttributeSelector.addIntSelector(qs, "c", "blueprintTypeID", blueprintTypeID);
-          AttributeSelector.addStringSelector(qs, "c", "blueprintTypeName", blueprintTypeName, p);
-          AttributeSelector.addLongSelector(qs, "c", "blueprintLocationID", blueprintLocationID);
-          AttributeSelector.addLongSelector(qs, "c", "outputLocationID", outputLocationID);
-          AttributeSelector.addIntSelector(qs, "c", "runs", runs);
-          AttributeSelector.addDoubleSelector(qs, "c", "cost", cost);
-          AttributeSelector.addLongSelector(qs, "c", "teamID", teamID);
-          AttributeSelector.addIntSelector(qs, "c", "licensedRuns", licensedRuns);
-          AttributeSelector.addDoubleSelector(qs, "c", "probability", probability);
-          AttributeSelector.addIntSelector(qs, "c", "productTypeID", productTypeID);
-          AttributeSelector.addStringSelector(qs, "c", "productTypeName", productTypeName, p);
-          AttributeSelector.addIntSelector(qs, "c", "status", status);
-          AttributeSelector.addIntSelector(qs, "c", "timeInSeconds", timeInSeconds);
-          AttributeSelector.addLongSelector(qs, "c", "startDate", startDate);
-          AttributeSelector.addLongSelector(qs, "c", "endDate", endDate);
-          AttributeSelector.addLongSelector(qs, "c", "pauseDate", pauseDate);
-          AttributeSelector.addLongSelector(qs, "c", "completedDate", completedDate);
-          AttributeSelector.addLongSelector(qs, "c", "completedCharacterID", completedCharacterID);
-          AttributeSelector.addIntSelector(qs, "c", "successfulRuns", successfulRuns);
-          // Set CID constraint and ordering
-          if (reverse) {
-            qs.append(" and c.cid < ").append(contid);
-            qs.append(" order by cid desc");
-          } else {
-            qs.append(" and c.cid > ").append(contid);
-            qs.append(" order by cid asc");
-          }
-          // Return result
-          TypedQuery<IndustryJob> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), IndustryJob.class);
-          query.setParameter("owner", owner);
-          p.fillParams(query);
-          query.setMaxResults(maxresults);
-          return query.getResultList();
-        }
-      });
+      return EveKitUserAccountProvider.getFactory()
+                                      .runTransaction(() -> {
+                                        StringBuilder qs = new StringBuilder();
+                                        qs.append("SELECT c FROM IndustryJob c WHERE ");
+                                        // Constrain to specified owner
+                                        qs.append("c.owner = :owner");
+                                        // Constrain lifeline
+                                        AttributeSelector.addLifelineSelector(qs, "c", at);
+                                        // Constrain attributes
+                                        AttributeParameters p = new AttributeParameters("att");
+                                        AttributeSelector.addIntSelector(qs, "c", "jobID", jobID);
+                                        AttributeSelector.addIntSelector(qs, "c", "installerID", installerID);
+                                        AttributeSelector.addLongSelector(qs, "c", "facilityID", facilityID);
+                                        AttributeSelector.addLongSelector(qs, "c", "stationID", stationID);
+                                        AttributeSelector.addIntSelector(qs, "c", "activityID", activityID);
+                                        AttributeSelector.addLongSelector(qs, "c", "blueprintID", blueprintID);
+                                        AttributeSelector.addIntSelector(qs, "c", "blueprintTypeID", blueprintTypeID);
+                                        AttributeSelector.addLongSelector(qs, "c", "blueprintLocationID",
+                                                                          blueprintLocationID);
+                                        AttributeSelector.addLongSelector(qs, "c", "outputLocationID",
+                                                                          outputLocationID);
+                                        AttributeSelector.addIntSelector(qs, "c", "runs", runs);
+                                        AttributeSelector.addDoubleSelector(qs, "c", "cost", cost);
+                                        AttributeSelector.addIntSelector(qs, "c", "licensedRuns", licensedRuns);
+                                        AttributeSelector.addDoubleSelector(qs, "c", "probability", probability);
+                                        AttributeSelector.addIntSelector(qs, "c", "productTypeID", productTypeID);
+                                        AttributeSelector.addIntSelector(qs, "c", "status", status);
+                                        AttributeSelector.addIntSelector(qs, "c", "timeInSeconds", timeInSeconds);
+                                        AttributeSelector.addLongSelector(qs, "c", "startDate", startDate);
+                                        AttributeSelector.addLongSelector(qs, "c", "endDate", endDate);
+                                        AttributeSelector.addLongSelector(qs, "c", "pauseDate", pauseDate);
+                                        AttributeSelector.addLongSelector(qs, "c", "completedDate", completedDate);
+                                        AttributeSelector.addIntSelector(qs, "c", "completedCharacterID",
+                                                                          completedCharacterID);
+                                        AttributeSelector.addIntSelector(qs, "c", "successfulRuns", successfulRuns);
+                                        // Set CID constraint and ordering
+                                        setCIDOrdering(qs, contid, reverse);
+                                        // Return result
+                                        TypedQuery<IndustryJob> query = EveKitUserAccountProvider.getFactory()
+                                                                                                 .getEntityManager()
+                                                                                                 .createQuery(
+                                                                                                     qs.toString(),
+                                                                                                     IndustryJob.class);
+                                        query.setParameter("owner", owner);
+                                        p.fillParams(query);
+                                        query.setMaxResults(maxresults);
+                                        return query.getResultList();
+                                      });
     } catch (Exception e) {
+      if (e.getCause() instanceof IOException) throw (IOException) e.getCause();
       log.log(Level.SEVERE, "query error", e);
+      throw new IOException(e.getCause());
     }
-    return Collections.emptyList();
   }
 
 }

@@ -1,43 +1,24 @@
 package enterprises.orbital.evekit.model;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Index;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.NoResultException;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-import javax.persistence.TypedQuery;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
-import enterprises.orbital.evekit.account.EveKitRefDataProvider;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+
+import javax.persistence.*;
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * Common abstract class for all model objects. Every synchronized object extends this class. Synchronized objects are immutable with one minor exception. The
@@ -483,4 +464,150 @@ public abstract class CachedData {
     }
     log.info("Removed " + removeCount + " entities from " + toRemove);
   }
+
+  //////////////////////////////////
+  // Convenience functions for various types of batch processing
+  //////////////////////////////////
+
+  // Interface which forwards a call to the class specific query function to retrieve data
+  public interface QueryCaller<A extends CachedData> {
+    List<A> query(long contid, AttributeSelector at) throws IOException;
+  }
+
+  // Interface to receive any query exceptions generated from a stream constructed below.
+  public interface StreamExceptionHandler {
+    void handle(IOException e);
+  }
+
+  public static class SimpleStreamExceptionHandler implements StreamExceptionHandler {
+    private List<IOException> caught = new ArrayList<>();
+
+    public void handle(IOException e) {
+      caught.add(e);
+    }
+
+    public boolean hit() {
+      return !caught.isEmpty();
+    }
+
+    public List<IOException> get() {
+      return caught;
+    }
+
+    public IOException getFirst() {
+      return caught.get(0);
+    }
+  }
+
+  /**
+   * Return a stream over a collection of CachedData order by CachedData ID.
+   * If a query error occurs during the stream, then the stream will be truncated at
+   * the last CachedData item successfully returned by the stream.  Since the stream
+   * interface does not provide an easy way to propagate such exceptions, this method
+   * accepts an optional exception handler interface which will be invoked when a
+   * query exception occurs.
+   *
+   * @param time the time at which objects in the stream should be live.
+   * @param query a QueryCaller which will generate batches of elements as needed
+   * @param ascending true if the stream should will be in ascending order, false otherwise.
+   * @param exceptionHandler an optional interface which will be called if a query error occurs during the stream.
+   * @param <A> subclass of CachedData which will be returned by the stream
+   * @return a stream of CachedData objects.
+   */
+  public static <A extends CachedData> Stream<A> stream(long time, QueryCaller<A> query, boolean ascending, StreamExceptionHandler exceptionHandler) {
+    return StreamSupport.stream(new Spliterator<A>() {
+      final AttributeSelector ats = AttributeSelector.values(time);
+      boolean done = false;
+      long contid = ascending ? -1 : Long.MAX_VALUE;
+      Deque<A> nextBatch = new ArrayDeque<>();
+
+      private void attemptFill() {
+        if (done || !nextBatch.isEmpty()) return;
+        try {
+          nextBatch.addAll(query.query(contid, ats));
+          if (nextBatch.isEmpty()) {
+            done = true;
+          } else {
+            contid = nextBatch.getLast()
+                              .getCid();
+          }
+        } catch (IOException e) {
+          log.log(Level.FINE, "Query error, truncating stream at last element", e);
+          nextBatch.clear();
+          done = true;
+          if (exceptionHandler != null) exceptionHandler.handle(e);
+        }
+      }
+
+      private boolean hasNext() {
+        attemptFill();
+        return !done;
+      }
+
+      @Override
+      public boolean tryAdvance(Consumer<? super A> action) {
+        if (hasNext()) {
+          action.accept(nextBatch.remove());
+          return true;
+        }
+        return false;
+      }
+
+      @Override
+      public void forEachRemaining(Consumer<? super A> action) {
+        while (hasNext())
+          action.accept(nextBatch.remove());
+      }
+
+      @Override
+      public Spliterator<A> trySplit() {
+        return null;
+      }
+
+      @Override
+      public long estimateSize() {
+        return Long.MAX_VALUE;
+      }
+
+      @Override
+      public long getExactSizeIfKnown() {
+        return -1;
+      }
+
+      @Override
+      public int characteristics() {
+        return Spliterator.SORTED | Spliterator.IMMUTABLE | Spliterator.NONNULL;
+      }
+
+      @Override
+      public boolean hasCharacteristics(int characteristics) {
+        return ((Spliterator.SORTED | Spliterator.IMMUTABLE | Spliterator.NONNULL) & characteristics) > 0;
+      }
+
+      @Override
+      public Comparator<? super A> getComparator() {
+        return ascending ? Comparator.comparingLong(CachedData::getCid) : Comparator.comparingLong(CachedData::getCid).reversed();
+      }
+    }, false);
+  }
+
+
+  /**
+   * Retrieve all data items of the specified type live at the specified time.
+   * This function continues to accumulate results until a query returns no results.
+   *
+   * @param time  the "live" time for the retrieval.
+   * @param query an interface which performs the type appropriate query call.
+   * @param <A>   class of the object which will be returned.
+   * @return the list of results.
+   * @throws IOException on any DB error.
+   */
+  @SuppressWarnings("Duplicates")
+  public static <A extends CachedData> List<A> retrieveAll(long time, QueryCaller<A> query) throws IOException {
+    SimpleStreamExceptionHandler capture = new SimpleStreamExceptionHandler();
+    List<A> collected = stream(time, query, true, capture).collect(Collectors.toList());
+    if (capture.hit()) throw capture.getFirst();
+    return collected;
+  }
+
 }
