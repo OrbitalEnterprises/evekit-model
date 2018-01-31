@@ -489,6 +489,7 @@ public class MarketOrder extends CachedData {
                                                                                                      qs.toString(),
                                                                                                      MarketOrder.class);
                                         query.setParameter("owner", owner);
+                                        p.fillParams(query);
                                         query.setMaxResults(maxresults);
                                         return query.getResultList();
                                       });
