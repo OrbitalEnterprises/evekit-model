@@ -69,7 +69,7 @@ public class FuelTest extends AbstractModelTester<Fuel> {
     // Should exclude:
     // - fuel for a different account
     // - fuel not live at the given time
-    // - fuel for a different itemID
+    // - fuel for a different containerID
     Fuel existing;
     Map<Integer, Fuel> listCheck = new HashMap<Integer, Fuel>();
 
