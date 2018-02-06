@@ -35,7 +35,6 @@ import java.util.logging.Logger;
         name = "ResearchAgent.getAll",
         query = "SELECT c FROM ResearchAgent c where c.owner = :owner and c.agentID > :contid and c.lifeStart <= :point and c.lifeEnd > :point order by c.agentID asc"),
 })
-// 1 hour cache time - API caches for 15 minutes
 public class ResearchAgent extends CachedData {
   private static final Logger log = Logger.getLogger(ResearchAgent.class.getName());
   private static final byte[] MASK = AccountAccessMask.createMask(AccountAccessMask.ACCESS_RESEARCH);

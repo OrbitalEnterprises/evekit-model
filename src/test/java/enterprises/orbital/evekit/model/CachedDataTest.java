@@ -1,7 +1,6 @@
 package enterprises.orbital.evekit.model;
 
 import enterprises.orbital.base.OrbitalProperties;
-import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.TestBase;
 import enterprises.orbital.evekit.account.*;
 import enterprises.orbital.evekit.model.character.*;
@@ -248,6 +247,42 @@ public class CachedDataTest extends AbstractAccountBasedTest {
       CachedData.update(next);
     }
     System.out.println("Created CharacterSheets");
+    count = 1;
+    for (int i = 0; i < count; i++) {
+      int sel = TestBase.getRandomInt(5);
+      CachedData next = new CharacterLocation(
+          TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomLong());
+      for (int j = 0; j < sel; j++) {
+        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
+      }
+      next.setup(testAccount, testTime);
+      CachedData.update(next);
+    }
+    System.out.println("Created CharacterLocations");
+    count = 1;
+    for (int i = 0; i < count; i++) {
+      int sel = TestBase.getRandomInt(5);
+      CachedData next = new CharacterShip(
+          TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomText(50));
+      for (int j = 0; j < sel; j++) {
+        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
+      }
+      next.setup(testAccount, testTime);
+      CachedData.update(next);
+    }
+    System.out.println("Created CharacterShips");
+    count = 1;
+    for (int i = 0; i < count; i++) {
+      int sel = TestBase.getRandomInt(5);
+      CachedData next = new CharacterOnline(
+          TestBase.getRandomBoolean(), TestBase.getRandomLong(),  TestBase.getRandomLong(), TestBase.getRandomInt());
+      for (int j = 0; j < sel; j++) {
+        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
+      }
+      next.setup(testAccount, testTime);
+      CachedData.update(next);
+    }
+    System.out.println("Created CharacterOnlines");
     count = 1;
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
@@ -1108,14 +1143,11 @@ public class CachedDataTest extends AbstractAccountBasedTest {
 
     // Pre-clean count
     final SynchronizedEveAccount verify = testAccount;
-    long remaining = EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<Long>() {
-      @Override
-      public Long run() throws Exception {
-        TypedQuery<Long> query = EveKitUserAccountProvider.getFactory().getEntityManager()
-            .createQuery("SELECT count(c) FROM CachedData c where c.owner = :owner", Long.class);
-        query.setParameter("owner", verify);
-        return query.getSingleResult();
-      }
+    long remaining = EveKitUserAccountProvider.getFactory().runTransaction(() -> {
+      TypedQuery<Long> query = EveKitUserAccountProvider.getFactory().getEntityManager()
+          .createQuery("SELECT count(c) FROM CachedData c where c.owner = :owner", Long.class);
+      query.setParameter("owner", verify);
+      return query.getSingleResult();
     });
     System.out.println("Number of elements before delete: " + remaining);
 
@@ -1130,6 +1162,9 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     CachedData.cleanup(testAccount, "CharacterNotification");
     CachedData.cleanup(testAccount, "CharacterNotificationBody");
     CachedData.cleanup(testAccount, "CharacterRole");
+    CachedData.cleanup(testAccount, "CharacterLocation");
+    CachedData.cleanup(testAccount, "CharacterShip");
+    CachedData.cleanup(testAccount, "CharacterOnline");
     CachedData.cleanup(testAccount, "CharacterSheet");
     CachedData.cleanup(testAccount, "CharacterSheetBalance");
     CachedData.cleanup(testAccount, "CharacterSheetClone");
@@ -1194,14 +1229,11 @@ public class CachedDataTest extends AbstractAccountBasedTest {
 
     // Verify all elements have been deleted.
     System.out.println("Verifying delete worked properly.");
-    remaining = EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<Long>() {
-      @Override
-      public Long run() throws Exception {
-        TypedQuery<Long> query = EveKitUserAccountProvider.getFactory().getEntityManager()
-            .createQuery("SELECT count(c) FROM CachedData c where c.owner = :owner", Long.class);
-        query.setParameter("owner", verify);
-        return query.getSingleResult();
-      }
+    remaining = EveKitUserAccountProvider.getFactory().runTransaction(() -> {
+      TypedQuery<Long> query = EveKitUserAccountProvider.getFactory().getEntityManager()
+          .createQuery("SELECT count(c) FROM CachedData c where c.owner = :owner", Long.class);
+      query.setParameter("owner", verify);
+      return query.getSingleResult();
     });
     Assert.assertEquals(0, remaining);
   }
