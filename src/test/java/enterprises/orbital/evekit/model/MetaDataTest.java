@@ -32,7 +32,7 @@ public class MetaDataTest {
   public void tearDown() {}
 
   protected CachedData makeTestTarget() throws IOException {
-    CachedData targetData = new Kill(1111L, 2222L, 1234, 5678L);
+    CachedData targetData = new Kill(1111, 2222L, 1234, 5678, 4444);
     targetData.setup(testAccount, 1235L);
     return CachedData.update(targetData);
   }

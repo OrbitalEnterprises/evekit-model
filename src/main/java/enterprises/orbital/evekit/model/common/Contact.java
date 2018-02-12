@@ -97,7 +97,7 @@ public class Contact extends CachedData {
     if (!(sup instanceof Contact)) return false;
     Contact other = (Contact) sup;
     return nullSafeObjectCompare(list, other.list) && contactID == other.contactID && nullSafeObjectCompare(contactName, other.contactName)
-        && standing == other.standing && contactTypeID == other.contactTypeID && inWatchlist == other.inWatchlist && labelMask == other.labelMask;
+        && Double.compare(standing, other.standing) == 0 && contactTypeID == other.contactTypeID && inWatchlist == other.inWatchlist && labelMask == other.labelMask;
   }
 
   /**

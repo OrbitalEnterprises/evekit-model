@@ -70,7 +70,10 @@ public class Location extends CachedData {
     if (!(sup instanceof Location)) return false;
     Location other = (Location) sup;
     return itemID == other.itemID && nullSafeObjectCompare(itemName,
-                                                           other.itemName) && x == other.x && y == other.y && z == other.z;
+                                                           other.itemName)
+        && Double.compare(x, other.x) == 0
+        && Double.compare(y, other.y) == 0
+        && Double.compare(z, other.z) == 0;
   }
 
   /**

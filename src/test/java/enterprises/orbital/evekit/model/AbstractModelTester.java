@@ -50,7 +50,7 @@ public class AbstractModelTester<A extends CachedData> extends AbstractAccountBa
     Assert.assertTrue(cut.equivalent(equiv));
     for (A next : vars.getVariants()) {
       next.setup(testAccount, time);
-      Assert.assertFalse(cut.equivalent(next));
+      Assert.assertFalse(cut.toString() + " vs " + next.toString(), cut.equivalent(next));
     }
 
     Assert.assertEquals(testAccount, cut.getOwner());

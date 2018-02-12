@@ -82,7 +82,9 @@ public class ResearchAgent extends CachedData {
       CachedData sup) {
     if (!(sup instanceof ResearchAgent)) return false;
     ResearchAgent other = (ResearchAgent) sup;
-    return agentID == other.agentID && pointsPerDay == other.pointsPerDay && remainderPoints == other.remainderPoints
+    return agentID == other.agentID &&
+        Float.compare(pointsPerDay, other.pointsPerDay) == 0 &&
+        Float.compare(remainderPoints, other.remainderPoints) == 0
         && researchStartDate == other.researchStartDate && skillTypeID == other.skillTypeID;
   }
 

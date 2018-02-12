@@ -2,8 +2,8 @@ package enterprises.orbital.evekit.model.common;
 
 import enterprises.orbital.evekit.TestBase;
 import enterprises.orbital.evekit.account.AccountAccessMask;
-import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AbstractModelTester;
+import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 import org.junit.Assert;
 import org.junit.Test;
@@ -14,112 +14,67 @@ import java.util.Map;
 
 public class KillAttackerTest extends AbstractModelTester<KillAttacker> {
 
-  final long                                    killID                  = TestBase.getRandomInt(100000000);
-  final long                                    attackerCharacterID     = TestBase.getRandomInt(100000000);
-  final long                                    allianceID              = TestBase.getRandomInt(100000000);
-  final String                                  allianceName            = "test alliance name";
-  final String                                  attackerCharacterName   = "test attacker character name";
-  final long                                    attackerCorporationID   = TestBase.getRandomInt(100000000);
-  final String                                  attackerCorporationName = "teset attacker corporation name";
-  final int                                     damageDone              = TestBase.getRandomInt(100000000);
-  final int                                     factionID               = TestBase.getRandomInt(100000000);
-  final String                                  factionName             = "test faction name";
-  final double                                  securityStatus          = TestBase.getRandomDouble(100000000);
-  final int                                     shipTypeID              = TestBase.getRandomInt(100000000);
-  final int                                     weaponTypeID            = TestBase.getRandomInt(100000000);
-  final boolean                                 finalBlow               = true;
+  private final int killID = TestBase.getRandomInt(100000000);
+  private final int attackerCharacterID = TestBase.getRandomInt(100000000);
+  private final int allianceID = TestBase.getRandomInt(100000000);
+  private final int attackerCorporationID = TestBase.getRandomInt(100000000);
+  private final int damageDone = TestBase.getRandomInt(100000000);
+  private final int factionID = TestBase.getRandomInt(100000000);
+  private final float securityStatus = TestBase.getRandomFloat(10);
+  private final int shipTypeID = TestBase.getRandomInt(100000000);
+  private final int weaponTypeID = TestBase.getRandomInt(100000000);
+  private final boolean finalBlow = TestBase.getRandomBoolean();
 
-  final ClassUnderTestConstructor<KillAttacker> eol                     = new ClassUnderTestConstructor<KillAttacker>() {
+  final ClassUnderTestConstructor<KillAttacker> eol = () -> new KillAttacker(
+      killID, attackerCharacterID, allianceID,
+      attackerCorporationID, damageDone, factionID,
+      securityStatus, shipTypeID, weaponTypeID, finalBlow);
 
-                                                                          @Override
-                                                                          public KillAttacker getCUT() {
-                                                                            return new KillAttacker(
-                                                                                killID, attackerCharacterID, allianceID, allianceName, attackerCharacterName,
-                                                                                attackerCorporationID, attackerCorporationName, damageDone, factionID,
-                                                                                factionName, securityStatus, shipTypeID, weaponTypeID, finalBlow);
-                                                                          }
-
-                                                                        };
-
-  final ClassUnderTestConstructor<KillAttacker> live                    = new ClassUnderTestConstructor<KillAttacker>() {
-                                                                          @Override
-                                                                          public KillAttacker getCUT() {
-                                                                            return new KillAttacker(
-                                                                                killID, attackerCharacterID, allianceID + 1, allianceName,
-                                                                                attackerCharacterName, attackerCorporationID, attackerCorporationName,
-                                                                                damageDone, factionID, factionName, securityStatus, shipTypeID, weaponTypeID,
-                                                                                finalBlow);
-                                                                          }
-
-                                                                        };
+  final ClassUnderTestConstructor<KillAttacker> live = () -> new KillAttacker(
+      killID, attackerCharacterID, allianceID + 1,
+      attackerCorporationID,
+      damageDone, factionID, securityStatus, shipTypeID, weaponTypeID,
+      finalBlow);
 
   @Test
   public void testBasic() throws Exception {
-
-    runBasicTests(eol, new CtorVariants<KillAttacker>() {
-
-      @Override
-      public KillAttacker[] getVariants() {
-        return new KillAttacker[] {
-            new KillAttacker(
-                killID + 1, attackerCharacterID, allianceID, allianceName, attackerCharacterName, attackerCorporationID, attackerCorporationName, damageDone,
-                factionID, factionName, securityStatus, shipTypeID, weaponTypeID, finalBlow),
-            new KillAttacker(
-                killID, attackerCharacterID + 1, allianceID, allianceName, attackerCharacterName, attackerCorporationID, attackerCorporationName, damageDone,
-                factionID, factionName, securityStatus, shipTypeID, weaponTypeID, finalBlow),
-            new KillAttacker(
-                killID, attackerCharacterID, allianceID + 1, allianceName, attackerCharacterName, attackerCorporationID, attackerCorporationName, damageDone,
-                factionID, factionName, securityStatus, shipTypeID, weaponTypeID, finalBlow),
-            new KillAttacker(
-                killID, attackerCharacterID, allianceID, allianceName + " 1", attackerCharacterName, attackerCorporationID, attackerCorporationName, damageDone,
-                factionID, factionName, securityStatus, shipTypeID, weaponTypeID, finalBlow),
-            new KillAttacker(
-                killID, attackerCharacterID, allianceID, allianceName, attackerCharacterName + " 1", attackerCorporationID, attackerCorporationName, damageDone,
-                factionID, factionName, securityStatus, shipTypeID, weaponTypeID, finalBlow),
-            new KillAttacker(
-                killID, attackerCharacterID, allianceID, allianceName, attackerCharacterName, attackerCorporationID + 1, attackerCorporationName, damageDone,
-                factionID, factionName, securityStatus, shipTypeID, weaponTypeID, finalBlow),
-            new KillAttacker(
-                killID, attackerCharacterID, allianceID, allianceName, attackerCharacterName, attackerCorporationID, attackerCorporationName + " 1", damageDone,
-                factionID, factionName, securityStatus, shipTypeID, weaponTypeID, finalBlow),
-            new KillAttacker(
-                killID, attackerCharacterID, allianceID, allianceName, attackerCharacterName, attackerCorporationID, attackerCorporationName, damageDone + 1,
-                factionID, factionName, securityStatus, shipTypeID, weaponTypeID, finalBlow),
-            new KillAttacker(
-                killID, attackerCharacterID, allianceID, allianceName, attackerCharacterName, attackerCorporationID, attackerCorporationName, damageDone,
-                factionID + 1, factionName, securityStatus, shipTypeID, weaponTypeID, finalBlow),
-            new KillAttacker(
-                killID, attackerCharacterID, allianceID, allianceName, attackerCharacterName, attackerCorporationID, attackerCorporationName, damageDone,
-                factionID, factionName + " 1", securityStatus, shipTypeID, weaponTypeID, finalBlow),
-            new KillAttacker(
-                killID, attackerCharacterID, allianceID, allianceName, attackerCharacterName, attackerCorporationID, attackerCorporationName, damageDone,
-                factionID, factionName, securityStatus + 1, shipTypeID, weaponTypeID, finalBlow),
-            new KillAttacker(
-                killID, attackerCharacterID, allianceID, allianceName, attackerCharacterName, attackerCorporationID, attackerCorporationName, damageDone,
-                factionID, factionName, securityStatus, shipTypeID + 1, weaponTypeID, finalBlow),
-            new KillAttacker(
-                killID, attackerCharacterID, allianceID, allianceName, attackerCharacterName, attackerCorporationID, attackerCorporationName, damageDone,
-                factionID, factionName, securityStatus, shipTypeID, weaponTypeID + 1, finalBlow),
-            new KillAttacker(
-                killID, attackerCharacterID, allianceID, allianceName, attackerCharacterName, attackerCorporationID, attackerCorporationName, damageDone,
-                factionID, factionName, securityStatus, shipTypeID, weaponTypeID, !finalBlow)
-        };
-      }
-
+    runBasicTests(eol, () -> new KillAttacker[]{
+        new KillAttacker(
+            killID + 1, attackerCharacterID, allianceID, attackerCorporationID, damageDone,
+            factionID, securityStatus, shipTypeID, weaponTypeID, finalBlow),
+        new KillAttacker(
+            killID, attackerCharacterID + 1, allianceID, attackerCorporationID, damageDone,
+            factionID, securityStatus, shipTypeID, weaponTypeID, finalBlow),
+        new KillAttacker(
+            killID, attackerCharacterID, allianceID + 1, attackerCorporationID, damageDone,
+            factionID, securityStatus, shipTypeID, weaponTypeID, finalBlow),
+        new KillAttacker(
+            killID, attackerCharacterID, allianceID, attackerCorporationID + 1, damageDone,
+            factionID, securityStatus, shipTypeID, weaponTypeID, finalBlow),
+        new KillAttacker(
+            killID, attackerCharacterID, allianceID, attackerCorporationID, damageDone + 1,
+            factionID, securityStatus, shipTypeID, weaponTypeID, finalBlow),
+        new KillAttacker(
+            killID, attackerCharacterID, allianceID, attackerCorporationID, damageDone,
+            factionID + 1, securityStatus, shipTypeID, weaponTypeID, finalBlow),
+        new KillAttacker(
+            killID, attackerCharacterID, allianceID, attackerCorporationID, damageDone,
+            factionID, securityStatus + 1.0F, shipTypeID, weaponTypeID, finalBlow),
+        new KillAttacker(
+            killID, attackerCharacterID, allianceID, attackerCorporationID, damageDone,
+            factionID, securityStatus, shipTypeID + 1, weaponTypeID, finalBlow),
+        new KillAttacker(
+            killID, attackerCharacterID, allianceID, attackerCorporationID, damageDone,
+            factionID, securityStatus, shipTypeID, weaponTypeID + 1, finalBlow),
+        new KillAttacker(
+            killID, attackerCharacterID, allianceID, attackerCorporationID, damageDone,
+            factionID, securityStatus, shipTypeID, weaponTypeID, !finalBlow)
     }, AccountAccessMask.createMask(AccountAccessMask.ACCESS_KILL_LOG));
   }
 
   @Test
   public void testGetLifeline() throws Exception {
-
-    runGetLifelineTest(eol, live, new ModelRetriever<KillAttacker>() {
-
-      @Override
-      public KillAttacker getModel(SynchronizedEveAccount account, long time) {
-        return KillAttacker.get(account, time, killID, attackerCharacterID);
-      }
-
-    });
+    runGetLifelineTest(eol, live, (account, time) -> KillAttacker.get(account, time, killID, attackerCharacterID));
   }
 
   @Test
@@ -128,92 +83,87 @@ public class KillAttackerTest extends AbstractModelTester<KillAttacker> {
     // - attackers for a different account
     // - attackers not live at the given time
     // - attackers for a different kill ID
-    // Need to test:
-    // - max results limitation
-    // - continuation ID
     KillAttacker existing;
-    Map<Long, KillAttacker> listCheck = new HashMap<Long, KillAttacker>();
+    Map<Integer, KillAttacker> listCheck = new HashMap<>();
 
     existing = new KillAttacker(
-        killID, attackerCharacterID, allianceID, allianceName, attackerCharacterName, attackerCorporationID, attackerCorporationName, damageDone, factionID,
-        factionName, securityStatus, shipTypeID, weaponTypeID, finalBlow);
+        killID, attackerCharacterID, allianceID, attackerCorporationID, damageDone, factionID,
+        securityStatus, shipTypeID, weaponTypeID, finalBlow);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(attackerCharacterID, existing);
 
     existing = new KillAttacker(
-        killID, attackerCharacterID + 10, allianceID, allianceName, attackerCharacterName, attackerCorporationID, attackerCorporationName, damageDone,
-        factionID, factionName, securityStatus, shipTypeID, weaponTypeID, finalBlow);
+        killID, attackerCharacterID + 10, allianceID, attackerCorporationID, damageDone,
+        factionID, securityStatus, shipTypeID, weaponTypeID, finalBlow);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(attackerCharacterID + 10, existing);
 
     existing = new KillAttacker(
-        killID, attackerCharacterID + 20, allianceID, allianceName, attackerCharacterName, attackerCorporationID, attackerCorporationName, damageDone,
-        factionID, factionName, securityStatus, shipTypeID, weaponTypeID, finalBlow);
+        killID, attackerCharacterID + 20, allianceID, attackerCorporationID, damageDone,
+        factionID, securityStatus, shipTypeID, weaponTypeID, finalBlow);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(attackerCharacterID + 20, existing);
 
     existing = new KillAttacker(
-        killID, attackerCharacterID + 30, allianceID, allianceName, attackerCharacterName, attackerCorporationID, attackerCorporationName, damageDone,
-        factionID, factionName, securityStatus, shipTypeID, weaponTypeID, finalBlow);
+        killID, attackerCharacterID + 30, allianceID, attackerCorporationID, damageDone,
+        factionID, securityStatus, shipTypeID, weaponTypeID, finalBlow);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(attackerCharacterID + 30, existing);
 
     // Associated with different account
     existing = new KillAttacker(
-        killID, attackerCharacterID, allianceID, allianceName, attackerCharacterName, attackerCorporationID, attackerCorporationName, damageDone, factionID,
-        factionName, securityStatus, shipTypeID, weaponTypeID, finalBlow);
+        killID, attackerCharacterID, allianceID, attackerCorporationID, damageDone, factionID,
+        securityStatus, shipTypeID, weaponTypeID, finalBlow);
     existing.setup(otherAccount, 7777L);
     CachedData.update(existing);
 
     // Associated with a different kill
     existing = new KillAttacker(
-        killID + 1, attackerCharacterID, allianceID, allianceName, attackerCharacterName, attackerCorporationID, attackerCorporationName, damageDone, factionID,
-        factionName, securityStatus, shipTypeID, weaponTypeID, finalBlow);
+        killID + 1, attackerCharacterID, allianceID, attackerCorporationID, damageDone, factionID,
+        securityStatus, shipTypeID, weaponTypeID, finalBlow);
     existing.setup(otherAccount, 7777L);
     CachedData.update(existing);
 
     // Not live at the given time
     existing = new KillAttacker(
-        killID, attackerCharacterID + 5, allianceID, allianceName, attackerCharacterName, attackerCorporationID, attackerCorporationName, damageDone, factionID,
-        factionName, securityStatus, shipTypeID, weaponTypeID, finalBlow);
+        killID, attackerCharacterID + 5, allianceID, attackerCorporationID, damageDone, factionID,
+        securityStatus, shipTypeID, weaponTypeID, finalBlow);
     existing.setup(testAccount, 9999L);
     CachedData.update(existing);
 
     // EOL before the given time
     existing = new KillAttacker(
-        killID, attackerCharacterID + 3, allianceID, allianceName, attackerCharacterName, attackerCorporationID, attackerCorporationName, damageDone, factionID,
-        factionName, securityStatus, shipTypeID, weaponTypeID, finalBlow);
+        killID, attackerCharacterID + 3, allianceID, attackerCorporationID, damageDone, factionID,
+        securityStatus, shipTypeID, weaponTypeID, finalBlow);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
     CachedData.update(existing);
 
     // Verify all contacts are returned
-    List<KillAttacker> result = KillAttacker.getAllKillAttackers(testAccount, 8888L, killID, 10, -1);
+    List<KillAttacker> result = CachedData.retrieveAll(8888L,
+                                                       (contid, at) -> KillAttacker.accessQuery(testAccount, contid,
+                                                                                                1000, false, at,
+                                                                                                AttributeSelector.any(),
+                                                                                                AttributeSelector.any(),
+                                                                                                AttributeSelector.any(),
+                                                                                                AttributeSelector.any(),
+                                                                                                AttributeSelector.any(),
+                                                                                                AttributeSelector.any(),
+                                                                                                AttributeSelector.any(),
+                                                                                                AttributeSelector.any(),
+                                                                                                AttributeSelector.any(),
+                                                                                                AttributeSelector.any()));
     Assert.assertEquals(listCheck.size(), result.size());
     for (KillAttacker next : result) {
-      long attackerCHaracterID = next.getAttackerCharacterID();
+      int attackerCharacterID = next.getAttackerCharacterID();
       Assert.assertEquals(killID, next.getKillID());
-      Assert.assertTrue(listCheck.containsKey(attackerCHaracterID));
-      Assert.assertEquals(listCheck.get(attackerCHaracterID), next);
+      Assert.assertTrue(listCheck.containsKey(attackerCharacterID));
+      Assert.assertEquals(listCheck.get(attackerCharacterID), next);
     }
-
-    // Verify limited set returned
-    long limit = listCheck.get(attackerCharacterID).getCid();
-    result = KillAttacker.getAllKillAttackers(testAccount, 8888L, killID, 2, limit - 1);
-    Assert.assertEquals(2, result.size());
-    Assert.assertEquals(listCheck.get(attackerCharacterID), result.get(0));
-    Assert.assertEquals(listCheck.get(attackerCharacterID + 10), result.get(1));
-
-    // Verify continuation ID returns proper set
-    limit = listCheck.get(attackerCharacterID + 10).getCid();
-    result = KillAttacker.getAllKillAttackers(testAccount, 8888L, killID, 100, limit);
-    Assert.assertEquals(2, result.size());
-    Assert.assertEquals(listCheck.get(attackerCharacterID + 20), result.get(0));
-    Assert.assertEquals(listCheck.get(attackerCharacterID + 30), result.get(1));
 
   }
 

@@ -1,108 +1,73 @@
 package enterprises.orbital.evekit.model.common;
 
-import org.junit.Test;
-
 import enterprises.orbital.evekit.TestBase;
 import enterprises.orbital.evekit.account.AccountAccessMask;
-import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AbstractModelTester;
-import enterprises.orbital.evekit.model.common.KillVictim;
+import org.junit.Test;
 
 public class KillVictimTest extends AbstractModelTester<KillVictim> {
 
-  final long                                  killID              = TestBase.getRandomInt(100000000);
-  final long                                  allianceID          = TestBase.getRandomInt(100000000);
-  final String                                allianceName        = "test alliance name";
-  final long                                  killCharacterID     = TestBase.getRandomInt(100000000);
-  final String                                killCharacterName   = "test kill character name";
-  final long                                  killCorporationID   = TestBase.getRandomInt(100000000);
-  final String                                killCorporationName = "test kill corporation name";
-  final long                                  damageTaken         = TestBase.getRandomInt(100000000);
-  final long                                  factionID           = TestBase.getRandomInt(100000000);
-  final String                                factionName         = "test faction name";
-  final int                                   shipTypeID          = TestBase.getRandomInt(100000000);
+  private final int killID = TestBase.getRandomInt(100000000);
+  private final int allianceID = TestBase.getRandomInt(100000000);
+  private final int killCharacterID = TestBase.getRandomInt(100000000);
+  private final int killCorporationID = TestBase.getRandomInt(100000000);
+  private final int damageTaken = TestBase.getRandomInt(100000000);
+  private final int factionID = TestBase.getRandomInt(100000000);
+  private final int shipTypeID = TestBase.getRandomInt(100000000);
+  private final double x = TestBase.getRandomDouble(100000000);
+  private final double y = TestBase.getRandomDouble(100000000);
+  private final double z = TestBase.getRandomDouble(100000000);
 
-  final ClassUnderTestConstructor<KillVictim> eol                 = new ClassUnderTestConstructor<KillVictim>() {
+  final ClassUnderTestConstructor<KillVictim> eol = () -> new KillVictim(
+      killID, allianceID, killCharacterID,
+      killCorporationID, damageTaken, factionID,
+      shipTypeID, x, y, z);
 
-                                                                    @Override
-                                                                    public KillVictim getCUT() {
-                                                                      return new KillVictim(
-                                                                          killID, allianceID, allianceName, killCharacterID, killCharacterName,
-                                                                          killCorporationID, killCorporationName, damageTaken, factionID, factionName,
-                                                                          shipTypeID);
-                                                                    }
-
-                                                                  };
-
-  final ClassUnderTestConstructor<KillVictim> live                = new ClassUnderTestConstructor<KillVictim>() {
-                                                                    @Override
-                                                                    public KillVictim getCUT() {
-                                                                      return new KillVictim(
-                                                                          killID, allianceID + 1, allianceName, killCharacterID, killCharacterName,
-                                                                          killCorporationID, killCorporationName, damageTaken, factionID, factionName,
-                                                                          shipTypeID);
-                                                                    }
-
-                                                                  };
+  final ClassUnderTestConstructor<KillVictim> live = () -> new KillVictim(
+      killID, allianceID + 1, killCharacterID,
+      killCorporationID, damageTaken, factionID,
+      shipTypeID, x, y, z);
 
   @Test
   public void testBasic() throws Exception {
 
-    runBasicTests(eol, new CtorVariants<KillVictim>() {
-
-      @Override
-      public KillVictim[] getVariants() {
-        return new KillVictim[] {
-            new KillVictim(
-                killID + 1, allianceID, allianceName, killCharacterID, killCharacterName, killCorporationID, killCorporationName, damageTaken, factionID,
-                factionName, shipTypeID),
-            new KillVictim(
-                killID, allianceID + 1, allianceName, killCharacterID, killCharacterName, killCorporationID, killCorporationName, damageTaken, factionID,
-                factionName, shipTypeID),
-            new KillVictim(
-                killID, allianceID, allianceName + " 1", killCharacterID, killCharacterName, killCorporationID, killCorporationName, damageTaken, factionID,
-                factionName, shipTypeID),
-            new KillVictim(
-                killID, allianceID, allianceName, killCharacterID + 1, killCharacterName, killCorporationID, killCorporationName, damageTaken, factionID,
-                factionName, shipTypeID),
-            new KillVictim(
-                killID, allianceID, allianceName, killCharacterID, killCharacterName + " 1", killCorporationID, killCorporationName, damageTaken, factionID,
-                factionName, shipTypeID),
-            new KillVictim(
-                killID, allianceID, allianceName, killCharacterID, killCharacterName, killCorporationID + 1, killCorporationName, damageTaken, factionID,
-                factionName, shipTypeID),
-            new KillVictim(
-                killID, allianceID, allianceName, killCharacterID, killCharacterName, killCorporationID, killCorporationName + " 1", damageTaken, factionID,
-                factionName, shipTypeID),
-            new KillVictim(
-                killID, allianceID, allianceName, killCharacterID, killCharacterName, killCorporationID, killCorporationName, damageTaken + 1, factionID,
-                factionName, shipTypeID),
-            new KillVictim(
-                killID, allianceID, allianceName, killCharacterID, killCharacterName, killCorporationID, killCorporationName, damageTaken, factionID + 1,
-                factionName, shipTypeID),
-            new KillVictim(
-                killID, allianceID, allianceName, killCharacterID, killCharacterName, killCorporationID, killCorporationName, damageTaken, factionID,
-                factionName + " 1", shipTypeID),
-            new KillVictim(
-                killID, allianceID, allianceName, killCharacterID, killCharacterName, killCorporationID, killCorporationName, damageTaken, factionID,
-                factionName, shipTypeID + 1)
-        };
-      }
-
+    runBasicTests(eol, () -> new KillVictim[]{
+        new KillVictim(
+            killID + 1, allianceID, killCharacterID, killCorporationID, damageTaken, factionID,
+            shipTypeID, x, y, z),
+        new KillVictim(
+            killID, allianceID + 1, killCharacterID, killCorporationID, damageTaken, factionID,
+            shipTypeID, x, y, z),
+        new KillVictim(
+            killID, allianceID, killCharacterID + 1, killCorporationID, damageTaken, factionID,
+            shipTypeID, x, y, z),
+        new KillVictim(
+            killID, allianceID, killCharacterID, killCorporationID + 1, damageTaken, factionID,
+            shipTypeID, x, y, z),
+        new KillVictim(
+            killID, allianceID, killCharacterID, killCorporationID, damageTaken + 1, factionID,
+            shipTypeID, x, y, z),
+        new KillVictim(
+            killID, allianceID, killCharacterID, killCorporationID, damageTaken, factionID + 1,
+            shipTypeID, x, y, z),
+        new KillVictim(
+            killID, allianceID, killCharacterID, killCorporationID, damageTaken, factionID,
+            shipTypeID + 1, x, y, z),
+        new KillVictim(
+            killID, allianceID, killCharacterID, killCorporationID, damageTaken, factionID,
+            shipTypeID, x + 1, y, z),
+        new KillVictim(
+            killID, allianceID, killCharacterID, killCorporationID, damageTaken, factionID,
+            shipTypeID, x, y + 1, z),
+        new KillVictim(
+            killID, allianceID, killCharacterID, killCorporationID, damageTaken, factionID,
+            shipTypeID, x, y, z + 1)
     }, AccountAccessMask.createMask(AccountAccessMask.ACCESS_KILL_LOG));
   }
 
   @Test
   public void testGetLifeline() throws Exception {
-
-    runGetLifelineTest(eol, live, new ModelRetriever<KillVictim>() {
-
-      @Override
-      public KillVictim getModel(SynchronizedEveAccount account, long time) {
-        return KillVictim.get(account, time, killID);
-      }
-
-    });
+    runGetLifelineTest(eol, live, (account, time) -> KillVictim.get(account, time, killID));
   }
 
 }

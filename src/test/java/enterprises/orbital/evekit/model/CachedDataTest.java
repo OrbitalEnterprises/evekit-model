@@ -672,7 +672,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     count = TestBase.getRandomInt(2000) + 500;
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
-      CachedData next = new Kill(TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomInt(), TestBase.getRandomLong());
+      CachedData next = new Kill(TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt());
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
@@ -685,9 +685,9 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
       CachedData next = new KillAttacker(
-          TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomText(50), TestBase.getRandomText(50),
-          TestBase.getRandomLong(), TestBase.getRandomText(50), TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomText(50),
-          TestBase.getRandomDouble(10), TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomBoolean());
+          TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt(),
+          TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt(),
+          TestBase.getRandomFloat(10), TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomBoolean());
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
@@ -703,8 +703,8 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
       CachedData next = new KillItem(
-          TestBase.getRandomLong(), TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt(),
-          TestBase.getRandomBoolean(), i, KillItem.TOP_LEVEL);
+          TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomLong(),
+          TestBase.getRandomInt(), i, KillItem.TOP_LEVEL);
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
@@ -721,8 +721,8 @@ public class CachedDataTest extends AbstractAccountBasedTest {
       count = TestBase.getRandomInt(5);
       for (int j = 0; j < count; j++) {
         KillItem child = new KillItem(
-            TestBase.getUniqueRandomLong(), TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt(),
-            TestBase.getRandomBoolean(), j, parent.getSequence());
+            TestBase.getUniqueRandomInteger(), TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomLong(),
+            TestBase.getRandomInt(), j, parent.getSequence());
         killItemParents.add(child);
         currentContained++;
         int sel = TestBase.getRandomInt(5);
@@ -739,9 +739,10 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
       CachedData next = new KillVictim(
-          TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomText(50), TestBase.getRandomLong(), TestBase.getRandomText(50),
-          TestBase.getRandomLong(), TestBase.getRandomText(50), TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomText(50),
-          TestBase.getRandomInt());
+          TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt(),
+          TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt(),
+          TestBase.getRandomInt(), TestBase.getRandomDouble(10000),
+          TestBase.getRandomDouble(10000), TestBase.getRandomDouble(10000));
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }

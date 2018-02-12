@@ -73,7 +73,8 @@ public class Standing extends CachedData {
     if (!(sup instanceof Standing)) return false;
     Standing other = (Standing) sup;
     return nullSafeObjectCompare(standingEntity,
-                                 other.standingEntity) && fromID == other.fromID && standing == other.standing;
+                                 other.standingEntity) && fromID == other.fromID
+        && Float.compare(standing, other.standing) == 0;
   }
 
   /**
