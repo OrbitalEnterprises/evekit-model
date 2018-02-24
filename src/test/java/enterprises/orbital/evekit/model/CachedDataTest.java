@@ -92,7 +92,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     // Now create at least one of every model element attached to this account.
     int count = TestBase.getRandomInt(5) + 1;
     for (int i = 0; i < count; i++) {
-      CachedData next = new Implant(TestBase.getUniqueRandomInteger(), TestBase.getRandomText(20));
+      CachedData next = new Implant(TestBase.getUniqueRandomInteger());
       for (int j = 0; j < 1; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
@@ -102,7 +102,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     System.out.println("Created Implants");
     count = TestBase.getRandomInt(5) + 1;
     for (int i = 0; i < count; i++) {
-      CachedData next = new JumpClone(TestBase.getUniqueRandomInteger(), TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomText(50));
+      CachedData next = new JumpClone(TestBase.getUniqueRandomInteger(), TestBase.getRandomInt(), TestBase.getRandomText(50), TestBase.getRandomText(50));
       for (int j = 0; j < 1; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
@@ -112,7 +112,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     System.out.println("Created Jump Clones");
     count = TestBase.getRandomInt(5) + 1;
     for (int i = 0; i < count; i++) {
-      CachedData next = new JumpCloneImplant(TestBase.getUniqueRandomInteger(), TestBase.getRandomInt(), TestBase.getRandomText(50));
+      CachedData next = new JumpCloneImplant(TestBase.getUniqueRandomInteger(), TestBase.getRandomInt());
       for (int j = 0; j < 1; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
@@ -235,11 +235,10 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
       CachedData next = new CharacterSheet(
-          TestBase.getRandomLong(), TestBase.getRandomText(50), TestBase.getRandomLong(), TestBase.getRandomText(50), TestBase.getRandomText(50),
-          TestBase.getRandomLong(), TestBase.getRandomInt(), TestBase.getRandomText(50), TestBase.getRandomInt(), TestBase.getRandomText(50),
-          TestBase.getRandomText(50), TestBase.getRandomText(50), TestBase.getRandomLong(), TestBase.getRandomText(50), TestBase.getRandomLong(),
-          TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomLong(),
-          TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomLong());
+          TestBase.getRandomLong(), TestBase.getRandomText(50), TestBase.getRandomInt(), TestBase.getRandomInt(),
+          TestBase.getRandomLong(), TestBase.getRandomInt(), TestBase.getRandomInt(),
+          TestBase.getRandomText(50), TestBase.getRandomInt(), TestBase.getRandomInt(),
+          TestBase.getRandomText(50), TestBase.getRandomFloat(10));
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
@@ -259,6 +258,32 @@ public class CachedDataTest extends AbstractAccountBasedTest {
       CachedData.update(next);
     }
     System.out.println("Created CharacterLocations");
+    count = 1;
+    for (int i = 0; i < count; i++) {
+      int sel = TestBase.getRandomInt(5);
+      CachedData next = new CharacterSheetAttributes(
+          TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt(),
+          TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt(),
+          TestBase.getRandomLong(), TestBase.getRandomLong());
+      for (int j = 0; j < sel; j++) {
+        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
+      }
+      next.setup(testAccount, testTime);
+      CachedData.update(next);
+    }
+    System.out.println("Created CharacterSheetAttributes");
+    count = 1;
+    for (int i = 0; i < count; i++) {
+      int sel = TestBase.getRandomInt(5);
+      CachedData next = new CharacterSheetSkillPoints(
+          TestBase.getRandomLong(), TestBase.getRandomInt());
+      for (int j = 0; j < sel; j++) {
+        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
+      }
+      next.setup(testAccount, testTime);
+      CachedData.update(next);
+    }
+    System.out.println("Created CharacterSheetSkillPoints");
     count = 1;
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
@@ -286,17 +311,6 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     count = 1;
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
-      CachedData next = new CharacterSheetBalance(TestBase.getRandomBigDecimal(100000000));
-      for (int j = 0; j < sel; j++) {
-        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
-      }
-      next.setup(testAccount, testTime);
-      CachedData.update(next);
-    }
-    System.out.println("Created CharacterSheetBalance");
-    count = 1;
-    for (int i = 0; i < count; i++) {
-      int sel = TestBase.getRandomInt(5);
       CachedData next = new CharacterSheetJump(TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomLong());
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
@@ -308,7 +322,8 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     count = 1;
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
-      CachedData next = new CharacterSheetClone(TestBase.getRandomLong());
+      CachedData next = new CharacterSheetClone(TestBase.getRandomLong(), TestBase.getRandomLong(),
+                                                TestBase.getRandomText(50), TestBase.getRandomLong());
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
@@ -319,7 +334,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     count = TestBase.getRandomInt(1000) + 200;
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
-      CachedData next = new CharacterSkill(TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomBoolean());
+      CachedData next = new CharacterSkill(TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt());
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
@@ -327,19 +342,6 @@ public class CachedDataTest extends AbstractAccountBasedTest {
       CachedData.update(next);
     }
     System.out.println("Created CharacterSkills");
-    count = 1;
-    for (int i = 0; i < count; i++) {
-      int sel = TestBase.getRandomInt(5);
-      CachedData next = new CharacterSkillInTraining(
-          TestBase.getRandomBoolean(), TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomInt(),
-          TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt());
-      for (int j = 0; j < sel; j++) {
-        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
-      }
-      next.setup(testAccount, testTime);
-      CachedData.update(next);
-    }
-    System.out.println("Created CharacterSkillInTraining");
     count = TestBase.getRandomInt(10) + 5;
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
@@ -464,7 +466,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
       int sel = TestBase.getRandomInt(5);
       CachedData next = new SkillInQueue(
           TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomInt(), i, TestBase.getRandomInt(), TestBase.getRandomLong(),
-          TestBase.getRandomInt());
+          TestBase.getRandomInt(), TestBase.getRandomInt());
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
@@ -1164,6 +1166,8 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     CachedData.cleanup(testAccount, "CharacterNotificationBody");
     CachedData.cleanup(testAccount, "CharacterRole");
     CachedData.cleanup(testAccount, "CharacterLocation");
+    CachedData.cleanup(testAccount, "CharacterSheetAttributes");
+    CachedData.cleanup(testAccount, "CharacterSheetSkillPoints");
     CachedData.cleanup(testAccount, "CharacterShip");
     CachedData.cleanup(testAccount, "CharacterOnline");
     CachedData.cleanup(testAccount, "CharacterSheet");

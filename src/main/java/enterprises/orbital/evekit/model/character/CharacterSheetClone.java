@@ -1,29 +1,22 @@
 package enterprises.orbital.evekit.model.character;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.persistence.Entity;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.NoResultException;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-import javax.persistence.TypedQuery;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
 import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 import io.swagger.annotations.ApiModelProperty;
+
+import javax.persistence.*;
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Entity
 @Table(
@@ -33,13 +26,15 @@ import io.swagger.annotations.ApiModelProperty;
         name = "CharacterSheetClone.get",
         query = "SELECT c FROM CharacterSheetClone c where c.owner = :owner and c.lifeStart <= :point and c.lifeEnd > :point"),
 })
-// 2 hour cache time - API caches for 1 hour
 public class CharacterSheetClone extends CachedData {
-  protected static final Logger log           = Logger.getLogger(CharacterSheetClone.class.getName());
-  private static final byte[]   MASK          = AccountAccessMask.createMask(AccountAccessMask.ACCESS_CHARACTER_SHEET);
-  // Stores just the cloneJumpDate part of the character sheet since this may change
-  // frequently and we want to avoid having to evolve the entire character sheet.
-  private long                  cloneJumpDate = -1;
+  protected static final Logger log = Logger.getLogger(CharacterSheetClone.class.getName());
+  private static final byte[] MASK = AccountAccessMask.createMask(AccountAccessMask.ACCESS_CHARACTER_SHEET);
+
+  private long cloneJumpDate = -1;
+  private long homeStationID;
+  private String homeStationType;
+  private long lastStationChangeDate = -1;
+
   @Transient
   @ApiModelProperty(
       value = "cloneJumpDate Date")
@@ -47,13 +42,26 @@ public class CharacterSheetClone extends CachedData {
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
       pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-  private Date                  cloneJumpDateDate;
+  private Date cloneJumpDateDate;
+
+  @Transient
+  @ApiModelProperty(
+      value = "lastStationChangeDate Date")
+  @JsonProperty("lastStationChangeDateDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+  private Date lastStationChangeDateDate;
 
   @SuppressWarnings("unused")
   protected CharacterSheetClone() {}
 
-  public CharacterSheetClone(long cloneJumpDate) {
+  public CharacterSheetClone(long cloneJumpDate, long homeStationID, String homeStationType,
+                             long lastStationChangeDate) {
     this.cloneJumpDate = cloneJumpDate;
+    this.homeStationID = homeStationID;
+    this.homeStationType = homeStationType;
+    this.lastStationChangeDate = lastStationChangeDate;
   }
 
   /**
@@ -63,6 +71,7 @@ public class CharacterSheetClone extends CachedData {
   public void prepareTransient() {
     fixDates();
     cloneJumpDateDate = assignDateField(cloneJumpDate);
+    lastStationChangeDateDate = assignDateField(lastStationChangeDate);
   }
 
   /**
@@ -70,10 +79,13 @@ public class CharacterSheetClone extends CachedData {
    */
   @Override
   public boolean equivalent(
-                            CachedData sup) {
+      CachedData sup) {
     if (!(sup instanceof CharacterSheetClone)) return false;
     CharacterSheetClone other = (CharacterSheetClone) sup;
-    return cloneJumpDate == other.cloneJumpDate;
+    return cloneJumpDate == other.cloneJumpDate &&
+        homeStationID == other.homeStationID &&
+        nullSafeObjectCompare(homeStationType, other.homeStationType) &&
+        lastStationChangeDate == other.lastStationChangeDate;
   }
 
   /**
@@ -88,93 +100,118 @@ public class CharacterSheetClone extends CachedData {
     return cloneJumpDate;
   }
 
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + (int) (cloneJumpDate ^ (cloneJumpDate >>> 32));
-    return result;
+  public long getHomeStationID() {
+    return homeStationID;
+  }
+
+  public String getHomeStationType() {
+    return homeStationType;
+  }
+
+  public long getLastStationChangeDate() {
+    return lastStationChangeDate;
   }
 
   @Override
-  public boolean equals(
-                        Object obj) {
-    if (this == obj) return true;
-    if (!super.equals(obj)) return false;
-    if (getClass() != obj.getClass()) return false;
-    CharacterSheetClone other = (CharacterSheetClone) obj;
-    if (cloneJumpDate != other.cloneJumpDate) return false;
-    return true;
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    CharacterSheetClone that = (CharacterSheetClone) o;
+    return cloneJumpDate == that.cloneJumpDate &&
+        homeStationID == that.homeStationID &&
+        lastStationChangeDate == that.lastStationChangeDate &&
+        Objects.equals(homeStationType, that.homeStationType);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), cloneJumpDate, homeStationID, homeStationType, lastStationChangeDate);
   }
 
   @Override
   public String toString() {
-    return "CharacterSheetClone [cloneJumpDate=" + cloneJumpDate + ", owner=" + owner + ", lifeStart=" + lifeStart + ", lifeEnd=" + lifeEnd + "]";
+    return "CharacterSheetClone{" +
+        "cloneJumpDate=" + cloneJumpDate +
+        ", homeStationID=" + homeStationID +
+        ", homeStationType='" + homeStationType + '\'' +
+        ", lastStationChangeDate=" + lastStationChangeDate +
+        ", cloneJumpDateDate=" + cloneJumpDateDate +
+        ", lastStationChangeDateDate=" + lastStationChangeDateDate +
+        '}';
   }
 
   public static CharacterSheetClone get(
-                                        final SynchronizedEveAccount owner,
-                                        final long time) {
+      final SynchronizedEveAccount owner,
+      final long time) throws IOException {
     try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<CharacterSheetClone>() {
-        @Override
-        public CharacterSheetClone run() throws Exception {
-          TypedQuery<CharacterSheetClone> getter = EveKitUserAccountProvider.getFactory().getEntityManager().createNamedQuery("CharacterSheetClone.get",
-                                                                                                                              CharacterSheetClone.class);
-          getter.setParameter("owner", owner);
-          getter.setParameter("point", time);
-          try {
-            return getter.getSingleResult();
-          } catch (NoResultException e) {
-            return null;
-          }
-        }
-      });
+      return EveKitUserAccountProvider.getFactory()
+                                      .runTransaction(() -> {
+                                        TypedQuery<CharacterSheetClone> getter = EveKitUserAccountProvider.getFactory()
+                                                                                                          .getEntityManager()
+                                                                                                          .createNamedQuery(
+                                                                                                              "CharacterSheetClone.get",
+                                                                                                              CharacterSheetClone.class);
+                                        getter.setParameter("owner", owner);
+                                        getter.setParameter("point", time);
+                                        try {
+                                          return getter.getSingleResult();
+                                        } catch (NoResultException e) {
+                                          return null;
+                                        }
+                                      });
     } catch (Exception e) {
+      if (e.getCause() instanceof IOException) throw (IOException) e.getCause();
       log.log(Level.SEVERE, "query error", e);
+      throw new IOException(e.getCause());
     }
-    return null;
   }
 
   public static List<CharacterSheetClone> accessQuery(
-                                                      final SynchronizedEveAccount owner,
-                                                      final long contid,
-                                                      final int maxresults,
-                                                      final boolean reverse,
-                                                      final AttributeSelector at,
-                                                      final AttributeSelector cloneJumpDate) {
+      final SynchronizedEveAccount owner,
+      final long contid,
+      final int maxresults,
+      final boolean reverse,
+      final AttributeSelector at,
+      final AttributeSelector cloneJumpDate,
+      final AttributeSelector homeStationID,
+      final AttributeSelector homeStationType,
+      final AttributeSelector lastStationChangeDate) throws IOException {
     try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<CharacterSheetClone>>() {
-        @Override
-        public List<CharacterSheetClone> run() throws Exception {
-          StringBuilder qs = new StringBuilder();
-          qs.append("SELECT c FROM CharacterSheetClone c WHERE ");
-          // Constrain to specified owner
-          qs.append("c.owner = :owner");
-          // Constrain lifeline
-          AttributeSelector.addLifelineSelector(qs, "c", at);
-          // Constrain attributes
-          AttributeSelector.addLongSelector(qs, "c", "cloneJumpDate", cloneJumpDate);
-          // Set CID constraint and ordering
-          if (reverse) {
-            qs.append(" and c.cid < ").append(contid);
-            qs.append(" order by cid desc");
-          } else {
-            qs.append(" and c.cid > ").append(contid);
-            qs.append(" order by cid asc");
-          }
-          // Return result
-          TypedQuery<CharacterSheetClone> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(),
-                                                                                                                        CharacterSheetClone.class);
-          query.setParameter("owner", owner);
-          query.setMaxResults(maxresults);
-          return query.getResultList();
-        }
-      });
+      return EveKitUserAccountProvider.getFactory()
+                                      .runTransaction(() -> {
+                                        StringBuilder qs = new StringBuilder();
+                                        qs.append("SELECT c FROM CharacterSheetClone c WHERE ");
+                                        // Constrain to specified owner
+                                        qs.append("c.owner = :owner");
+                                        // Constrain lifeline
+                                        AttributeSelector.addLifelineSelector(qs, "c", at);
+                                        // Constrain attributes
+                                        AttributeParameters p = new AttributeParameters("att");
+                                        AttributeSelector.addLongSelector(qs, "c", "cloneJumpDate", cloneJumpDate);
+                                        AttributeSelector.addLongSelector(qs, "c", "homeStationID", homeStationID);
+                                        AttributeSelector.addStringSelector(qs, "c", "homeStationType", homeStationType,
+                                                                            p);
+                                        AttributeSelector.addLongSelector(qs, "c", "lastStationChangeDate",
+                                                                          lastStationChangeDate);
+                                        // Set CID constraint and ordering
+                                        setCIDOrdering(qs, contid, reverse);
+                                        // Return result
+                                        TypedQuery<CharacterSheetClone> query = EveKitUserAccountProvider.getFactory()
+                                                                                                         .getEntityManager()
+                                                                                                         .createQuery(
+                                                                                                             qs.toString(),
+                                                                                                             CharacterSheetClone.class);
+                                        query.setParameter("owner", owner);
+                                        p.fillParams(query);
+                                        query.setMaxResults(maxresults);
+                                        return query.getResultList();
+                                      });
     } catch (Exception e) {
+      if (e.getCause() instanceof IOException) throw (IOException) e.getCause();
       log.log(Level.SEVERE, "query error", e);
+      throw new IOException(e.getCause());
     }
-    return Collections.emptyList();
   }
 
 }

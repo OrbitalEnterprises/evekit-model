@@ -1,59 +1,38 @@
 package enterprises.orbital.evekit.model.character;
 
-import org.junit.Test;
-
 import enterprises.orbital.evekit.TestBase;
 import enterprises.orbital.evekit.account.AccountAccessMask;
-import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AbstractModelTester;
-import enterprises.orbital.evekit.model.character.CharacterSheetClone;
+import org.junit.Test;
 
 public class CharacterSheetCloneTest extends AbstractModelTester<CharacterSheetClone> {
-  final long                                           cloneJumpDate = TestBase.getRandomInt(100000000);
+  private final long cloneJumpDate = TestBase.getRandomInt(100000000);
+  private final long homeStationID = TestBase.getRandomInt(100000000);
+  private final String homeStationType = TestBase.getRandomText(50);
+  private final long lastStationChangeDate = TestBase.getRandomLong();
 
-  final ClassUnderTestConstructor<CharacterSheetClone> eol           = new ClassUnderTestConstructor<CharacterSheetClone>() {
+  final ClassUnderTestConstructor<CharacterSheetClone> eol = () -> new CharacterSheetClone(cloneJumpDate, homeStationID,
+                                                                                           homeStationType,
+                                                                                           lastStationChangeDate);
 
-                                                                       @Override
-                                                                       public CharacterSheetClone getCUT() {
-                                                                         return new CharacterSheetClone(cloneJumpDate);
-                                                                       }
-
-                                                                     };
-
-  final ClassUnderTestConstructor<CharacterSheetClone> live          = new ClassUnderTestConstructor<CharacterSheetClone>() {
-                                                                       @Override
-                                                                       public CharacterSheetClone getCUT() {
-                                                                         return new CharacterSheetClone(cloneJumpDate);
-                                                                       }
-
-                                                                     };
+  final ClassUnderTestConstructor<CharacterSheetClone> live = () -> new CharacterSheetClone(cloneJumpDate + 1,
+                                                                                            homeStationID,
+                                                                                            homeStationType,
+                                                                                            lastStationChangeDate);
 
   @Test
   public void testBasic() throws Exception {
-
-    runBasicTests(eol, new CtorVariants<CharacterSheetClone>() {
-
-      @Override
-      public CharacterSheetClone[] getVariants() {
-        return new CharacterSheetClone[] {
-            new CharacterSheetClone(cloneJumpDate + 10)
-        };
-      }
-
+    runBasicTests(eol, () -> new CharacterSheetClone[]{
+        new CharacterSheetClone(cloneJumpDate + 10, homeStationID, homeStationType, lastStationChangeDate),
+        new CharacterSheetClone(cloneJumpDate, homeStationID + 1, homeStationType, lastStationChangeDate),
+        new CharacterSheetClone(cloneJumpDate, homeStationID, homeStationType + "1", lastStationChangeDate),
+        new CharacterSheetClone(cloneJumpDate, homeStationID, homeStationType, lastStationChangeDate + 1),
     }, AccountAccessMask.createMask(AccountAccessMask.ACCESS_CHARACTER_SHEET));
 
   }
 
   @Test
   public void testGetLifeline() throws Exception {
-
-    runGetLifelineTest(eol, live, new ModelRetriever<CharacterSheetClone>() {
-
-      @Override
-      public CharacterSheetClone getModel(SynchronizedEveAccount account, long time) {
-        return CharacterSheetClone.get(account, time);
-      }
-
-    });
+    runGetLifelineTest(eol, live, CharacterSheetClone::get);
   }
 }

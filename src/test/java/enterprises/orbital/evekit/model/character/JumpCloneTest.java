@@ -1,70 +1,43 @@
 package enterprises.orbital.evekit.model.character;
 
+import enterprises.orbital.evekit.TestBase;
+import enterprises.orbital.evekit.account.AccountAccessMask;
+import enterprises.orbital.evekit.model.AbstractModelTester;
+import enterprises.orbital.evekit.model.AttributeSelector;
+import enterprises.orbital.evekit.model.CachedData;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-import enterprises.orbital.evekit.TestBase;
-import enterprises.orbital.evekit.account.AccountAccessMask;
-import enterprises.orbital.evekit.account.SynchronizedEveAccount;
-import enterprises.orbital.evekit.model.AbstractModelTester;
-import enterprises.orbital.evekit.model.CachedData;
-import enterprises.orbital.evekit.model.character.JumpClone;
-
 public class JumpCloneTest extends AbstractModelTester<JumpClone> {
 
-  final int                                  jumpCloneID = TestBase.getRandomInt(100000000);
-  final int                                  typeID      = TestBase.getRandomInt(100000000);
-  final long                                 locationID  = TestBase.getRandomInt(100000000);
-  final String                               cloneName   = "test clone";
+  private final int jumpCloneID = TestBase.getRandomInt(100000000);
+  private final long locationID = TestBase.getRandomInt(100000000);
+  private final String cloneName = "test clone";
+  private final String locationType = "test type";
 
-  final ClassUnderTestConstructor<JumpClone> eol         = new ClassUnderTestConstructor<JumpClone>() {
+  final ClassUnderTestConstructor<JumpClone> eol = () -> new JumpClone(jumpCloneID, locationID, cloneName,
+                                                                       locationType);
 
-                                                           @Override
-                                                           public JumpClone getCUT() {
-                                                             return new JumpClone(jumpCloneID, typeID, locationID, cloneName);
-                                                           }
-
-                                                         };
-
-  final ClassUnderTestConstructor<JumpClone> live        = new ClassUnderTestConstructor<JumpClone>() {
-                                                           @Override
-                                                           public JumpClone getCUT() {
-                                                             return new JumpClone(jumpCloneID, typeID + 1, locationID + 1, cloneName + " 1");
-                                                           }
-
-                                                         };
+  final ClassUnderTestConstructor<JumpClone> live = () -> new JumpClone(jumpCloneID, locationID + 1, cloneName + " 1",
+                                                                        locationType);
 
   @Test
   public void testBasic() throws Exception {
-
-    runBasicTests(eol, new CtorVariants<JumpClone>() {
-
-      @Override
-      public JumpClone[] getVariants() {
-        return new JumpClone[] {
-            new JumpClone(jumpCloneID + 1, typeID, locationID, cloneName), new JumpClone(jumpCloneID, typeID + 1, locationID, cloneName),
-            new JumpClone(jumpCloneID, typeID, locationID + 1, cloneName), new JumpClone(jumpCloneID, typeID, locationID, cloneName + " 1")
-        };
-      }
-
+    runBasicTests(eol, () -> new JumpClone[]{
+        new JumpClone(jumpCloneID + 1, locationID, cloneName, locationType),
+        new JumpClone(jumpCloneID, locationID + 1, cloneName, locationType),
+        new JumpClone(jumpCloneID, locationID, cloneName + " 1", locationType),
+        new JumpClone(jumpCloneID, locationID, cloneName, locationType + "1")
     }, AccountAccessMask.createMask(AccountAccessMask.ACCESS_CHARACTER_SHEET));
   }
 
   @Test
   public void testGetLifeline() throws Exception {
-
-    runGetLifelineTest(eol, live, new ModelRetriever<JumpClone>() {
-
-      @Override
-      public JumpClone getModel(SynchronizedEveAccount account, long time) {
-        return JumpClone.get(account, time, jumpCloneID);
-      }
-
-    });
+    runGetLifelineTest(eol, live, (account, time) -> JumpClone.get(account, time, jumpCloneID));
   }
 
   @Test
@@ -73,35 +46,41 @@ public class JumpCloneTest extends AbstractModelTester<JumpClone> {
     // - clones for a different account
     // - clones not live at the given time
     JumpClone existing;
-    Map<Integer, JumpClone> listCheck = new HashMap<Integer, JumpClone>();
+    Map<Integer, JumpClone> listCheck = new HashMap<>();
 
-    existing = new JumpClone(jumpCloneID, typeID, locationID, cloneName);
+    existing = new JumpClone(jumpCloneID, locationID, cloneName, locationType);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(jumpCloneID, existing);
 
-    existing = new JumpClone(jumpCloneID + 10, typeID + 10, locationID + 10, cloneName + " 10");
+    existing = new JumpClone(jumpCloneID + 10, locationID + 10, cloneName + " 10", locationType + "10");
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(jumpCloneID + 10, existing);
 
     // Associated with different account
-    existing = new JumpClone(jumpCloneID, typeID, locationID, cloneName);
+    existing = new JumpClone(jumpCloneID, locationID, cloneName, locationType);
     existing.setup(otherAccount, 7777L);
     CachedData.update(existing);
 
     // Not live at the given time
-    existing = new JumpClone(jumpCloneID + 3, typeID + 3, locationID + 3, cloneName + " 3");
+    existing = new JumpClone(jumpCloneID + 3, locationID + 3, cloneName + " 3", locationType + "3");
     existing.setup(testAccount, 9999L);
     CachedData.update(existing);
 
     // EOL before the given time
-    existing = new JumpClone(jumpCloneID + 4, typeID + 4, locationID + 4, cloneName + " 4");
+    existing = new JumpClone(jumpCloneID + 4, locationID + 4, cloneName + " 4", locationType + "4");
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
     CachedData.update(existing);
 
-    List<JumpClone> result = JumpClone.getAll(testAccount, 8888L);
+    List<JumpClone> result = CachedData.retrieveAll(8888L,
+                                                    (contid, at) -> JumpClone.accessQuery(testAccount, contid, 1000,
+                                                                                          false, at,
+                                                                                          AttributeSelector.any(),
+                                                                                          AttributeSelector.any(),
+                                                                                          AttributeSelector.any(),
+                                                                                          AttributeSelector.any()));
     Assert.assertEquals(listCheck.size(), result.size());
     for (JumpClone next : result) {
       int jumpCloneID = next.getJumpCloneID();
