@@ -13,6 +13,7 @@ import javax.persistence.TypedQuery;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.ExecutionException;
@@ -155,15 +156,23 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     System.out.println("Created CharacterContactNotifications");
     count = TestBase.getRandomInt(100) + 50;
     for (int i = 0; i < count; i++) {
+      String[] rts = new String[]{"alliance", "character", "corporation", "mailing_list"};
       int sel = TestBase.getRandomInt(5);
       CharacterMailMessage next = new CharacterMailMessage(
-          TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomText(50), TestBase.getRandomLong(), TestBase.getRandomText(50),
-          TestBase.getRandomLong(), TestBase.getRandomBoolean(), TestBase.getRandomInt());
-      for (int j = 0; j < TestBase.getRandomInt(5) + 2; j++) {
-        next.getToCharacterID().add(TestBase.getRandomLong());
+          TestBase.getRandomLong(),
+          TestBase.getRandomInt(),
+          TestBase.getRandomLong(),
+          TestBase.getRandomText(50),
+          TestBase.getRandomBoolean(),
+          new HashSet<>(),
+          new HashSet<>(),
+          TestBase.getRandomText(1000));
+      for (int j = 0; j < TestBase.getRandomInt(5) + 5; j++) {
+        next.getLabels().add(TestBase.getUniqueRandomInteger());
       }
-      for (int j = 0; j < TestBase.getRandomInt(5) + 2; j++) {
-        next.getToListID().add(TestBase.getRandomLong());
+      for (int j = 0; j < TestBase.getRandomInt(10) + 10; j++) {
+        next.getRecipients().add(new MailMessageRecipient(rts[TestBase.getRandomInt(rts.length)],
+                                                          TestBase.getRandomInt()));
       }
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
@@ -172,17 +181,6 @@ public class CachedDataTest extends AbstractAccountBasedTest {
       CachedData.update(next);
     }
     System.out.println("Created CharacterMailMessages");
-    count = TestBase.getRandomInt(100) + 50;
-    for (int i = 0; i < count; i++) {
-      int sel = TestBase.getRandomInt(5);
-      CachedData next = new CharacterMailMessageBody(TestBase.getRandomLong(), TestBase.getRandomBoolean(), TestBase.getRandomText(1000));
-      for (int j = 0; j < sel; j++) {
-        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
-      }
-      next.setup(testAccount, testTime);
-      CachedData.update(next);
-    }
-    System.out.println("Created CharacterMailMessageBodies");
     count = TestBase.getRandomInt(10) + 5;
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
@@ -386,7 +384,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     count = TestBase.getRandomInt(1000) + 200;
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
-      CachedData next = new MailingList(TestBase.getRandomText(50), TestBase.getRandomLong());
+      CachedData next = new MailingList(TestBase.getRandomText(50), TestBase.getRandomInt());
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
@@ -394,6 +392,18 @@ public class CachedDataTest extends AbstractAccountBasedTest {
       CachedData.update(next);
     }
     System.out.println("Created MailingLists");
+    count = TestBase.getRandomInt(1000) + 200;
+    for (int i = 0; i < count; i++) {
+      int sel = TestBase.getRandomInt(5);
+      CachedData next = new MailLabel(TestBase.getRandomInt(), TestBase.getRandomInt(),
+                                      TestBase.getRandomText(50), TestBase.getRandomText(50));
+      for (int j = 0; j < sel; j++) {
+        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
+      }
+      next.setup(testAccount, testTime);
+      CachedData.update(next);
+    }
+    System.out.println("Created MailLabels");
     count = TestBase.getRandomInt(10) + 5;
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
@@ -1160,7 +1170,6 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     CachedData.cleanup(testAccount, "Capsuleer");
     CachedData.cleanup(testAccount, "CharacterContactNotification");
     CachedData.cleanup(testAccount, "CharacterMailMessage");
-    CachedData.cleanup(testAccount, "CharacterMailMessageBody");
     CachedData.cleanup(testAccount, "CharacterMedal");
     CachedData.cleanup(testAccount, "CharacterNotification");
     CachedData.cleanup(testAccount, "CharacterNotificationBody");
@@ -1183,6 +1192,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     CachedData.cleanup(testAccount, "JumpClone");
     CachedData.cleanup(testAccount, "JumpCloneImplant");
     CachedData.cleanup(testAccount, "MailingList");
+    CachedData.cleanup(testAccount, "MailLabel");
     CachedData.cleanup(testAccount, "PlanetaryColony");
     CachedData.cleanup(testAccount, "PlanetaryLink");
     CachedData.cleanup(testAccount, "PlanetaryPin");

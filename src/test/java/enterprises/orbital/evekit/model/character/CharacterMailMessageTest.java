@@ -1,190 +1,487 @@
 package enterprises.orbital.evekit.model.character;
 
+import enterprises.orbital.evekit.TestBase;
+import enterprises.orbital.evekit.account.AccountAccessMask;
+import enterprises.orbital.evekit.model.AbstractModelTester;
+import enterprises.orbital.evekit.model.AttributeSelector;
+import enterprises.orbital.evekit.model.CachedData;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-import enterprises.orbital.evekit.TestBase;
-import enterprises.orbital.evekit.account.AccountAccessMask;
-import enterprises.orbital.evekit.account.SynchronizedEveAccount;
-import enterprises.orbital.evekit.model.AbstractModelTester;
-import enterprises.orbital.evekit.model.CachedData;
-import enterprises.orbital.evekit.model.character.CharacterMailMessage;
-
 public class CharacterMailMessageTest extends AbstractModelTester<CharacterMailMessage> {
 
-  final long      messageID        = TestBase.getRandomInt(100000000);
-  final long      senderID         = TestBase.getRandomInt(100000000);
-  final String    senderName       = "test sender";
-  final Set<Long> toCharacterID    = new HashSet<Long>();
-  final long      sentDate         = TestBase.getRandomInt(100000000);
-  final String    title            = "test title";
-  final long      toCorpOrAllianceID = TestBase.getRandomInt(100000000);
-  final Set<Long> toListID         = new HashSet<Long>();
-  final boolean   msgRead          = true;
-  final int       senderTypeID     = TestBase.getRandomInt(100000000);
+  private final long messageID = TestBase.getRandomInt(100000000);
+  private final int senderID = TestBase.getRandomInt(100000000);
+  private final long sentDate = TestBase.getRandomInt(100000000);
+  private final String title = "test title";
+  private final boolean msgRead = true;
+  private final Set<Integer> labels = new HashSet<>();
+  private final Set<MailMessageRecipient> recipients = new HashSet<>();
+  private final String body = TestBase.getRandomText(1000);
+  private final String[] recipientTypes;
 
   public CharacterMailMessageTest() {
-    int numReceivers = TestBase.getRandomInt(5) + 1;
-    int numLists = TestBase.getRandomInt(5) + 1;
-    for (int i = 0; i < numReceivers; i++) {
-      toCharacterID.add(TestBase.getUniqueRandomLong());
+    int numLabels = TestBase.getRandomInt(5) + 10;
+    int numRecipients = TestBase.getRandomInt(10) + 10;
+    for (int i = 0; i < numLabels; i++) {
+      labels.add(TestBase.getUniqueRandomInteger());
     }
-    for (int i = 0; i < numLists; i++) {
-      toListID.add(TestBase.getUniqueRandomLong());
+    recipientTypes = new String[]{"alliance", "character", "corporation", "mailing_list"};
+    for (int i = 0; i < numRecipients; i++) {
+      String rt = recipientTypes[TestBase.getRandomInt(recipientTypes.length)];
+      int ri = TestBase.getUniqueRandomInteger();
+      recipients.add(new MailMessageRecipient(rt, ri));
     }
   }
 
-  public CharacterMailMessage makeMessage(long messageID, String senderName, long sentDate, boolean msgRead) {
-    CharacterMailMessage result = new CharacterMailMessage(messageID, senderID, senderName, sentDate, title, toCorpOrAllianceID, msgRead, senderTypeID);
-    result.getToCharacterID().addAll(toCharacterID);
-    result.getToListID().addAll(toListID);
-    return result;
+  private CharacterMailMessage makeMessage(long mid, int sid, int[] lbls, String[] rts, int[] rtis) {
+    Set<Integer> labelSet = new HashSet<>();
+    for (int lbl : lbls) {
+      labelSet.add(lbl);
+    }
+    Set<MailMessageRecipient> recipientSet = new HashSet<>();
+    for (int i = 0; i < rts.length; i++) {
+      recipientSet.add(new MailMessageRecipient(rts[i], rtis[i]));
+    }
+    return new CharacterMailMessage(mid, sid, sentDate, title, msgRead, labelSet, recipientSet, body);
   }
 
-  final ClassUnderTestConstructor<CharacterMailMessage> eol  = new ClassUnderTestConstructor<CharacterMailMessage>() {
+  final ClassUnderTestConstructor<CharacterMailMessage> eol = () -> new CharacterMailMessage(messageID, senderID,
+                                                                                             sentDate, title, msgRead,
+                                                                                             labels, recipients, body);
 
-                                                               @Override
-                                                               public CharacterMailMessage getCUT() {
-                                                                 return makeMessage(messageID, senderName, sentDate, msgRead);
-                                                               }
-
-                                                             };
-
-  final ClassUnderTestConstructor<CharacterMailMessage> live = new ClassUnderTestConstructor<CharacterMailMessage>() {
-                                                               @Override
-                                                               public CharacterMailMessage getCUT() {
-                                                                 return makeMessage(messageID, senderName + " 2", sentDate, msgRead);
-                                                               }
-
-                                                             };
+  final ClassUnderTestConstructor<CharacterMailMessage> live = () -> new CharacterMailMessage(messageID, senderID + 1,
+                                                                                              sentDate, title, msgRead,
+                                                                                              labels, recipients, body);
 
   @Test
   public void testBasic() throws Exception {
-
-    runBasicTests(eol, new CtorVariants<CharacterMailMessage>() {
-
-      @Override
-      public CharacterMailMessage[] getVariants() {
-        CharacterMailMessage[] result = new CharacterMailMessage[] {
-            new CharacterMailMessage(messageID + 1, senderID, senderName, sentDate, title, toCorpOrAllianceID, msgRead, senderTypeID),
-            new CharacterMailMessage(messageID, senderID + 1, senderName, sentDate, title, toCorpOrAllianceID, msgRead, senderTypeID),
-            new CharacterMailMessage(messageID, senderID, senderName + "1", sentDate, title, toCorpOrAllianceID, msgRead, senderTypeID),
-            new CharacterMailMessage(messageID, senderID, senderName, sentDate + 1, title, toCorpOrAllianceID, msgRead, senderTypeID),
-            new CharacterMailMessage(messageID, senderID, senderName, sentDate, title + "1", toCorpOrAllianceID, msgRead, senderTypeID),
-            new CharacterMailMessage(messageID, senderID, senderName, sentDate, title, toCorpOrAllianceID + 1, msgRead, senderTypeID),
-            new CharacterMailMessage(messageID, senderID, senderName, sentDate, title, toCorpOrAllianceID, !msgRead, senderTypeID),
-            new CharacterMailMessage(messageID, senderID, senderName, sentDate, title, toCorpOrAllianceID, msgRead, senderTypeID + 1),
-            new CharacterMailMessage(messageID, senderID, senderName, sentDate, title, toCorpOrAllianceID, msgRead, senderTypeID),
-            new CharacterMailMessage(messageID, senderID, senderName, sentDate, title, toCorpOrAllianceID, msgRead, senderTypeID)
-        };
-        for (int i = 0; i < result.length; i++) {
-          result[i].getToCharacterID().addAll(toCharacterID);
-          result[i].getToListID().addAll(toListID);
-        }
-        result[result.length - 2].getToCharacterID().add(1L);
-        result[result.length - 1].getToListID().add(1L);
-        return result;
-
-      }
-
+    runBasicTests(eol, () -> {
+      Set<Integer> labelCopy = new HashSet<>(labels);
+      labelCopy.add(TestBase.getUniqueRandomInteger());
+      Set<MailMessageRecipient> recipientCopy = new HashSet<>(recipients);
+      String rt = recipientTypes[TestBase.getRandomInt(recipientTypes.length)];
+      int ri = TestBase.getUniqueRandomInteger();
+      recipientCopy.add(new MailMessageRecipient(rt, ri));
+      return new CharacterMailMessage[]{
+          new CharacterMailMessage(messageID + 1, senderID, sentDate, title, msgRead, labels, recipients, body),
+          new CharacterMailMessage(messageID, senderID + 1, sentDate, title, msgRead, labels, recipients, body),
+          new CharacterMailMessage(messageID, senderID, sentDate + 1, title, msgRead, labels, recipients, body),
+          new CharacterMailMessage(messageID, senderID, sentDate, title + "1", msgRead, labels, recipients, body),
+          new CharacterMailMessage(messageID, senderID, sentDate, title, !msgRead, labels, recipients, body),
+          new CharacterMailMessage(messageID, senderID, sentDate, title, msgRead, labelCopy, recipients, body),
+          new CharacterMailMessage(messageID, senderID, sentDate, title, msgRead, labels, recipientCopy, body),
+          new CharacterMailMessage(messageID, senderID, sentDate, title, msgRead, labels, recipients, body + "1"),
+      };
     }, AccountAccessMask.createMask(AccountAccessMask.ACCESS_MAIL));
   }
 
   @Test
   public void testGetLifeline() throws Exception {
-    runGetLifelineTest(eol, live, new ModelRetriever<CharacterMailMessage>() {
-
-      @Override
-      public CharacterMailMessage getModel(SynchronizedEveAccount account, long time) {
-        return CharacterMailMessage.get(account, time, messageID);
-      }
-
-    });
+    runGetLifelineTest(eol, live, (account, time) -> CharacterMailMessage.get(account, time, messageID));
   }
 
   @Test
-  public void testGetMessageIDs() throws Exception {
+  public void testSelectByLabel() throws Exception {
     // Should exclude:
     // - messages for a different account
     // - messages not live at the given time
     // Need to test:
-    // - max results limitation
-    // - continuation ID
-    // - unread limitation
+    // - messages with a specific label
+    // - messages without a specific label
 
-    CharacterMailMessage existing;
-    Set<Long> listCheck = new HashSet<Long>();
+    CharacterMailMessage existing, sample;
 
-    existing = makeMessage(messageID, senderName, sentDate, msgRead);
+    int[] lbls = new int[]{1, 2, 3};
+    String[] rts = new String[]{"alliance", "character", "corporation", "mailing_list"};
+    int[] ris = new int[]{1, 2, 3, 4};
+
+    existing = makeMessage(messageID, senderID, lbls, rts, ris);
+    existing.setup(testAccount, 7777L);
+    sample = CachedData.update(existing);
+
+    // Different label set
+    existing = makeMessage(messageID + 10, senderID + 10, new int[]{4, 5, 6}, rts, ris);
     existing.setup(testAccount, 7777L);
     CachedData.update(existing);
-    listCheck.add(messageID);
-
-    existing = makeMessage(messageID + 10, senderName + " 2", sentDate + 10, msgRead);
-    existing.setup(testAccount, 7777L);
-    CachedData.update(existing);
-    listCheck.add(messageID + 10);
-
-    existing = makeMessage(messageID + 20, senderName + " 3", sentDate + 20, msgRead);
-    existing.setup(testAccount, 7777L);
-    CachedData.update(existing);
-    listCheck.add(messageID + 20);
-
-    existing = makeMessage(messageID + 30, senderName + " 4", sentDate + 30, msgRead);
-    existing.setup(testAccount, 7777L);
-    CachedData.update(existing);
-    listCheck.add(messageID + 30);
 
     // Associated with different account
-    existing = makeMessage(messageID, senderName, sentDate, msgRead);
+    existing = makeMessage(messageID, senderID, lbls, rts, ris);
     existing.setup(otherAccount, 7777L);
     CachedData.update(existing);
 
     // Not live at the given time
-    existing = makeMessage(messageID + 5, senderName + " 0.5", sentDate + 5, msgRead);
+    existing = makeMessage(messageID + 5, senderID + 5, lbls, rts, ris);
     existing.setup(testAccount, 9999L);
     CachedData.update(existing);
 
     // EOL before the given time
-    existing = makeMessage(messageID + 3, senderName + " 0.3", sentDate + 3, msgRead);
+    existing = makeMessage(messageID + 3, senderID + 3, lbls, rts, ris);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
     CachedData.update(existing);
 
-    // Unread at given time
-    existing = makeMessage(messageID + 40, senderName + " 5", sentDate + 40, false);
+    // Verify message with requested label is selected
+    List<CharacterMailMessage> check = CachedData.retrieveAll(8888L,
+                                                              (contid, at) -> CharacterMailMessage.accessQuery(
+                                                                  testAccount,
+                                                                  contid,
+                                                                  1000,
+                                                                  false,
+                                                                  at,
+                                                                  AttributeSelector.values(messageID),
+                                                                  AttributeSelector.any(),
+                                                                  AttributeSelector.any(),
+                                                                  AttributeSelector.any(),
+                                                                  AttributeSelector.any(),
+                                                                  AttributeSelector.values(2, 3, 4, 5),
+                                                                  AttributeSelector.any(),
+                                                                  AttributeSelector.any(),
+                                                                  AttributeSelector.any()));
+    Assert.assertEquals(1, check.size());
+    Assert.assertEquals(sample, check.get(0));
+
+    // Verify no messages match
+    check = CachedData.retrieveAll(8888L,
+                                   (contid, at) -> CharacterMailMessage.accessQuery(
+                                       testAccount,
+                                       contid,
+                                       1000,
+                                       false,
+                                       at,
+                                       AttributeSelector.values(messageID),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.values(5, 6),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any()));
+    Assert.assertEquals(0, check.size());
+
+    // Verify message with requested label is selected by range
+    check = CachedData.retrieveAll(8888L,
+                                   (contid, at) -> CharacterMailMessage.accessQuery(
+                                       testAccount,
+                                       contid,
+                                       1000,
+                                       false,
+                                       at,
+                                       AttributeSelector.values(messageID),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.range(0, 10),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any()));
+    Assert.assertEquals(1, check.size());
+    Assert.assertEquals(sample, check.get(0));
+
+    // Verify no messages match by range
+    check = CachedData.retrieveAll(8888L,
+                                   (contid, at) -> CharacterMailMessage.accessQuery(
+                                       testAccount,
+                                       contid,
+                                       1000,
+                                       false,
+                                       at,
+                                       AttributeSelector.values(messageID),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.range(10, 100),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any()));
+    Assert.assertEquals(0, check.size());
+
+  }
+
+  @Test
+  public void testSelectByRecipientType() throws Exception {
+    // Should exclude:
+    // - messages for a different account
+    // - messages not live at the given time
+    // Need to test:
+    // - messages with a specific recipient type
+    // - messages without a specific recipient type
+
+    CharacterMailMessage existing, sample;
+
+    int[] lbls = new int[]{1, 2, 3};
+    String[] rts = new String[]{"alliance", "character"};
+    int[] ris = new int[]{1, 2, 3, 4};
+
+    existing = makeMessage(messageID, senderID, lbls, rts, ris);
+    existing.setup(testAccount, 7777L);
+    sample = CachedData.update(existing);
+
+    // Different label set
+    existing = makeMessage(messageID + 10, senderID + 10, new int[]{4, 5, 6}, rts, ris);
     existing.setup(testAccount, 7777L);
     CachedData.update(existing);
-    listCheck.add(messageID + 40);
 
-    // Verify only unread message is returned
-    List<Long> result = CharacterMailMessage.getMessageIDs(testAccount, 8888L, true, 5, 0);
-    Assert.assertEquals(1, result.size());
-    Assert.assertEquals(messageID + 40, result.get(0).longValue());
+    // Associated with different account
+    existing = makeMessage(messageID, senderID, lbls, rts, ris);
+    existing.setup(otherAccount, 7777L);
+    CachedData.update(existing);
 
-    // Verify all message IDs are returned
-    result = CharacterMailMessage.getMessageIDs(testAccount, 8888L, false, 10, 0);
-    Assert.assertEquals(listCheck.size(), result.size());
-    for (Long next : result) {
-      Assert.assertTrue(listCheck.contains(next));
-    }
+    // Not live at the given time
+    existing = makeMessage(messageID + 5, senderID + 5, lbls, rts, ris);
+    existing.setup(testAccount, 9999L);
+    CachedData.update(existing);
 
-    // Verify limited set returned
-    result = CharacterMailMessage.getMessageIDs(testAccount, 8888L, false, 2, sentDate - 1);
-    Assert.assertEquals(2, result.size());
-    Assert.assertEquals(messageID, result.get(0).longValue());
-    Assert.assertEquals(messageID + 10, result.get(1).longValue());
+    // EOL before the given time
+    existing = makeMessage(messageID + 3, senderID + 3, lbls, rts, ris);
+    existing.setup(testAccount, 7777L);
+    existing.evolve(null, 7977L);
+    CachedData.update(existing);
 
-    // Verify continuation ID returns proper set
-    result = CharacterMailMessage.getMessageIDs(testAccount, 8888L, false, 100, sentDate + 10);
-    Assert.assertEquals(3, result.size());
-    Assert.assertEquals(messageID + 20, result.get(0).longValue());
-    Assert.assertEquals(messageID + 30, result.get(1).longValue());
-    Assert.assertEquals(messageID + 40, result.get(2).longValue());
+    // Verify message with requested label is selected
+    List<CharacterMailMessage> check = CachedData.retrieveAll(8888L,
+                                                              (contid, at) -> CharacterMailMessage.accessQuery(
+                                                                  testAccount,
+                                                                  contid,
+                                                                  1000,
+                                                                  false,
+                                                                  at,
+                                                                  AttributeSelector.values(messageID),
+                                                                  AttributeSelector.any(),
+                                                                  AttributeSelector.any(),
+                                                                  AttributeSelector.any(),
+                                                                  AttributeSelector.any(),
+                                                                  AttributeSelector.any(),
+                                                                  AttributeSelector.values("alliance", "corporation"),
+                                                                  AttributeSelector.any(),
+                                                                  AttributeSelector.any()));
+    Assert.assertEquals(1, check.size());
+    Assert.assertEquals(sample, check.get(0));
+
+    // Verify no messages match
+    check = CachedData.retrieveAll(8888L,
+                                   (contid, at) -> CharacterMailMessage.accessQuery(
+                                       testAccount,
+                                       contid,
+                                       1000,
+                                       false,
+                                       at,
+                                       AttributeSelector.values(messageID),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.values("corporation", "mailing_list"),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any()));
+    Assert.assertEquals(0, check.size());
+
+    // Verify message with requested label is selected by range
+    check = CachedData.retrieveAll(8888L,
+                                   (contid, at) -> CharacterMailMessage.accessQuery(
+                                       testAccount,
+                                       contid,
+                                       1000,
+                                       false,
+                                       at,
+                                       AttributeSelector.values(messageID),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.range("a", "z"),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any()));
+    Assert.assertEquals(1, check.size());
+    Assert.assertEquals(sample, check.get(0));
+
+    // Verify no messages match by range
+    check = CachedData.retrieveAll(8888L,
+                                   (contid, at) -> CharacterMailMessage.accessQuery(
+                                       testAccount,
+                                       contid,
+                                       1000,
+                                       false,
+                                       at,
+                                       AttributeSelector.values(messageID),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.range("q", "z"),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any()));
+    Assert.assertEquals(0, check.size());
+
+    // Verify message with requested label is selected by "like"
+    check = CachedData.retrieveAll(8888L,
+                                   (contid, at) -> CharacterMailMessage.accessQuery(
+                                       testAccount,
+                                       contid,
+                                       1000,
+                                       false,
+                                       at,
+                                       AttributeSelector.values(messageID),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.like("char%"),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any()));
+    Assert.assertEquals(1, check.size());
+    Assert.assertEquals(sample, check.get(0));
+
+    // Verify no messages match by range
+    check = CachedData.retrieveAll(8888L,
+                                   (contid, at) -> CharacterMailMessage.accessQuery(
+                                       testAccount,
+                                       contid,
+                                       1000,
+                                       false,
+                                       at,
+                                       AttributeSelector.values(messageID),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.like("corp%"),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any()));
+    Assert.assertEquals(0, check.size());
+
   }
+
+  @Test
+  public void testSelectByRecipientID() throws Exception {
+    // Should exclude:
+    // - messages for a different account
+    // - messages not live at the given time
+    // Need to test:
+    // - messages with a specific recipient ID
+    // - messages without a specific recipient ID
+
+    CharacterMailMessage existing, sample;
+
+    int[] lbls = new int[]{1, 2, 3};
+    String[] rts = new String[]{"alliance", "character"};
+    int[] ris = new int[]{1, 2};
+
+    existing = makeMessage(messageID, senderID, lbls, rts, ris);
+    existing.setup(testAccount, 7777L);
+    sample = CachedData.update(existing);
+
+    // Different label set
+    existing = makeMessage(messageID + 10, senderID + 10, new int[]{4, 5, 6}, rts, ris);
+    existing.setup(testAccount, 7777L);
+    CachedData.update(existing);
+
+    // Associated with different account
+    existing = makeMessage(messageID, senderID, lbls, rts, ris);
+    existing.setup(otherAccount, 7777L);
+    CachedData.update(existing);
+
+    // Not live at the given time
+    existing = makeMessage(messageID + 5, senderID + 5, lbls, rts, ris);
+    existing.setup(testAccount, 9999L);
+    CachedData.update(existing);
+
+    // EOL before the given time
+    existing = makeMessage(messageID + 3, senderID + 3, lbls, rts, ris);
+    existing.setup(testAccount, 7777L);
+    existing.evolve(null, 7977L);
+    CachedData.update(existing);
+
+    // Verify message with requested recipient ID is selected
+    List<CharacterMailMessage> check = CachedData.retrieveAll(8888L,
+                                                              (contid, at) -> CharacterMailMessage.accessQuery(
+                                                                  testAccount,
+                                                                  contid,
+                                                                  1000,
+                                                                  false,
+                                                                  at,
+                                                                  AttributeSelector.values(messageID),
+                                                                  AttributeSelector.any(),
+                                                                  AttributeSelector.any(),
+                                                                  AttributeSelector.any(),
+                                                                  AttributeSelector.any(),
+                                                                  AttributeSelector.any(),
+                                                                  AttributeSelector.any(),
+                                                                  AttributeSelector.values(2, 6, 7),
+                                                                  AttributeSelector.any()));
+    Assert.assertEquals(1, check.size());
+    Assert.assertEquals(sample, check.get(0));
+
+    // Verify no messages match
+    check = CachedData.retrieveAll(8888L,
+                                   (contid, at) -> CharacterMailMessage.accessQuery(
+                                       testAccount,
+                                       contid,
+                                       1000,
+                                       false,
+                                       at,
+                                       AttributeSelector.values(messageID),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.values(6, 7),
+                                       AttributeSelector.any()));
+    Assert.assertEquals(0, check.size());
+
+    // Verify message with requested recipient ID is selected by range
+    check = CachedData.retrieveAll(8888L,
+                                   (contid, at) -> CharacterMailMessage.accessQuery(
+                                       testAccount,
+                                       contid,
+                                       1000,
+                                       false,
+                                       at,
+                                       AttributeSelector.values(messageID),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.range(0, 10),
+                                       AttributeSelector.any()));
+    Assert.assertEquals(1, check.size());
+    Assert.assertEquals(sample, check.get(0));
+
+    // Verify no messages match by range
+    check = CachedData.retrieveAll(8888L,
+                                   (contid, at) -> CharacterMailMessage.accessQuery(
+                                       testAccount,
+                                       contid,
+                                       1000,
+                                       false,
+                                       at,
+                                       AttributeSelector.values(messageID),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.any(),
+                                       AttributeSelector.range(5, 10),
+                                       AttributeSelector.any()));
+    Assert.assertEquals(0, check.size());
+  }
+
 
 }
