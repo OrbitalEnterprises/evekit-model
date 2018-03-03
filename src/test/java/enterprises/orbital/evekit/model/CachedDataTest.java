@@ -554,8 +554,9 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
       CachedData next = new Contact(
-          TestBase.getRandomText(30), TestBase.getRandomInt(), TestBase.getRandomText(30), TestBase.getRandomDouble(100000000), TestBase.getRandomInt(),
-          TestBase.getRandomBoolean(), TestBase.getRandomLong());
+          TestBase.getRandomText(30), TestBase.getRandomInt(), TestBase.getRandomFloat(100000000),
+          TestBase.getRandomText(50), TestBase.getRandomBoolean(), TestBase.getRandomBoolean(),
+          TestBase.getRandomLong());
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
@@ -1180,11 +1181,9 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     CachedData.cleanup(testAccount, "CharacterShip");
     CachedData.cleanup(testAccount, "CharacterOnline");
     CachedData.cleanup(testAccount, "CharacterSheet");
-    CachedData.cleanup(testAccount, "CharacterSheetBalance");
     CachedData.cleanup(testAccount, "CharacterSheetClone");
     CachedData.cleanup(testAccount, "CharacterSheetJump");
     CachedData.cleanup(testAccount, "CharacterSkill");
-    CachedData.cleanup(testAccount, "CharacterSkillInTraining");
     CachedData.cleanup(testAccount, "CharacterTitle");
     CachedData.cleanup(testAccount, "ChatChannel");
     CachedData.cleanup(testAccount, "ChatChannelMember");
