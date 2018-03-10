@@ -12,10 +12,7 @@ import org.junit.Test;
 import javax.persistence.TypedQuery;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 public class CachedDataTest extends AbstractAccountBasedTest {
@@ -137,6 +134,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
       int sel = TestBase.getRandomInt(5);
       CachedData next = Capsuleer.getOrCreateCapsuleer(testAccount);
       for (int j = 0; j < sel; j++) {
+        assert next != null;
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       CachedData.update(next);
@@ -408,8 +406,8 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
       CachedData next = new PlanetaryColony(
-          TestBase.getUniqueRandomLong(), TestBase.getRandomInt(), TestBase.getRandomText(50), TestBase.getRandomText(50), TestBase.getRandomInt(),
-          TestBase.getRandomText(50), TestBase.getRandomLong(), TestBase.getRandomText(50), TestBase.getRandomLong(), TestBase.getRandomInt(),
+          TestBase.getUniqueRandomInteger(), TestBase.getRandomInt(), TestBase.getRandomText(50), TestBase.getRandomInt(),
+          TestBase.getRandomLong(), TestBase.getRandomInt(),
           TestBase.getRandomInt());
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
@@ -422,9 +420,19 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
       CachedData next = new PlanetaryPin(
-          TestBase.getUniqueRandomLong(), TestBase.getUniqueRandomLong(), TestBase.getRandomInt(), TestBase.getRandomText(50), TestBase.getRandomInt(),
+          TestBase.getUniqueRandomInteger(), TestBase.getUniqueRandomLong(), TestBase.getRandomInt(), TestBase.getRandomInt(),
           TestBase.getRandomLong(), TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomLong(),
-          TestBase.getRandomInt(), TestBase.getRandomText(50), TestBase.getRandomInt(), TestBase.getRandomDouble(50), TestBase.getRandomDouble(50));
+          TestBase.getRandomInt(), TestBase.getRandomFloat(50), TestBase.getRandomFloat(50),
+          TestBase.getRandomFloat(50), new HashSet<>(), new HashSet<>());
+      for (int j = 0; j < TestBase.getRandomInt(5) + 5; j++) {
+        ((PlanetaryPin) next).getHeads().add(new PlanetaryPinHead(TestBase.getUniqueRandomInteger(),
+                                                                  TestBase.getRandomFloat(100),
+                                                                  TestBase.getRandomFloat(100)));
+      }
+      for (int j = 0; j < TestBase.getRandomInt(10) + 10; j++) {
+        ((PlanetaryPin) next).getContents().add(new PlanetaryPinContent(TestBase.getUniqueRandomInteger(),
+                                                                        TestBase.getRandomLong()));
+      }
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
@@ -436,7 +444,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
       CachedData next = new PlanetaryLink(
-          TestBase.getUniqueRandomLong(), TestBase.getUniqueRandomLong(), TestBase.getUniqueRandomLong(), TestBase.getRandomInt());
+          TestBase.getUniqueRandomInteger(), TestBase.getUniqueRandomLong(), TestBase.getUniqueRandomLong(), TestBase.getRandomInt());
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
@@ -448,9 +456,11 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
       CachedData next = new PlanetaryRoute(
-          TestBase.getUniqueRandomLong(), TestBase.getUniqueRandomLong(), TestBase.getUniqueRandomLong(), TestBase.getUniqueRandomLong(),
-          TestBase.getRandomInt(), TestBase.getRandomText(50), TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomLong(),
-          TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomLong());
+          TestBase.getUniqueRandomInteger(), TestBase.getUniqueRandomLong(), TestBase.getUniqueRandomLong(), TestBase.getUniqueRandomLong(),
+          TestBase.getRandomInt(), TestBase.getRandomFloat(100), new ArrayList<>());
+      for (int j = 0; j < TestBase.getRandomInt(5) + 5; j++) {
+        ((PlanetaryRoute) next).getWaypoints().add(TestBase.getUniqueRandomLong());
+      }
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
@@ -861,8 +871,10 @@ public class CachedDataTest extends AbstractAccountBasedTest {
       int sel = TestBase.getRandomInt(5);
       CachedData next = Corporation.getOrCreateCorporation(testAccount);
       for (int j = 0; j < sel; j++) {
+        assert next != null;
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
+      assert next != null;
       next.setup(testAccount, testTime);
       CachedData.update(next);
     }

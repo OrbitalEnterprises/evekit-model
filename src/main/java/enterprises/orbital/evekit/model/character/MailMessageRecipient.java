@@ -44,4 +44,12 @@ public class MailMessageRecipient {
   public int hashCode() {
     return Objects.hash(recipientType, recipientID);
   }
+
+  @Override
+  public String toString() {
+    return "MailMessageRecipient{" +
+        "recipientType='" + recipientType + '\'' +
+        ", recipientID=" + recipientID +
+        '}';
+  }
 }

@@ -248,15 +248,7 @@ public class CharacterMailMessage extends CachedData {
                                         AttributeSelector.addIntSelector(qs, "e", "recipientID", recipientID);
                                         AttributeSelector.addStringSelector(qs, "c", "body", body, p);
                                         // Set CID constraint and ordering
-                                        if (reverse) {
-                                          qs.append(" and c.cid < ")
-                                            .append(contid);
-                                          qs.append(" order by c.cid desc");
-                                        } else {
-                                          qs.append(" and c.cid > ")
-                                            .append(contid);
-                                          qs.append(" order by c.cid asc");
-                                        }
+                                        setCIDOrdering(qs, contid, reverse);
                                         // Return result
                                         TypedQuery<CharacterMailMessage> query = EveKitUserAccountProvider.getFactory()
                                                                                                           .getEntityManager()

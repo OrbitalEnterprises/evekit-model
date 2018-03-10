@@ -153,6 +153,33 @@ public abstract class CachedData {
   }
 
   /**
+   * Null safe collection compare.  Normally, the List collection types
+   * implement a sensible equality check.  However, Hibernates PersistentBag class
+   * relies on Object.equals which fails in most cases.  This function essentially
+   * copies AbstractCollection.equals.
+   *
+   * @param a first list to compare
+   * @param b second list to compare
+   * @param <A> type of lists (must be identical)
+   * @return true if the lists are identical, false otherwise
+   */
+  public static <A> boolean nullSafeListCompare(List<A> a, List<A> b) {
+    if (a == b) return true;
+    if (a == null || b == null) return false;
+    if (a.size() != b.size()) return false;
+
+    ListIterator<A> e1 = a.listIterator();
+    ListIterator<A> e2 = b.listIterator();
+    while (e1.hasNext() && e2.hasNext()) {
+      A o1 = e1.next();
+      A o2 = e2.next();
+      if (!(o1==null ? o2==null : o1.equals(o2)))
+        return false;
+    }
+    return true;
+  }
+
+  /**
    * Initialize this CachedData object.
    * 
    * @param owner
@@ -372,11 +399,11 @@ public abstract class CachedData {
     if (reverse) {
       qs.append(" and c.cid < ")
         .append(contid);
-      qs.append(" order by cid desc");
+      qs.append(" order by c.cid desc");
     } else {
       qs.append(" and c.cid > ")
         .append(contid);
-      qs.append(" order by cid asc");
+      qs.append(" order by c.cid asc");
     }
   }
 

@@ -1,19 +1,5 @@
 package enterprises.orbital.evekit.model.character;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.persistence.Entity;
-import javax.persistence.Index;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.NoResultException;
-import javax.persistence.Table;
-import javax.persistence.TypedQuery;
-
-import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
@@ -21,65 +7,58 @@ import enterprises.orbital.evekit.model.AttributeParameters;
 import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
+import javax.persistence.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 @Entity
 @Table(
     name = "evekit_data_planetary_route",
     indexes = {
         @Index(
             name = "planetIDIndex",
-            columnList = "planetID",
-            unique = false),
+            columnList = "planetID"),
         @Index(
             name = "routeIDIndex",
-            columnList = "routeID",
-            unique = false)
+            columnList = "routeID")
     })
 @NamedQueries({
     @NamedQuery(
         name = "PlanetaryRoute.getByPlanetAndRouteID",
         query = "SELECT c FROM PlanetaryRoute c where c.owner = :owner and c.planetID = :pid and c.routeID = :rid and c.lifeStart <= :point and c.lifeEnd > :point"),
-    @NamedQuery(
-        name = "PlanetaryRoute.getAll",
-        query = "SELECT c FROM PlanetaryRoute c where c.owner = :owner and c.lifeStart <= :point and c.lifeEnd > :point order by c.routeID asc"),
-    @NamedQuery(
-        name = "PlanetaryRoute.getAllByPlanetID",
-        query = "SELECT c FROM PlanetaryRoute c where c.owner = :owner and c.planetID = :pid and c.lifeStart <= :point and c.lifeEnd > :point order by c.routeID asc"),
 })
-// 1 hour cache time - API cache time unknown
 public class PlanetaryRoute extends CachedData {
-  private static final Logger log  = Logger.getLogger(PlanetaryRoute.class.getName());
+  private static final Logger log = Logger.getLogger(PlanetaryRoute.class.getName());
   private static final byte[] MASK = AccountAccessMask.createMask(AccountAccessMask.ACCESS_ASSETS);
-  private long                planetID;
-  private long                routeID;
-  private long                sourcePinID;
-  private long                destinationPinID;
-  private int                 contentTypeID;
-  private String              contentTypeName;
-  private int                 quantity;
-  private long                waypoint1;
-  private long                waypoint2;
-  private long                waypoint3;
-  private long                waypoint4;
-  private long                waypoint5;
+
+  private int planetID;
+  private long routeID;
+  private long sourcePinID;
+  private long destinationPinID;
+  private int contentTypeID;
+  private float quantity;
+
+  @ElementCollection(fetch = FetchType.EAGER)
+  @CollectionTable(name = "planet_route_waypoint", joinColumns = @JoinColumn(name = "planet_route_cid"))
+  @Column(name = "waypointID")
+  private List<Long> waypoints = new ArrayList<>();
 
   @SuppressWarnings("unused")
   protected PlanetaryRoute() {}
 
-  public PlanetaryRoute(long planetID, long routeID, long sourcePinID, long destinationPinID, int contentTypeID, String contentTypeName, int quantity,
-                        long waypoint1, long waypoint2, long waypoint3, long waypoint4, long waypoint5) {
-    super();
+  public PlanetaryRoute(int planetID, long routeID, long sourcePinID, long destinationPinID, int contentTypeID,
+                        float quantity, List<Long> waypoints) {
     this.planetID = planetID;
     this.routeID = routeID;
     this.sourcePinID = sourcePinID;
     this.destinationPinID = destinationPinID;
     this.contentTypeID = contentTypeID;
-    this.contentTypeName = contentTypeName;
     this.quantity = quantity;
-    this.waypoint1 = waypoint1;
-    this.waypoint2 = waypoint2;
-    this.waypoint3 = waypoint3;
-    this.waypoint4 = waypoint4;
-    this.waypoint5 = waypoint5;
+    this.waypoints = waypoints;
   }
 
   /**
@@ -95,13 +74,12 @@ public class PlanetaryRoute extends CachedData {
    */
   @Override
   public boolean equivalent(
-                            CachedData sup) {
+      CachedData sup) {
     if (!(sup instanceof PlanetaryRoute)) return false;
     PlanetaryRoute other = (PlanetaryRoute) sup;
     return planetID == other.planetID && routeID == other.routeID && sourcePinID == other.sourcePinID && destinationPinID == other.destinationPinID
-        && contentTypeID == other.contentTypeID && nullSafeObjectCompare(contentTypeName, other.contentTypeName) && quantity == other.quantity
-        && waypoint1 == other.waypoint1 && waypoint2 == other.waypoint2 && waypoint3 == other.waypoint3 && waypoint4 == other.waypoint4
-        && waypoint5 == other.waypoint5;
+        && contentTypeID == other.contentTypeID && (Float.compare(quantity, other.quantity) == 0)
+        && nullSafeListCompare(waypoints, other.waypoints);
   }
 
   /**
@@ -112,7 +90,7 @@ public class PlanetaryRoute extends CachedData {
     return MASK;
   }
 
-  public long getPlanetID() {
+  public int getPlanetID() {
     return planetID;
   }
 
@@ -132,217 +110,129 @@ public class PlanetaryRoute extends CachedData {
     return contentTypeID;
   }
 
-  public String getContentTypeName() {
-    return contentTypeName;
-  }
-
-  public int getQuantity() {
+  public float getQuantity() {
     return quantity;
   }
 
-  public long getWaypoint1() {
-    return waypoint1;
+  public List<Long> getWaypoints() {
+    return waypoints;
   }
 
-  public long getWaypoint2() {
-    return waypoint2;
-  }
-
-  public long getWaypoint3() {
-    return waypoint3;
-  }
-
-  public long getWaypoint4() {
-    return waypoint4;
-  }
-
-  public long getWaypoint5() {
-    return waypoint5;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    PlanetaryRoute that = (PlanetaryRoute) o;
+    return planetID == that.planetID &&
+        routeID == that.routeID &&
+        sourcePinID == that.sourcePinID &&
+        destinationPinID == that.destinationPinID &&
+        contentTypeID == that.contentTypeID &&
+        Float.compare(that.quantity, quantity) == 0 &&
+        nullSafeListCompare(waypoints, that.waypoints);
   }
 
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + contentTypeID;
-    result = prime * result + ((contentTypeName == null) ? 0 : contentTypeName.hashCode());
-    result = prime * result + (int) (destinationPinID ^ (destinationPinID >>> 32));
-    result = prime * result + (int) (planetID ^ (planetID >>> 32));
-    result = prime * result + quantity;
-    result = prime * result + (int) (routeID ^ (routeID >>> 32));
-    result = prime * result + (int) (sourcePinID ^ (sourcePinID >>> 32));
-    result = prime * result + (int) (waypoint1 ^ (waypoint1 >>> 32));
-    result = prime * result + (int) (waypoint2 ^ (waypoint2 >>> 32));
-    result = prime * result + (int) (waypoint3 ^ (waypoint3 >>> 32));
-    result = prime * result + (int) (waypoint4 ^ (waypoint4 >>> 32));
-    result = prime * result + (int) (waypoint5 ^ (waypoint5 >>> 32));
-    return result;
-  }
-
-  @Override
-  public boolean equals(
-                        Object obj) {
-    if (this == obj) return true;
-    if (!super.equals(obj)) return false;
-    if (getClass() != obj.getClass()) return false;
-    PlanetaryRoute other = (PlanetaryRoute) obj;
-    if (contentTypeID != other.contentTypeID) return false;
-    if (contentTypeName == null) {
-      if (other.contentTypeName != null) return false;
-    } else if (!contentTypeName.equals(other.contentTypeName)) return false;
-    if (destinationPinID != other.destinationPinID) return false;
-    if (planetID != other.planetID) return false;
-    if (quantity != other.quantity) return false;
-    if (routeID != other.routeID) return false;
-    if (sourcePinID != other.sourcePinID) return false;
-    if (waypoint1 != other.waypoint1) return false;
-    if (waypoint2 != other.waypoint2) return false;
-    if (waypoint3 != other.waypoint3) return false;
-    if (waypoint4 != other.waypoint4) return false;
-    if (waypoint5 != other.waypoint5) return false;
-    return true;
+    return Objects.hash(super.hashCode(), planetID, routeID, sourcePinID, destinationPinID, contentTypeID, quantity,
+                        waypoints);
   }
 
   @Override
   public String toString() {
-    return "PlanetaryRoute [planetID=" + planetID + ", routeID=" + routeID + ", sourcePinID=" + sourcePinID + ", destinationPinID=" + destinationPinID
-        + ", contentTypeID=" + contentTypeID + ", contentTypeName=" + contentTypeName + ", quantity=" + quantity + ", waypoint1=" + waypoint1 + ", waypoint2="
-        + waypoint2 + ", waypoint3=" + waypoint3 + ", waypoint4=" + waypoint4 + ", waypoint5=" + waypoint5 + ", owner=" + owner + ", lifeStart=" + lifeStart
-        + ", lifeEnd=" + lifeEnd + "]";
+    return "PlanetaryRoute{" +
+        "planetID=" + planetID +
+        ", routeID=" + routeID +
+        ", sourcePinID=" + sourcePinID +
+        ", destinationPinID=" + destinationPinID +
+        ", contentTypeID=" + contentTypeID +
+        ", quantity=" + quantity +
+        ", waypoints=" + waypoints +
+        '}';
   }
 
   public static PlanetaryRoute get(
-                                   final SynchronizedEveAccount owner,
-                                   final long time,
-                                   final long planetID,
-                                   final long routeID) {
+      final SynchronizedEveAccount owner,
+      final long time,
+      final int planetID,
+      final long routeID) throws IOException {
     try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<PlanetaryRoute>() {
-        @Override
-        public PlanetaryRoute run() throws Exception {
-          TypedQuery<PlanetaryRoute> getter = EveKitUserAccountProvider.getFactory().getEntityManager().createNamedQuery("PlanetaryRoute.getByPlanetAndRouteID",
-                                                                                                                         PlanetaryRoute.class);
-          getter.setParameter("owner", owner);
-          getter.setParameter("pid", planetID);
-          getter.setParameter("rid", routeID);
-          getter.setParameter("point", time);
-          try {
-            return getter.getSingleResult();
-          } catch (NoResultException e) {
-            return null;
-          }
-        }
-      });
+      return EveKitUserAccountProvider.getFactory()
+                                      .runTransaction(() -> {
+                                        TypedQuery<PlanetaryRoute> getter = EveKitUserAccountProvider.getFactory()
+                                                                                                     .getEntityManager()
+                                                                                                     .createNamedQuery(
+                                                                                                         "PlanetaryRoute.getByPlanetAndRouteID",
+                                                                                                         PlanetaryRoute.class);
+                                        getter.setParameter("owner", owner);
+                                        getter.setParameter("pid", planetID);
+                                        getter.setParameter("rid", routeID);
+                                        getter.setParameter("point", time);
+                                        try {
+                                          return getter.getSingleResult();
+                                        } catch (NoResultException e) {
+                                          return null;
+                                        }
+                                      });
     } catch (Exception e) {
+      if (e.getCause() instanceof IOException) throw (IOException) e.getCause();
       log.log(Level.SEVERE, "query error", e);
+      throw new IOException(e.getCause());
     }
-    return null;
-  }
-
-  public static List<PlanetaryRoute> getAllPlanetaryRoutes(
-                                                           final SynchronizedEveAccount owner,
-                                                           final long time) {
-    try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<PlanetaryRoute>>() {
-        @Override
-        public List<PlanetaryRoute> run() throws Exception {
-          TypedQuery<PlanetaryRoute> getter = EveKitUserAccountProvider.getFactory().getEntityManager().createNamedQuery("PlanetaryRoute.getAll",
-                                                                                                                         PlanetaryRoute.class);
-          getter.setParameter("owner", owner);
-          getter.setParameter("point", time);
-          return getter.getResultList();
-        }
-      });
-    } catch (Exception e) {
-      log.log(Level.SEVERE, "query error", e);
-    }
-    return Collections.emptyList();
-  }
-
-  public static List<PlanetaryRoute> getAllPlanetaryRoutesByPlanet(
-                                                                   final SynchronizedEveAccount owner,
-                                                                   final long time,
-                                                                   final long planetID) {
-    try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<PlanetaryRoute>>() {
-        @Override
-        public List<PlanetaryRoute> run() throws Exception {
-          TypedQuery<PlanetaryRoute> getter = EveKitUserAccountProvider.getFactory().getEntityManager().createNamedQuery("PlanetaryRoute.getAllByPlanetID",
-                                                                                                                         PlanetaryRoute.class);
-          getter.setParameter("owner", owner);
-          getter.setParameter("pid", planetID);
-          getter.setParameter("point", time);
-          return getter.getResultList();
-        }
-      });
-    } catch (Exception e) {
-      log.log(Level.SEVERE, "query error", e);
-    }
-    return Collections.emptyList();
   }
 
   public static List<PlanetaryRoute> accessQuery(
-                                                 final SynchronizedEveAccount owner,
-                                                 final long contid,
-                                                 final int maxresults,
-                                                 final boolean reverse,
-                                                 final AttributeSelector at,
-                                                 final AttributeSelector planetID,
-                                                 final AttributeSelector routeID,
-                                                 final AttributeSelector sourcePinID,
-                                                 final AttributeSelector destinationPinID,
-                                                 final AttributeSelector contentTypeID,
-                                                 final AttributeSelector contentTypeName,
-                                                 final AttributeSelector quantity,
-                                                 final AttributeSelector waypoint1,
-                                                 final AttributeSelector waypoint2,
-                                                 final AttributeSelector waypoint3,
-                                                 final AttributeSelector waypoint4,
-                                                 final AttributeSelector waypoint5) {
+      final SynchronizedEveAccount owner,
+      final long contid,
+      final int maxresults,
+      final boolean reverse,
+      final AttributeSelector at,
+      final AttributeSelector planetID,
+      final AttributeSelector routeID,
+      final AttributeSelector sourcePinID,
+      final AttributeSelector destinationPinID,
+      final AttributeSelector contentTypeID,
+      final AttributeSelector quantity,
+      final AttributeSelector waypoint) throws IOException {
     try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<PlanetaryRoute>>() {
-        @Override
-        public List<PlanetaryRoute> run() throws Exception {
-          StringBuilder qs = new StringBuilder();
-          qs.append("SELECT c FROM PlanetaryRoute c WHERE ");
-          // Constrain to specified owner
-          qs.append("c.owner = :owner");
-          // Constrain lifeline
-          AttributeSelector.addLifelineSelector(qs, "c", at);
-          // Constrain attributes
-          AttributeParameters p = new AttributeParameters("att");
-          AttributeSelector.addLongSelector(qs, "c", "planetID", planetID);
-          AttributeSelector.addLongSelector(qs, "c", "routeID", routeID);
-          AttributeSelector.addLongSelector(qs, "c", "sourcePinID", sourcePinID);
-          AttributeSelector.addLongSelector(qs, "c", "destinationPinID", destinationPinID);
-          AttributeSelector.addIntSelector(qs, "c", "contentTypeID", contentTypeID);
-          AttributeSelector.addStringSelector(qs, "c", "contentTypeName", contentTypeName, p);
-          AttributeSelector.addIntSelector(qs, "c", "quantity", quantity);
-          AttributeSelector.addLongSelector(qs, "c", "waypoint1", waypoint1);
-          AttributeSelector.addLongSelector(qs, "c", "waypoint2", waypoint2);
-          AttributeSelector.addLongSelector(qs, "c", "waypoint3", waypoint3);
-          AttributeSelector.addLongSelector(qs, "c", "waypoint4", waypoint4);
-          AttributeSelector.addLongSelector(qs, "c", "waypoint5", waypoint5);
-          // Set CID constraint and ordering
-          if (reverse) {
-            qs.append(" and c.cid < ").append(contid);
-            qs.append(" order by cid desc");
-          } else {
-            qs.append(" and c.cid > ").append(contid);
-            qs.append(" order by cid asc");
-          }
-          // Return result
-          TypedQuery<PlanetaryRoute> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), PlanetaryRoute.class);
-          query.setParameter("owner", owner);
-          p.fillParams(query);
-          query.setMaxResults(maxresults);
-          return query.getResultList();
-        }
-      });
+      return EveKitUserAccountProvider.getFactory()
+                                      .runTransaction(() -> {
+                                        StringBuilder qs = new StringBuilder();
+                                        qs.append("SELECT DISTINCT c FROM PlanetaryRoute c ");
+                                        qs.append("JOIN c.waypoints d WHERE ");
+                                        // Constrain to specified owner
+                                        qs.append("c.owner = :owner");
+                                        // Constrain lifeline
+                                        AttributeSelector.addLifelineSelector(qs, "c", at);
+                                        // Constrain attributes
+                                        AttributeParameters p = new AttributeParameters("att");
+                                        AttributeSelector.addIntSelector(qs, "c", "planetID", planetID);
+                                        AttributeSelector.addLongSelector(qs, "c", "routeID", routeID);
+                                        AttributeSelector.addLongSelector(qs, "c", "sourcePinID", sourcePinID);
+                                        AttributeSelector.addLongSelector(qs, "c", "destinationPinID",
+                                                                          destinationPinID);
+                                        AttributeSelector.addIntSelector(qs, "c", "contentTypeID", contentTypeID);
+                                        AttributeSelector.addFloatSelector(qs, "c", "quantity", quantity);
+                                        AttributeSelector.addLongSelector(qs, null, "d", waypoint);
+                                        // Set CID constraint and ordering
+                                        setCIDOrdering(qs, contid, reverse);
+                                        // Return result
+                                        TypedQuery<PlanetaryRoute> query = EveKitUserAccountProvider.getFactory()
+                                                                                                    .getEntityManager()
+                                                                                                    .createQuery(
+                                                                                                        qs.toString(),
+                                                                                                        PlanetaryRoute.class);
+                                        query.setParameter("owner", owner);
+                                        p.fillParams(query);
+                                        query.setMaxResults(maxresults);
+                                        return query.getResultList();
+                                      });
     } catch (Exception e) {
+      if (e.getCause() instanceof IOException) throw (IOException) e.getCause();
       log.log(Level.SEVERE, "query error", e);
+      throw new IOException(e.getCause());
     }
-    return Collections.emptyList();
   }
 
 }
