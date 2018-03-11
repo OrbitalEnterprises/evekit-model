@@ -121,7 +121,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     count = TestBase.getRandomInt(1000) + 1;
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
-      CachedData next = new CalendarEventAttendee(TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomText(50), TestBase.getRandomText(50));
+      CachedData next = new CalendarEventAttendee(TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomText(50));
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
@@ -499,7 +499,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
       int sel = TestBase.getRandomInt(5);
       CachedData next = new UpcomingCalendarEvent(
           TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomInt(), TestBase.getRandomText(50), TestBase.getRandomText(50),
-          TestBase.getRandomLong(), TestBase.getRandomText(50), TestBase.getRandomText(50), TestBase.getRandomBoolean(), TestBase.getRandomInt());
+          TestBase.getRandomInt(), TestBase.getRandomText(50), TestBase.getRandomText(50), TestBase.getRandomInt(), TestBase.getRandomText(50));
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
