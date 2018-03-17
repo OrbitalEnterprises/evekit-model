@@ -1,18 +1,5 @@
 package enterprises.orbital.evekit.model.character;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.persistence.Entity;
-import javax.persistence.Index;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.NoResultException;
-import javax.persistence.Table;
-import javax.persistence.TypedQuery;
-
 import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
@@ -21,42 +8,48 @@ import enterprises.orbital.evekit.model.AttributeParameters;
 import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
+import javax.persistence.*;
+import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 @Entity
 @Table(
     name = "evekit_data_character_role",
     indexes = {
         @Index(
             name = "roleCategoryIndex",
-            columnList = "roleCategory",
-            unique = false),
+            columnList = "roleCategory"),
         @Index(
-            name = "roleIDIndex",
-            columnList = "roleID",
-            unique = false),
+            name = "roleNameIndex",
+            columnList = "roleName"),
     })
 @NamedQueries({
     @NamedQuery(
-        name = "CharacterRole.getByCategoryAndRoleID",
-        query = "SELECT c FROM CharacterRole c where c.owner = :owner and c.roleCategory = :cat and c.roleID = :rid and c.lifeStart <= :point and c.lifeEnd > :point"),
-    @NamedQuery(
-        name = "CharacterRole.getAll",
-        query = "SELECT c FROM CharacterRole c where c.owner = :owner and c.lifeStart <= :point and c.lifeEnd > :point order by c.cid asc"),
+        name = "CharacterRole.getByCategoryAndName",
+        query = "SELECT c FROM CharacterRole c where c.owner = :owner and c.roleCategory = :cat and c.roleName = :name and c.lifeStart <= :point and c.lifeEnd > :point")
 })
-// 2 hour cache time - API caches for 1 hour
 public class CharacterRole extends CachedData {
-  private static final Logger log  = Logger.getLogger(CharacterRole.class.getName());
+  private static final Logger log = Logger.getLogger(CharacterRole.class.getName());
   private static final byte[] MASK = AccountAccessMask.createMask(AccountAccessMask.ACCESS_CHARACTER_SHEET);
-  private String              roleCategory;
-  private long                roleID;
-  private String              roleName;
+
+  // Injected role categories
+  public static final String CAT_CORPORATION = "CORPORATION";
+  public static final String CAT_CORPORATION_AT_HQ = "CORPORATION_AT_HQ";
+  public static final String CAT_CORPORATION_AT_BASE = "CORPORATION_AT_BASE";
+  public static final String CAT_CORPORATION_AT_OTHER = "CORPORATION_AT_OTHER";
+
+  private String roleCategory;
+  private String roleName;
 
   @SuppressWarnings("unused")
   protected CharacterRole() {}
 
-  public CharacterRole(String roleCategory, long roleID, String roleName) {
+  public CharacterRole(String roleCategory, String roleName) {
     super();
     this.roleCategory = roleCategory;
-    this.roleID = roleID;
     this.roleName = roleName;
   }
 
@@ -73,10 +66,10 @@ public class CharacterRole extends CachedData {
    */
   @Override
   public boolean equivalent(
-                            CachedData sup) {
+      CachedData sup) {
     if (!(sup instanceof CharacterRole)) return false;
     CharacterRole other = (CharacterRole) sup;
-    return nullSafeObjectCompare(roleCategory, other.roleCategory) && roleID == other.roleID && nullSafeObjectCompare(roleName, other.roleName);
+    return nullSafeObjectCompare(roleCategory, other.roleCategory) && nullSafeObjectCompare(roleName, other.roleName);
   }
 
   /**
@@ -91,139 +84,105 @@ public class CharacterRole extends CachedData {
     return roleCategory;
   }
 
-  public long getRoleID() {
-    return roleID;
-  }
-
   public String getRoleName() {
     return roleName;
   }
 
   @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + ((roleCategory == null) ? 0 : roleCategory.hashCode());
-    result = prime * result + (int) (roleID ^ (roleID >>> 32));
-    result = prime * result + ((roleName == null) ? 0 : roleName.hashCode());
-    return result;
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    CharacterRole that = (CharacterRole) o;
+    return Objects.equals(roleCategory, that.roleCategory) &&
+        Objects.equals(roleName, that.roleName);
   }
 
   @Override
-  public boolean equals(
-                        Object obj) {
-    if (this == obj) return true;
-    if (!super.equals(obj)) return false;
-    if (getClass() != obj.getClass()) return false;
-    CharacterRole other = (CharacterRole) obj;
-    if (roleCategory == null) {
-      if (other.roleCategory != null) return false;
-    } else if (!roleCategory.equals(other.roleCategory)) return false;
-    if (roleID != other.roleID) return false;
-    if (roleName == null) {
-      if (other.roleName != null) return false;
-    } else if (!roleName.equals(other.roleName)) return false;
-    return true;
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), roleCategory, roleName);
   }
 
   @Override
   public String toString() {
-    return "CharacterRole [roleCategory=" + roleCategory + ", roleID=" + roleID + ", roleName=" + roleName + ", owner=" + owner + ", lifeStart=" + lifeStart
-        + ", lifeEnd=" + lifeEnd + "]";
+    return "CharacterRole{" +
+        "roleCategory='" + roleCategory + '\'' +
+        ", roleName='" + roleName + '\'' +
+        '}';
   }
 
   public static CharacterRole get(
-                                  final SynchronizedEveAccount owner,
-                                  final long time,
-                                  final String roleCategory,
-                                  final long roleID) {
+      final SynchronizedEveAccount owner,
+      final long time,
+      final String roleCategory,
+      final String roleName) throws IOException {
     try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<CharacterRole>() {
-        @Override
-        public CharacterRole run() throws Exception {
-          TypedQuery<CharacterRole> getter = EveKitUserAccountProvider.getFactory().getEntityManager().createNamedQuery("CharacterRole.getByCategoryAndRoleID",
-                                                                                                                        CharacterRole.class);
-          getter.setParameter("owner", owner);
-          getter.setParameter("cat", roleCategory);
-          getter.setParameter("rid", roleID);
-          getter.setParameter("point", time);
-          try {
-            return getter.getSingleResult();
-          } catch (NoResultException e) {
-            return null;
-          }
-        }
-      });
+      return EveKitUserAccountProvider.getFactory()
+                                      .runTransaction(() -> {
+                                        TypedQuery<CharacterRole> getter = EveKitUserAccountProvider.getFactory()
+                                                                                                    .getEntityManager()
+                                                                                                    .createNamedQuery(
+                                                                                                        "CharacterRole.getByCategoryAndName",
+                                                                                                        CharacterRole.class);
+                                        getter.setParameter("owner", owner);
+                                        getter.setParameter("cat", roleCategory);
+                                        getter.setParameter("name", roleName);
+                                        getter.setParameter("point", time);
+                                        try {
+                                          return getter.getSingleResult();
+                                        } catch (NoResultException e) {
+                                          return null;
+                                        }
+                                      });
     } catch (Exception e) {
+      if (e.getCause() instanceof IOException) throw (IOException) e.getCause();
       log.log(Level.SEVERE, "query error", e);
+      throw new IOException(e.getCause());
     }
-    return null;
-  }
-
-  public static List<CharacterRole> getAllRoles(
-                                                final SynchronizedEveAccount owner,
-                                                final long time) {
-    try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<CharacterRole>>() {
-        @Override
-        public List<CharacterRole> run() throws Exception {
-          TypedQuery<CharacterRole> getter = EveKitUserAccountProvider.getFactory().getEntityManager().createNamedQuery("CharacterRole.getAll",
-                                                                                                                        CharacterRole.class);
-          getter.setParameter("owner", owner);
-          getter.setParameter("point", time);
-          return getter.getResultList();
-        }
-      });
-    } catch (Exception e) {
-      log.log(Level.SEVERE, "query error", e);
-    }
-    return Collections.emptyList();
   }
 
   public static List<CharacterRole> accessQuery(
-                                                final SynchronizedEveAccount owner,
-                                                final long contid,
-                                                final int maxresults,
-                                                final boolean reverse,
-                                                final AttributeSelector at,
-                                                final AttributeSelector roleCategory,
-                                                final AttributeSelector roleID,
-                                                final AttributeSelector roleName) {
+      final SynchronizedEveAccount owner,
+      final long contid,
+      final int maxresults,
+      final boolean reverse,
+      final AttributeSelector at,
+      final AttributeSelector roleCategory,
+      final AttributeSelector roleName) throws IOException {
     try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<CharacterRole>>() {
-        @Override
-        public List<CharacterRole> run() throws Exception {
-          StringBuilder qs = new StringBuilder();
-          qs.append("SELECT c FROM CharacterRole c WHERE ");
-          // Constrain to specified owner
-          qs.append("c.owner = :owner");
-          // Constrain lifeline
-          AttributeSelector.addLifelineSelector(qs, "c", at);
-          // Constrain attributes
-          AttributeParameters p = new AttributeParameters("att");
-          AttributeSelector.addStringSelector(qs, "c", "roleCategory", roleCategory, p);
-          AttributeSelector.addLongSelector(qs, "c", "roleID", roleID);
-          AttributeSelector.addStringSelector(qs, "c", "roleName", roleName, p);
-          // Set CID constraint and ordering
-          if (reverse) {
-            qs.append(" and c.cid < ").append(contid);
-            qs.append(" order by cid desc");
-          } else {
-            qs.append(" and c.cid > ").append(contid);
-            qs.append(" order by cid asc");
-          }
-          // Return result
-          TypedQuery<CharacterRole> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), CharacterRole.class);
-          query.setParameter("owner", owner);
-          p.fillParams(query);
-          query.setMaxResults(maxresults);
-          return query.getResultList();
-        }
-      });
+      return EveKitUserAccountProvider.getFactory()
+                                      .runTransaction(new RunInTransaction<List<CharacterRole>>() {
+                                        @Override
+                                        public List<CharacterRole> run() throws Exception {
+                                          StringBuilder qs = new StringBuilder();
+                                          qs.append("SELECT c FROM CharacterRole c WHERE ");
+                                          // Constrain to specified owner
+                                          qs.append("c.owner = :owner");
+                                          // Constrain lifeline
+                                          AttributeSelector.addLifelineSelector(qs, "c", at);
+                                          // Constrain attributes
+                                          AttributeParameters p = new AttributeParameters("att");
+                                          AttributeSelector.addStringSelector(qs, "c", "roleCategory", roleCategory, p);
+                                          AttributeSelector.addStringSelector(qs, "c", "roleName", roleName, p);
+                                          // Set CID constraint and ordering
+                                          setCIDOrdering(qs, contid, reverse);
+                                          // Return result
+                                          TypedQuery<CharacterRole> query = EveKitUserAccountProvider.getFactory()
+                                                                                                     .getEntityManager()
+                                                                                                     .createQuery(
+                                                                                                         qs.toString(),
+                                                                                                         CharacterRole.class);
+                                          query.setParameter("owner", owner);
+                                          p.fillParams(query);
+                                          query.setMaxResults(maxresults);
+                                          return query.getResultList();
+                                        }
+                                      });
     } catch (Exception e) {
+      if (e.getCause() instanceof IOException) throw (IOException) e.getCause();
       log.log(Level.SEVERE, "query error", e);
+      throw new IOException(e.getCause());
     }
-    return Collections.emptyList();
   }
 
 }

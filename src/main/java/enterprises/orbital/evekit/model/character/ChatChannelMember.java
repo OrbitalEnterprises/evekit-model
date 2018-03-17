@@ -1,24 +1,7 @@
 package enterprises.orbital.evekit.model.character;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.persistence.Entity;
-import javax.persistence.Index;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.NoResultException;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-import javax.persistence.TypedQuery;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
@@ -27,50 +10,52 @@ import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.persistence.*;
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 @Entity
 @Table(
     name = "evekit_data_chatchannel_member",
     indexes = {
         @Index(
             name = "channelIDIndex",
-            columnList = "channelID",
-            unique = false),
+            columnList = "channelID"),
         @Index(
             name = "categoryIndex",
-            columnList = "category",
-            unique = false),
+            columnList = "category"),
         @Index(
             name = "accessorIDIndex",
-            columnList = "accessorID",
-            unique = false)
+            columnList = "accessorID")
     })
 @NamedQueries({
     @NamedQuery(
         name = "ChatChannelMember.getByID",
         query = "SELECT c FROM ChatChannelMember c where c.owner = :owner and c.channelID = :channel and c.category = :category and c.accessorID = :accessor and c.lifeStart <= :point and c.lifeEnd > :point"),
-    @NamedQuery(
-        name = "ChatChannelMember.list",
-        query = "SELECT c FROM ChatChannelMember c where c.owner = :owner and c.lifeStart <= :point and c.lifeEnd > :point order by c.cid asc"),
-    @NamedQuery(
-        name = "ChatChannelMember.listByChannelID",
-        query = "SELECT c FROM ChatChannelMember c where c.owner = :owner and c.channelID = :channel and c.lifeStart <= :point and c.lifeEnd > :point order by c.cid asc"),
-    @NamedQuery(
-        name = "ChatChannelMember.listByChannelAndCategory",
-        query = "SELECT c FROM ChatChannelMember c where c.owner = :owner and c.channelID = :channel and c.category = :category and c.lifeStart <= :point and c.lifeEnd > :point order by c.cid asc"),
 })
-// 2 hour cache time - API caches for 1 hour
 public class ChatChannelMember extends CachedData {
-  private static final Logger log       = Logger.getLogger(ChatChannelMember.class.getName());
-  private static final byte[] MASK      = AccountAccessMask.createMask(AccountAccessMask.ACCESS_CHAT_CHANNELS);
+  private static final Logger log = Logger.getLogger(ChatChannelMember.class.getName());
+  private static final byte[] MASK = AccountAccessMask.createMask(AccountAccessMask.ACCESS_CHAT_CHANNELS);
+
+  public static final String CAT_ALLOWED = "allowed";
+  public static final String CAT_BLOCKED = "blocked";
+  public static final String CAT_MUTED = "muted";
+  public static final String CAT_OPERATOR = "operator";
+
   // Channel this member is attached to
-  private long                channelID;
+  private int channelID;
   // One of "allowed", "blocked", "muted", or "operators"
-  private String              category;
+  private String category;
   // Member fields. Not all categories will populate all fields
-  private long                accessorID;
-  private String              accessorName;
-  private long                untilWhen = -1;
-  private String              reason;
+  private int accessorID;
+  private String accessorType;
+  private long untilWhen = -1;
+  private String reason;
+
   @Transient
   @ApiModelProperty(
       value = "untilWhen Date")
@@ -78,17 +63,18 @@ public class ChatChannelMember extends CachedData {
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
       pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-  private Date                untilWhenDate;
+  private Date untilWhenDate;
 
   @SuppressWarnings("unused")
   protected ChatChannelMember() {}
 
-  public ChatChannelMember(long channelID, String category, long accessorID, String accessorName, long untilWhen, String reason) {
+  public ChatChannelMember(int channelID, String category, int accessorID, String accessorType, long untilWhen,
+                           String reason) {
     super();
     this.channelID = channelID;
     this.category = category;
     this.accessorID = accessorID;
-    this.accessorName = accessorName;
+    this.accessorType = accessorType;
     this.untilWhen = untilWhen;
     this.reason = reason;
   }
@@ -107,11 +93,14 @@ public class ChatChannelMember extends CachedData {
    */
   @Override
   public boolean equivalent(
-                            CachedData sup) {
+      CachedData sup) {
     if (!(sup instanceof ChatChannelMember)) return false;
     ChatChannelMember other = (ChatChannelMember) sup;
-    return channelID == other.channelID && nullSafeObjectCompare(category, other.category) && accessorID == other.accessorID
-        && nullSafeObjectCompare(accessorName, other.accessorName) && untilWhen == other.untilWhen && nullSafeObjectCompare(reason, other.reason);
+    return channelID == other.channelID && nullSafeObjectCompare(category,
+                                                                 other.category) && accessorID == other.accessorID
+        && nullSafeObjectCompare(accessorType,
+                                 other.accessorType) && untilWhen == other.untilWhen && nullSafeObjectCompare(reason,
+                                                                                                              other.reason);
   }
 
   /**
@@ -122,7 +111,7 @@ public class ChatChannelMember extends CachedData {
     return MASK;
   }
 
-  public long getChannelID() {
+  public int getChannelID() {
     return channelID;
   }
 
@@ -130,12 +119,12 @@ public class ChatChannelMember extends CachedData {
     return category;
   }
 
-  public long getAccessorID() {
+  public int getAccessorID() {
     return accessorID;
   }
 
-  public String getAccessorName() {
-    return accessorName;
+  public String getAccessorType() {
+    return accessorType;
   }
 
   public long getUntilWhen() {
@@ -147,192 +136,116 @@ public class ChatChannelMember extends CachedData {
   }
 
   @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + (int) (accessorID ^ (accessorID >>> 32));
-    result = prime * result + ((accessorName == null) ? 0 : accessorName.hashCode());
-    result = prime * result + ((category == null) ? 0 : category.hashCode());
-    result = prime * result + (int) (channelID ^ (channelID >>> 32));
-    result = prime * result + ((reason == null) ? 0 : reason.hashCode());
-    result = prime * result + (int) (untilWhen ^ (untilWhen >>> 32));
-    return result;
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    ChatChannelMember that = (ChatChannelMember) o;
+    return channelID == that.channelID &&
+        accessorID == that.accessorID &&
+        untilWhen == that.untilWhen &&
+        Objects.equals(category, that.category) &&
+        Objects.equals(accessorType, that.accessorType) &&
+        Objects.equals(reason, that.reason);
   }
 
   @Override
-  public boolean equals(
-                        Object obj) {
-    if (this == obj) return true;
-    if (!super.equals(obj)) return false;
-    if (getClass() != obj.getClass()) return false;
-    ChatChannelMember other = (ChatChannelMember) obj;
-    if (accessorID != other.accessorID) return false;
-    if (accessorName == null) {
-      if (other.accessorName != null) return false;
-    } else if (!accessorName.equals(other.accessorName)) return false;
-    if (category == null) {
-      if (other.category != null) return false;
-    } else if (!category.equals(other.category)) return false;
-    if (channelID != other.channelID) return false;
-    if (reason == null) {
-      if (other.reason != null) return false;
-    } else if (!reason.equals(other.reason)) return false;
-    if (untilWhen != other.untilWhen) return false;
-    return true;
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), channelID, category, accessorID, accessorType, untilWhen, reason);
   }
 
   @Override
   public String toString() {
-    return "ChatChannelMember [channelID=" + channelID + ", category=" + category + ", accessorID=" + accessorID + ", accessorName=" + accessorName
-        + ", untilWhen=" + untilWhen + ", reason=" + reason + "]";
+    return "ChatChannelMember{" +
+        "channelID=" + channelID +
+        ", category='" + category + '\'' +
+        ", accessorID=" + accessorID +
+        ", accessorType='" + accessorType + '\'' +
+        ", untilWhen=" + untilWhen +
+        ", reason='" + reason + '\'' +
+        ", untilWhenDate=" + untilWhenDate +
+        '}';
   }
 
   public static ChatChannelMember get(
-                                      final SynchronizedEveAccount owner,
-                                      final long time,
-                                      final long channelID,
-                                      final String category,
-                                      final long accessorID) {
+      final SynchronizedEveAccount owner,
+      final long time,
+      final int channelID,
+      final String category,
+      final int accessorID) throws IOException {
     try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<ChatChannelMember>() {
-        @Override
-        public ChatChannelMember run() throws Exception {
-          TypedQuery<ChatChannelMember> getter = EveKitUserAccountProvider.getFactory().getEntityManager().createNamedQuery("ChatChannelMember.getByID",
-                                                                                                                            ChatChannelMember.class);
-          getter.setParameter("owner", owner);
-          getter.setParameter("channel", channelID);
-          getter.setParameter("category", category);
-          getter.setParameter("accessor", accessorID);
-          getter.setParameter("point", time);
-          try {
-            return getter.getSingleResult();
-          } catch (NoResultException e) {
-            return null;
-          }
-        }
-      });
+      return EveKitUserAccountProvider.getFactory()
+                                      .runTransaction(() -> {
+                                        TypedQuery<ChatChannelMember> getter = EveKitUserAccountProvider.getFactory()
+                                                                                                        .getEntityManager()
+                                                                                                        .createNamedQuery(
+                                                                                                            "ChatChannelMember.getByID",
+                                                                                                            ChatChannelMember.class);
+                                        getter.setParameter("owner", owner);
+                                        getter.setParameter("channel", channelID);
+                                        getter.setParameter("category", category);
+                                        getter.setParameter("accessor", accessorID);
+                                        getter.setParameter("point", time);
+                                        try {
+                                          return getter.getSingleResult();
+                                        } catch (NoResultException e) {
+                                          return null;
+                                        }
+                                      });
     } catch (Exception e) {
+      if (e.getCause() instanceof IOException) throw (IOException) e.getCause();
       log.log(Level.SEVERE, "query error", e);
+      throw new IOException(e.getCause());
     }
-    return null;
-  }
-
-  public static List<ChatChannelMember> getAllChatChannelMembers(
-                                                                 final SynchronizedEveAccount owner,
-                                                                 final long time) {
-    try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<ChatChannelMember>>() {
-        @Override
-        public List<ChatChannelMember> run() throws Exception {
-          TypedQuery<ChatChannelMember> getter = EveKitUserAccountProvider.getFactory().getEntityManager().createNamedQuery("ChatChannelMember.list",
-                                                                                                                            ChatChannelMember.class);
-          getter.setParameter("owner", owner);
-          getter.setParameter("point", time);
-          return getter.getResultList();
-        }
-      });
-    } catch (Exception e) {
-      log.log(Level.SEVERE, "query error", e);
-    }
-    return Collections.emptyList();
-  }
-
-  public static List<ChatChannelMember> getByChannelID(
-                                                       final SynchronizedEveAccount owner,
-                                                       final long time,
-                                                       final long channelID) {
-    try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<ChatChannelMember>>() {
-        @Override
-        public List<ChatChannelMember> run() throws Exception {
-          TypedQuery<ChatChannelMember> getter = EveKitUserAccountProvider.getFactory().getEntityManager().createNamedQuery("ChatChannelMember.listByChannelID",
-                                                                                                                            ChatChannelMember.class);
-          getter.setParameter("owner", owner);
-          getter.setParameter("channel", channelID);
-          getter.setParameter("point", time);
-          return getter.getResultList();
-        }
-      });
-    } catch (Exception e) {
-      log.log(Level.SEVERE, "query error", e);
-    }
-    return Collections.emptyList();
-  }
-
-  public static List<ChatChannelMember> getByChannelIDAndCategory(
-                                                                  final SynchronizedEveAccount owner,
-                                                                  final long time,
-                                                                  final long channelID,
-                                                                  final String category) {
-    try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<ChatChannelMember>>() {
-        @Override
-        public List<ChatChannelMember> run() throws Exception {
-          TypedQuery<ChatChannelMember> getter = EveKitUserAccountProvider.getFactory().getEntityManager()
-              .createNamedQuery("ChatChannelMember.listByChannelAndCategory", ChatChannelMember.class);
-          getter.setParameter("owner", owner);
-          getter.setParameter("channel", channelID);
-          getter.setParameter("category", category);
-          getter.setParameter("point", time);
-          return getter.getResultList();
-        }
-      });
-    } catch (Exception e) {
-      log.log(Level.SEVERE, "query error", e);
-    }
-    return Collections.emptyList();
   }
 
   public static List<ChatChannelMember> accessQuery(
-                                                    final SynchronizedEveAccount owner,
-                                                    final long contid,
-                                                    final int maxresults,
-                                                    final boolean reverse,
-                                                    final AttributeSelector at,
-                                                    final AttributeSelector channelID,
-                                                    final AttributeSelector category,
-                                                    final AttributeSelector accessorID,
-                                                    final AttributeSelector accessorName,
-                                                    final AttributeSelector untilWhen,
-                                                    final AttributeSelector reason) {
+      final SynchronizedEveAccount owner,
+      final long contid,
+      final int maxresults,
+      final boolean reverse,
+      final AttributeSelector at,
+      final AttributeSelector channelID,
+      final AttributeSelector category,
+      final AttributeSelector accessorID,
+      final AttributeSelector accessorType,
+      final AttributeSelector untilWhen,
+      final AttributeSelector reason) throws IOException {
     try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<ChatChannelMember>>() {
-        @Override
-        public List<ChatChannelMember> run() throws Exception {
-          StringBuilder qs = new StringBuilder();
-          qs.append("SELECT c FROM ChatChannelMember c WHERE ");
-          // Constrain to specified owner
-          qs.append("c.owner = :owner");
-          // Constrain lifeline
-          AttributeSelector.addLifelineSelector(qs, "c", at);
-          // Constrain attributes
-          AttributeParameters p = new AttributeParameters("att");
-          AttributeSelector.addLongSelector(qs, "c", "channelID", channelID);
-          AttributeSelector.addStringSelector(qs, "c", "category", category, p);
-          AttributeSelector.addLongSelector(qs, "c", "accessorID", accessorID);
-          AttributeSelector.addStringSelector(qs, "c", "accessorName", accessorName, p);
-          AttributeSelector.addLongSelector(qs, "c", "untilWhen", untilWhen);
-          AttributeSelector.addStringSelector(qs, "c", "reason", reason, p);
-          // Set CID constraint and ordering
-          if (reverse) {
-            qs.append(" and c.cid < ").append(contid);
-            qs.append(" order by cid desc");
-          } else {
-            qs.append(" and c.cid > ").append(contid);
-            qs.append(" order by cid asc");
-          }
-          // Return result
-          TypedQuery<ChatChannelMember> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), ChatChannelMember.class);
-          query.setParameter("owner", owner);
-          p.fillParams(query);
-          query.setMaxResults(maxresults);
-          return query.getResultList();
-        }
-      });
+      return EveKitUserAccountProvider.getFactory()
+                                      .runTransaction(() -> {
+                                        StringBuilder qs = new StringBuilder();
+                                        qs.append("SELECT c FROM ChatChannelMember c WHERE ");
+                                        // Constrain to specified owner
+                                        qs.append("c.owner = :owner");
+                                        // Constrain lifeline
+                                        AttributeSelector.addLifelineSelector(qs, "c", at);
+                                        // Constrain attributes
+                                        AttributeParameters p = new AttributeParameters("att");
+                                        AttributeSelector.addIntSelector(qs, "c", "channelID", channelID);
+                                        AttributeSelector.addStringSelector(qs, "c", "category", category, p);
+                                        AttributeSelector.addIntSelector(qs, "c", "accessorID", accessorID);
+                                        AttributeSelector.addStringSelector(qs, "c", "accessorType", accessorType, p);
+                                        AttributeSelector.addLongSelector(qs, "c", "untilWhen", untilWhen);
+                                        AttributeSelector.addStringSelector(qs, "c", "reason", reason, p);
+                                        // Set CID constraint and ordering
+                                        setCIDOrdering(qs, contid, reverse);
+                                        // Return result
+                                        TypedQuery<ChatChannelMember> query = EveKitUserAccountProvider.getFactory()
+                                                                                                       .getEntityManager()
+                                                                                                       .createQuery(
+                                                                                                           qs.toString(),
+                                                                                                           ChatChannelMember.class);
+                                        query.setParameter("owner", owner);
+                                        p.fillParams(query);
+                                        query.setMaxResults(maxresults);
+                                        return query.getResultList();
+                                      });
     } catch (Exception e) {
+      if (e.getCause() instanceof IOException) throw (IOException) e.getCause();
       log.log(Level.SEVERE, "query error", e);
+      throw new IOException(e.getCause());
     }
-    return Collections.emptyList();
   }
 
 }

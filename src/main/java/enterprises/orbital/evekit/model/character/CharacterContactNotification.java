@@ -1,26 +1,7 @@
 package enterprises.orbital.evekit.model.character;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.persistence.Entity;
-import javax.persistence.Index;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.NoResultException;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-import javax.persistence.TypedQuery;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import enterprises.orbital.base.OrbitalProperties;
-import enterprises.orbital.base.PersistentProperty;
-import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
@@ -29,37 +10,40 @@ import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.persistence.*;
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 @Entity
 @Table(
     name = "evekit_data_character_contact_notification",
     indexes = {
         @Index(
             name = "notificationIDIndex",
-            columnList = "notificationID",
-            unique = false),
+            columnList = "notificationID"),
         @Index(
             name = "sentDateIndex",
-            columnList = "sentDate",
-            unique = false)
+            columnList = "sentDate")
     })
 @NamedQueries({
     @NamedQuery(
         name = "CharacterContactNotification.getByNotificationID",
         query = "SELECT c FROM CharacterContactNotification c where c.owner = :owner and c.notificationID = :nid and c.lifeStart <= :point and c.lifeEnd > :point"),
-    @NamedQuery(
-        name = "CharacterContactNotification.getAll",
-        query = "SELECT c FROM CharacterContactNotification c where c.owner = :owner and c.sentDate > :contid and c.lifeStart <= :point and c.lifeEnd > :point order by c.sentDate asc"),
 })
 // 1 hour cache time - API caches for 30 minutes
 public class CharacterContactNotification extends CachedData {
-  private static final Logger log                 = Logger.getLogger(CharacterContactNotification.class.getName());
-  private static final byte[] MASK                = AccountAccessMask.createMask(AccountAccessMask.ACCESS_CONTACT_NOTIFICATIONS);
-  private static final int    DEFAULT_MAX_RESULTS = 1000;
-  private long                notificationID;
-  private long                senderID;
-  private String              senderName;
-  private long                sentDate            = -1;
-  private String              messageData;
+  private static final Logger log = Logger.getLogger(CharacterContactNotification.class.getName());
+  private static final byte[] MASK = AccountAccessMask.createMask(AccountAccessMask.ACCESS_CONTACT_NOTIFICATIONS);
+
+  private int notificationID;
+  private int senderID;
+  private long sentDate = -1;
+  private float standingLevel;
+  private String messageData;
   @Transient
   @ApiModelProperty(
       value = "sentDate Date")
@@ -67,16 +51,17 @@ public class CharacterContactNotification extends CachedData {
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
       pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-  private Date                sentDateDate;
+  private Date sentDateDate;
 
   @SuppressWarnings("unused")
   protected CharacterContactNotification() {}
 
-  public CharacterContactNotification(long notificationID, long senderID, String senderName, long sentDate, String messageData) {
+  public CharacterContactNotification(int notificationID, int senderID, long sentDate, float standingLevel,
+                                      String messageData) {
     this.notificationID = notificationID;
     this.senderID = senderID;
-    this.senderName = senderName;
     this.sentDate = sentDate;
+    this.standingLevel = standingLevel;
     this.messageData = messageData;
   }
 
@@ -94,11 +79,13 @@ public class CharacterContactNotification extends CachedData {
    */
   @Override
   public boolean equivalent(
-                            CachedData sup) {
+      CachedData sup) {
     if (!(sup instanceof CharacterContactNotification)) return false;
     CharacterContactNotification other = (CharacterContactNotification) sup;
-    return notificationID == other.notificationID && senderID == other.senderID && nullSafeObjectCompare(senderName, other.senderName)
-        && sentDate == other.sentDate && nullSafeObjectCompare(messageData, other.messageData);
+    return notificationID == other.notificationID && senderID == other.senderID
+        && sentDate == other.sentDate
+        && Float.compare(standingLevel, other.standingLevel) == 0
+        && nullSafeObjectCompare(messageData, other.messageData);
   }
 
   /**
@@ -109,20 +96,20 @@ public class CharacterContactNotification extends CachedData {
     return MASK;
   }
 
-  public long getNotificationID() {
+  public int getNotificationID() {
     return notificationID;
   }
 
-  public long getSenderID() {
+  public int getSenderID() {
     return senderID;
-  }
-
-  public String getSenderName() {
-    return senderName;
   }
 
   public long getSentDate() {
     return sentDate;
+  }
+
+  public float getStandingLevel() {
+    return standingLevel;
   }
 
   public String getMessageData() {
@@ -130,167 +117,116 @@ public class CharacterContactNotification extends CachedData {
   }
 
   @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + ((messageData == null) ? 0 : messageData.hashCode());
-    result = prime * result + (int) (notificationID ^ (notificationID >>> 32));
-    result = prime * result + (int) (senderID ^ (senderID >>> 32));
-    result = prime * result + ((senderName == null) ? 0 : senderName.hashCode());
-    result = prime * result + (int) (sentDate ^ (sentDate >>> 32));
-    return result;
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    CharacterContactNotification that = (CharacterContactNotification) o;
+    return notificationID == that.notificationID &&
+        senderID == that.senderID &&
+        sentDate == that.sentDate &&
+        Float.compare(that.standingLevel, standingLevel) == 0 &&
+        Objects.equals(messageData, that.messageData);
   }
 
   @Override
-  public boolean equals(
-                        Object obj) {
-    if (this == obj) return true;
-    if (!super.equals(obj)) return false;
-    if (getClass() != obj.getClass()) return false;
-    CharacterContactNotification other = (CharacterContactNotification) obj;
-    if (messageData == null) {
-      if (other.messageData != null) return false;
-    } else if (!messageData.equals(other.messageData)) return false;
-    if (notificationID != other.notificationID) return false;
-    if (senderID != other.senderID) return false;
-    if (senderName == null) {
-      if (other.senderName != null) return false;
-    } else if (!senderName.equals(other.senderName)) return false;
-    if (sentDate != other.sentDate) return false;
-    return true;
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), notificationID, senderID, sentDate, standingLevel, messageData);
   }
 
   @Override
   public String toString() {
-    return "CharacterContactNotification [notificationID=" + notificationID + ", senderID=" + senderID + ", senderName=" + senderName + ", sentDate=" + sentDate
-        + ", messageData=" + messageData + ", owner=" + owner + ", lifeStart=" + lifeStart + ", lifeEnd=" + lifeEnd + "]";
+    return "CharacterContactNotification{" +
+        "notificationID=" + notificationID +
+        ", senderID=" + senderID +
+        ", sentDate=" + sentDate +
+        ", standingLevel=" + standingLevel +
+        ", messageData='" + messageData + '\'' +
+        ", sentDateDate=" + sentDateDate +
+        '}';
   }
 
   /**
    * Retrieve contact notification with the given ID, live at the given time, or null if no such notification exists.
-   * 
-   * @param owner
-   *          notification owner
-   * @param time
-   *          time at which notification must be live
-   * @param notificationID
-   *          notification ID
+   *
+   * @param owner          notification owner
+   * @param time           time at which notification must be live
+   * @param notificationID notification ID
    * @return contact notification with the given ID live at the given time, or null
    */
   public static CharacterContactNotification get(
-                                                 final SynchronizedEveAccount owner,
-                                                 final long time,
-                                                 final long notificationID) {
+      final SynchronizedEveAccount owner,
+      final long time,
+      final int notificationID) throws IOException {
     try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<CharacterContactNotification>() {
-        @Override
-        public CharacterContactNotification run() throws Exception {
-          TypedQuery<CharacterContactNotification> getter = EveKitUserAccountProvider.getFactory().getEntityManager()
-              .createNamedQuery("CharacterContactNotification.getByNotificationID", CharacterContactNotification.class);
-          getter.setParameter("owner", owner);
-          getter.setParameter("nid", notificationID);
-          getter.setParameter("point", time);
-          try {
-            return getter.getSingleResult();
-          } catch (NoResultException e) {
-            return null;
-          }
-        }
-      });
+      return EveKitUserAccountProvider.getFactory()
+                                      .runTransaction(() -> {
+                                        TypedQuery<CharacterContactNotification> getter = EveKitUserAccountProvider.getFactory()
+                                                                                                                   .getEntityManager()
+                                                                                                                   .createNamedQuery(
+                                                                                                                       "CharacterContactNotification.getByNotificationID",
+                                                                                                                       CharacterContactNotification.class);
+                                        getter.setParameter("owner", owner);
+                                        getter.setParameter("nid", notificationID);
+                                        getter.setParameter("point", time);
+                                        try {
+                                          return getter.getSingleResult();
+                                        } catch (NoResultException e) {
+                                          return null;
+                                        }
+                                      });
     } catch (Exception e) {
+      if (e.getCause() instanceof IOException) throw (IOException) e.getCause();
       log.log(Level.SEVERE, "query error", e);
+      throw new IOException(e.getCause());
     }
-    return null;
-  }
-
-  /**
-   * Retrieve list of contact notifications live at the given time with sentDate after "contid"
-   * 
-   * @param owner
-   *          notifications owner
-   * @param time
-   *          time at which notifications must be live
-   * @param maxresults
-   *          maximum number of notifications to retrieve
-   * @param contid
-   *          sentDate (exclusive) after which notifications will be retrieved
-   * @return list of contact notifications live at the given time with sentDate after "contid"
-   */
-  public static List<CharacterContactNotification> getAllNotifications(
-                                                                       final SynchronizedEveAccount owner,
-                                                                       final long time,
-                                                                       int maxresults,
-                                                                       final long contid) {
-    final int maxr = OrbitalProperties.getNonzeroLimited(maxresults, (int) PersistentProperty
-        .getLongPropertyWithFallback(OrbitalProperties.getPropertyName(CharacterContactNotification.class, "maxresults"), DEFAULT_MAX_RESULTS));
-    try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<CharacterContactNotification>>() {
-        @Override
-        public List<CharacterContactNotification> run() throws Exception {
-          TypedQuery<CharacterContactNotification> getter = EveKitUserAccountProvider.getFactory().getEntityManager()
-              .createNamedQuery("CharacterContactNotification.getAll", CharacterContactNotification.class);
-          getter.setParameter("owner", owner);
-          getter.setParameter("contid", contid);
-          getter.setParameter("point", time);
-          getter.setMaxResults(maxr);
-          return getter.getResultList();
-        }
-      });
-    } catch (Exception e) {
-      log.log(Level.SEVERE, "query error", e);
-    }
-    return Collections.emptyList();
   }
 
   public static List<CharacterContactNotification> accessQuery(
-                                                               final SynchronizedEveAccount owner,
-                                                               final long contid,
-                                                               final int maxresults,
-                                                               final boolean reverse,
-                                                               final AttributeSelector at,
-                                                               final AttributeSelector notificationID,
-                                                               final AttributeSelector senderID,
-                                                               final AttributeSelector senderName,
-                                                               final AttributeSelector sentDate,
-                                                               final AttributeSelector messageData) {
+      final SynchronizedEveAccount owner,
+      final long contid,
+      final int maxresults,
+      final boolean reverse,
+      final AttributeSelector at,
+      final AttributeSelector notificationID,
+      final AttributeSelector senderID,
+      final AttributeSelector sentDate,
+      final AttributeSelector standingLevel,
+      final AttributeSelector messageData) throws IOException {
     try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<CharacterContactNotification>>() {
-        @Override
-        public List<CharacterContactNotification> run() throws Exception {
-          StringBuilder qs = new StringBuilder();
-          qs.append("SELECT c FROM CharacterContactNotification c WHERE ");
-          // Constrain to specified owner
-          qs.append("c.owner = :owner");
-          // Constrain lifeline
-          AttributeSelector.addLifelineSelector(qs, "c", at);
-          // Constrain attributes
-          AttributeParameters p = new AttributeParameters("att");
-          AttributeSelector.addLongSelector(qs, "c", "notificationID", notificationID);
-          AttributeSelector.addLongSelector(qs, "c", "senderID", senderID);
-          AttributeSelector.addStringSelector(qs, "c", "senderName", senderName, p);
-          AttributeSelector.addLongSelector(qs, "c", "sentDate", sentDate);
-          AttributeSelector.addStringSelector(qs, "c", "messageData", messageData, p);
-          // Set CID constraint and ordering
-          if (reverse) {
-            qs.append(" and c.cid < ").append(contid);
-            qs.append(" order by cid desc");
-          } else {
-            qs.append(" and c.cid > ").append(contid);
-            qs.append(" order by cid asc");
-          }
-          // Return result
-          TypedQuery<CharacterContactNotification> query = EveKitUserAccountProvider.getFactory().getEntityManager()
-              .createQuery(qs.toString(), CharacterContactNotification.class);
-          query.setParameter("owner", owner);
-          p.fillParams(query);
-          query.setMaxResults(maxresults);
-          return query.getResultList();
-        }
-      });
+      return EveKitUserAccountProvider.getFactory()
+                                      .runTransaction(() -> {
+                                        StringBuilder qs = new StringBuilder();
+                                        qs.append("SELECT c FROM CharacterContactNotification c WHERE ");
+                                        // Constrain to specified owner
+                                        qs.append("c.owner = :owner");
+                                        // Constrain lifeline
+                                        AttributeSelector.addLifelineSelector(qs, "c", at);
+                                        // Constrain attributes
+                                        AttributeParameters p = new AttributeParameters("att");
+                                        AttributeSelector.addIntSelector(qs, "c", "notificationID", notificationID);
+                                        AttributeSelector.addIntSelector(qs, "c", "senderID", senderID);
+                                        AttributeSelector.addLongSelector(qs, "c", "sentDate", sentDate);
+                                        AttributeSelector.addFloatSelector(qs, "c", "standingLevel", standingLevel);
+                                        AttributeSelector.addStringSelector(qs, "c", "messageData", messageData, p);
+                                        // Set CID constraint and ordering
+                                        setCIDOrdering(qs, contid, reverse);
+                                        // Return result
+                                        TypedQuery<CharacterContactNotification> query = EveKitUserAccountProvider.getFactory()
+                                                                                                                  .getEntityManager()
+                                                                                                                  .createQuery(
+                                                                                                                      qs.toString(),
+                                                                                                                      CharacterContactNotification.class);
+                                        query.setParameter("owner", owner);
+                                        p.fillParams(query);
+                                        query.setMaxResults(maxresults);
+                                        return query.getResultList();
+                                      });
     } catch (Exception e) {
+      if (e.getCause() instanceof IOException) throw (IOException) e.getCause();
       log.log(Level.SEVERE, "query error", e);
+      throw new IOException(e.getCause());
     }
-    return Collections.emptyList();
   }
 
 }

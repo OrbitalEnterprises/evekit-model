@@ -1,78 +1,48 @@
 package enterprises.orbital.evekit.model.character;
 
+import enterprises.orbital.evekit.TestBase;
+import enterprises.orbital.evekit.account.AccountAccessMask;
+import enterprises.orbital.evekit.model.AbstractModelTester;
+import enterprises.orbital.evekit.model.AttributeSelector;
+import enterprises.orbital.evekit.model.CachedData;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-import enterprises.orbital.evekit.TestBase;
-import enterprises.orbital.evekit.account.AccountAccessMask;
-import enterprises.orbital.evekit.account.SynchronizedEveAccount;
-import enterprises.orbital.evekit.model.AbstractModelTester;
-import enterprises.orbital.evekit.model.CachedData;
-
 public class ChatChannelMemberTest extends AbstractModelTester<ChatChannelMember> {
-  final private long                                 channelID    = TestBase.getRandomInt(100000000);
-  final private String                               category     = "allowed";
-  final private long                                 accessorID   = TestBase.getRandomInt(100000000);
-  final private String                               accessorName = "teset accessor";
-  final private long                                 untilWhen    = TestBase.getRandomInt(100000000);
-  final private String                               reason       = "test reason";
+  final private int channelID = TestBase.getRandomInt(100000000);
+  final private String category = "allowed";
+  final private int accessorID = TestBase.getRandomInt(100000000);
+  final private String accessorType = "teset accessor";
+  final private long untilWhen = TestBase.getRandomInt(100000000);
+  final private String reason = "test reason";
 
-  final ClassUnderTestConstructor<ChatChannelMember> eol          = new ClassUnderTestConstructor<ChatChannelMember>() {
+  final ClassUnderTestConstructor<ChatChannelMember> eol = () -> new ChatChannelMember(
+      channelID, category, accessorID, accessorType, untilWhen, reason);
 
-                                                                    @Override
-                                                                    public ChatChannelMember getCUT() {
-                                                                      return new ChatChannelMember(
-                                                                          channelID, category, accessorID, accessorName, untilWhen, reason);
-                                                                    }
-
-                                                                  };
-
-  final ClassUnderTestConstructor<ChatChannelMember> live         = new ClassUnderTestConstructor<ChatChannelMember>() {
-                                                                    @Override
-                                                                    public ChatChannelMember getCUT() {
-                                                                      return new ChatChannelMember(
-                                                                          channelID, category, accessorID, accessorName, untilWhen, reason);
-                                                                    }
-
-                                                                  };
+  final ClassUnderTestConstructor<ChatChannelMember> live = () -> new ChatChannelMember(
+      channelID, category, accessorID, accessorType, untilWhen, reason);
 
   @Test
   public void testBasic() throws Exception {
-
-    runBasicTests(eol, new CtorVariants<ChatChannelMember>() {
-
-      @Override
-      public ChatChannelMember[] getVariants() {
-        return new ChatChannelMember[] {
-            new ChatChannelMember(channelID + 1, category, accessorID, accessorName, untilWhen, reason),
-            new ChatChannelMember(channelID, category + "1", accessorID, accessorName, untilWhen, reason),
-            new ChatChannelMember(channelID, category, accessorID + 1, accessorName, untilWhen, reason),
-            new ChatChannelMember(channelID, category, accessorID, accessorName + "1", untilWhen, reason),
-            new ChatChannelMember(channelID, category, accessorID, accessorName, untilWhen + 1, reason),
-            new ChatChannelMember(channelID, category, accessorID, accessorName, untilWhen, reason + "1")
-        };
-      }
-
+    runBasicTests(eol, () -> new ChatChannelMember[]{
+        new ChatChannelMember(channelID + 1, category, accessorID, accessorType, untilWhen, reason),
+        new ChatChannelMember(channelID, category + "1", accessorID, accessorType, untilWhen, reason),
+        new ChatChannelMember(channelID, category, accessorID + 1, accessorType, untilWhen, reason),
+        new ChatChannelMember(channelID, category, accessorID, accessorType + "1", untilWhen, reason),
+        new ChatChannelMember(channelID, category, accessorID, accessorType, untilWhen + 1, reason),
+        new ChatChannelMember(channelID, category, accessorID, accessorType, untilWhen, reason + "1")
     }, AccountAccessMask.createMask(AccountAccessMask.ACCESS_CHAT_CHANNELS));
   }
 
   @Test
   public void testGetLifeline() throws Exception {
 
-    runGetLifelineTest(eol, live, new ModelRetriever<ChatChannelMember>() {
-
-      @Override
-      public ChatChannelMember getModel(
-                                        SynchronizedEveAccount account,
-                                        long time) {
-        return ChatChannelMember.get(account, time, channelID, category, accessorID);
-      }
-
-    });
+    runGetLifelineTest(eol, live,
+                       (account, time) -> ChatChannelMember.get(account, time, channelID, category, accessorID));
   }
 
   @Test
@@ -81,205 +51,85 @@ public class ChatChannelMemberTest extends AbstractModelTester<ChatChannelMember
     // - members for a different account
     // - members not live at the given time
     ChatChannelMember existing;
-    Map<Long, Map<String, Map<Long, ChatChannelMember>>> listCheck = new HashMap<Long, Map<String, Map<Long, ChatChannelMember>>>();
+    Map<Integer, Map<String, Map<Integer, ChatChannelMember>>> listCheck = new HashMap<>();
 
-    existing = new ChatChannelMember(channelID, category, accessorID, accessorName, untilWhen, reason);
+    existing = new ChatChannelMember(channelID, category, accessorID, accessorType, untilWhen, reason);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
-    listCheck.put(channelID, new HashMap<String, Map<Long, ChatChannelMember>>());
-    listCheck.get(channelID).put(category, new HashMap<Long, ChatChannelMember>());
-    listCheck.get(channelID).get(category).put(accessorID, existing);
+    listCheck.put(channelID, new HashMap<>());
+    listCheck.get(channelID)
+             .put(category, new HashMap<>());
+    listCheck.get(channelID)
+             .get(category)
+             .put(accessorID, existing);
 
-    existing = new ChatChannelMember(channelID, category + "10", accessorID, accessorName, untilWhen, reason);
+    existing = new ChatChannelMember(channelID, category + "10", accessorID, accessorType, untilWhen, reason);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
-    listCheck.get(channelID).put(category + "10", new HashMap<Long, ChatChannelMember>());
-    listCheck.get(channelID).get(category + "10").put(accessorID, existing);
+    listCheck.get(channelID)
+             .put(category + "10", new HashMap<>());
+    listCheck.get(channelID)
+             .get(category + "10")
+             .put(accessorID, existing);
 
-    existing = new ChatChannelMember(channelID, category, accessorID + 10, accessorName, untilWhen, reason);
+    existing = new ChatChannelMember(channelID, category, accessorID + 10, accessorType, untilWhen, reason);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
-    listCheck.get(channelID).get(category).put(accessorID + 10, existing);
+    listCheck.get(channelID)
+             .get(category)
+             .put(accessorID + 10, existing);
 
-    existing = new ChatChannelMember(channelID + 10, category, accessorID, accessorName, untilWhen, reason);
+    existing = new ChatChannelMember(channelID + 10, category, accessorID, accessorType, untilWhen, reason);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
-    listCheck.put(channelID + 10, new HashMap<String, Map<Long, ChatChannelMember>>());
-    listCheck.get(channelID + 10).put(category, new HashMap<Long, ChatChannelMember>());
-    listCheck.get(channelID + 10).get(category).put(accessorID, existing);
+    listCheck.put(channelID + 10, new HashMap<>());
+    listCheck.get(channelID + 10)
+             .put(category, new HashMap<>());
+    listCheck.get(channelID + 10)
+             .get(category)
+             .put(accessorID, existing);
 
     // Associated with different account
-    existing = new ChatChannelMember(channelID, category, accessorID, accessorName, untilWhen, reason);
+    existing = new ChatChannelMember(channelID, category, accessorID, accessorType, untilWhen, reason);
     existing.setup(otherAccount, 7777L);
     CachedData.update(existing);
 
     // Not live at the given time
-    existing = new ChatChannelMember(channelID, category, accessorID + 5, accessorName, untilWhen, reason);
+    existing = new ChatChannelMember(channelID, category, accessorID + 5, accessorType, untilWhen, reason);
     existing.setup(testAccount, 9999L);
     CachedData.update(existing);
 
     // EOL before the given time
-    existing = new ChatChannelMember(channelID, category, accessorID + 3, accessorName, untilWhen, reason);
+    existing = new ChatChannelMember(channelID, category, accessorID + 3, accessorType, untilWhen, reason);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
     CachedData.update(existing);
 
     // Verify all members are returned
-    List<ChatChannelMember> result = ChatChannelMember.getAllChatChannelMembers(testAccount, 8888L);
+    List<ChatChannelMember> result = CachedData.retrieveAll(8888L,
+                                                            (contid, at) -> ChatChannelMember.accessQuery(testAccount,
+                                                                                                          contid, 1000,
+                                                                                                          false, at,
+                                                                                                          AttributeSelector.any(),
+                                                                                                          AttributeSelector.any(),
+                                                                                                          AttributeSelector.any(),
+                                                                                                          AttributeSelector.any(),
+                                                                                                          AttributeSelector.any(),
+                                                                                                          AttributeSelector.any()));
     Assert.assertEquals(4, result.size());
     for (ChatChannelMember next : result) {
-      long channelID = next.getChannelID();
+      int channelID = next.getChannelID();
       String category = next.getCategory();
-      long accessorID = next.getAccessorID();
+      int accessorID = next.getAccessorID();
       Assert.assertTrue(listCheck.containsKey(channelID));
-      Assert.assertTrue(listCheck.get(channelID).containsKey(category));
-      Assert.assertTrue(listCheck.get(channelID).get(category).containsKey(accessorID));
-      Assert.assertEquals(listCheck.get(channelID).get(category).get(accessorID), next);
-    }
-  }
-
-  @Test
-  public void testGetAllChatChannelMembersByChannelID() throws Exception {
-    // Should exclude:
-    // - members for a different channel
-    // - members for a different account
-    // - members not live at the given time
-    ChatChannelMember existing;
-    Map<Long, Map<String, Map<Long, ChatChannelMember>>> listCheck = new HashMap<Long, Map<String, Map<Long, ChatChannelMember>>>();
-
-    existing = new ChatChannelMember(channelID, category, accessorID, accessorName, untilWhen, reason);
-    existing.setup(testAccount, 7777L);
-    existing = CachedData.update(existing);
-    listCheck.put(channelID, new HashMap<String, Map<Long, ChatChannelMember>>());
-    listCheck.get(channelID).put(category, new HashMap<Long, ChatChannelMember>());
-    listCheck.get(channelID).get(category).put(accessorID, existing);
-
-    existing = new ChatChannelMember(channelID, category + "10", accessorID, accessorName, untilWhen, reason);
-    existing.setup(testAccount, 7777L);
-    existing = CachedData.update(existing);
-    listCheck.get(channelID).put(category + "10", new HashMap<Long, ChatChannelMember>());
-    listCheck.get(channelID).get(category + "10").put(accessorID, existing);
-
-    existing = new ChatChannelMember(channelID, category, accessorID + 10, accessorName, untilWhen, reason);
-    existing.setup(testAccount, 7777L);
-    existing = CachedData.update(existing);
-    listCheck.get(channelID).get(category).put(accessorID + 10, existing);
-
-    existing = new ChatChannelMember(channelID, category, accessorID + 20, accessorName, untilWhen, reason);
-    existing.setup(testAccount, 7777L);
-    existing = CachedData.update(existing);
-    listCheck.get(channelID).get(category).put(accessorID + 20, existing);
-
-    // Associated with different channel
-    existing = new ChatChannelMember(channelID + 10, category, accessorID, accessorName, untilWhen, reason);
-    existing.setup(otherAccount, 7777L);
-    CachedData.update(existing);
-
-    // Associated with different account
-    existing = new ChatChannelMember(channelID, category, accessorID, accessorName, untilWhen, reason);
-    existing.setup(otherAccount, 7777L);
-    CachedData.update(existing);
-
-    // Not live at the given time
-    existing = new ChatChannelMember(channelID, category, accessorID + 5, accessorName, untilWhen, reason);
-    existing.setup(testAccount, 9999L);
-    CachedData.update(existing);
-
-    // EOL before the given time
-    existing = new ChatChannelMember(channelID, category, accessorID + 3, accessorName, untilWhen, reason);
-    existing.setup(testAccount, 7777L);
-    existing.evolve(null, 7977L);
-    CachedData.update(existing);
-
-    // Verify all members are returned
-    List<ChatChannelMember> result = ChatChannelMember.getByChannelID(testAccount, 8888L, channelID);
-    Assert.assertEquals(4, result.size());
-    for (ChatChannelMember next : result) {
-      long channelID = next.getChannelID();
-      String category = next.getCategory();
-      long accessorID = next.getAccessorID();
-      Assert.assertTrue(listCheck.containsKey(channelID));
-      Assert.assertTrue(listCheck.get(channelID).containsKey(category));
-      Assert.assertTrue(listCheck.get(channelID).get(category).containsKey(accessorID));
-      Assert.assertEquals(listCheck.get(channelID).get(category).get(accessorID), next);
-    }
-  }
-
-  @Test
-  public void testGetAllChatChannelMembersByChannelIDAndCategory() throws Exception {
-    // Should exclude:
-    // - members for a different channel
-    // - members for a different category
-    // - members for a different category and channel
-    // - members for a different account
-    // - members not live at the given time
-    ChatChannelMember existing;
-    Map<Long, Map<String, Map<Long, ChatChannelMember>>> listCheck = new HashMap<Long, Map<String, Map<Long, ChatChannelMember>>>();
-
-    existing = new ChatChannelMember(channelID, category, accessorID, accessorName, untilWhen, reason);
-    existing.setup(testAccount, 7777L);
-    existing = CachedData.update(existing);
-    listCheck.put(channelID, new HashMap<String, Map<Long, ChatChannelMember>>());
-    listCheck.get(channelID).put(category, new HashMap<Long, ChatChannelMember>());
-    listCheck.get(channelID).get(category).put(accessorID, existing);
-
-    existing = new ChatChannelMember(channelID, category, accessorID + 10, accessorName, untilWhen, reason);
-    existing.setup(testAccount, 7777L);
-    existing = CachedData.update(existing);
-    listCheck.get(channelID).get(category).put(accessorID + 10, existing);
-
-    existing = new ChatChannelMember(channelID, category, accessorID + 20, accessorName, untilWhen, reason);
-    existing.setup(testAccount, 7777L);
-    existing = CachedData.update(existing);
-    listCheck.get(channelID).get(category).put(accessorID + 20, existing);
-
-    existing = new ChatChannelMember(channelID, category, accessorID + 30, accessorName, untilWhen, reason);
-    existing.setup(testAccount, 7777L);
-    existing = CachedData.update(existing);
-    listCheck.get(channelID).get(category).put(accessorID + 30, existing);
-
-    // Associated with different channel
-    existing = new ChatChannelMember(channelID + 10, category, accessorID, accessorName, untilWhen, reason);
-    existing.setup(otherAccount, 7777L);
-    CachedData.update(existing);
-
-    // Associated with different category
-    existing = new ChatChannelMember(channelID, category + "10", accessorID, accessorName, untilWhen, reason);
-    existing.setup(otherAccount, 7777L);
-    CachedData.update(existing);
-
-    // Associated with different channel and category
-    existing = new ChatChannelMember(channelID + 10, category + "10", accessorID, accessorName, untilWhen, reason);
-    existing.setup(otherAccount, 7777L);
-    CachedData.update(existing);
-
-    // Associated with different account
-    existing = new ChatChannelMember(channelID, category, accessorID, accessorName, untilWhen, reason);
-    existing.setup(otherAccount, 7777L);
-    CachedData.update(existing);
-
-    // Not live at the given time
-    existing = new ChatChannelMember(channelID, category, accessorID + 5, accessorName, untilWhen, reason);
-    existing.setup(testAccount, 9999L);
-    CachedData.update(existing);
-
-    // EOL before the given time
-    existing = new ChatChannelMember(channelID, category, accessorID + 3, accessorName, untilWhen, reason);
-    existing.setup(testAccount, 7777L);
-    existing.evolve(null, 7977L);
-    CachedData.update(existing);
-
-    // Verify all members are returned
-    List<ChatChannelMember> result = ChatChannelMember.getByChannelIDAndCategory(testAccount, 8888L, channelID, category);
-    Assert.assertEquals(4, result.size());
-    for (ChatChannelMember next : result) {
-      long channelID = next.getChannelID();
-      String category = next.getCategory();
-      long accessorID = next.getAccessorID();
-      Assert.assertTrue(listCheck.containsKey(channelID));
-      Assert.assertTrue(listCheck.get(channelID).containsKey(category));
-      Assert.assertTrue(listCheck.get(channelID).get(category).containsKey(accessorID));
-      Assert.assertEquals(listCheck.get(channelID).get(category).get(accessorID), next);
+      Assert.assertTrue(listCheck.get(channelID)
+                                 .containsKey(category));
+      Assert.assertTrue(listCheck.get(channelID)
+                                 .get(category)
+                                 .containsKey(accessorID));
+      Assert.assertEquals(listCheck.get(channelID)
+                                   .get(category)
+                                   .get(accessorID), next);
     }
   }
 

@@ -144,7 +144,8 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
       CachedData next = new CharacterContactNotification(
-          TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomText(50), TestBase.getRandomLong(), TestBase.getRandomText(50));
+          TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomLong(),
+          TestBase.getRandomFloat(10), TestBase.getRandomText(50));
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
@@ -183,8 +184,8 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
       CachedData next = new CharacterMedal(
-          TestBase.getRandomText(50), TestBase.getRandomInt(), TestBase.getRandomText(50), TestBase.getRandomLong(), TestBase.getRandomLong(),
-          TestBase.getRandomLong(), TestBase.getRandomText(50), TestBase.getRandomText(50));
+          TestBase.getRandomText(50), TestBase.getRandomInt(), TestBase.getRandomText(50), TestBase.getRandomInt(), TestBase.getRandomLong(),
+          TestBase.getRandomInt(), TestBase.getRandomText(50), TestBase.getRandomText(50));
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
@@ -192,11 +193,25 @@ public class CachedDataTest extends AbstractAccountBasedTest {
       CachedData.update(next);
     }
     System.out.println("Created CharacterMedals");
+    count = TestBase.getRandomInt(10) + 5;
+    for (int i = 0; i < count; i++) {
+      int sel = TestBase.getRandomInt(5);
+      CachedData next = new CharacterMedalGraphic(
+          TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomInt(), TestBase.getRandomInt(),
+          TestBase.getRandomText(50), TestBase.getRandomInt());
+      for (int j = 0; j < sel; j++) {
+        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
+      }
+      next.setup(testAccount, testTime);
+      CachedData.update(next);
+    }
+    System.out.println("Created CharacterMedalGraphics");
     count = TestBase.getRandomInt(100) + 50;
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
       CachedData next = new CharacterNotification(
-          TestBase.getRandomLong(), TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomBoolean());
+          TestBase.getRandomLong(), TestBase.getRandomText(50), TestBase.getRandomInt(), TestBase.getRandomText(50),
+          TestBase.getRandomLong(), TestBase.getRandomBoolean(), TestBase.getRandomText(50));
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
@@ -204,22 +219,10 @@ public class CachedDataTest extends AbstractAccountBasedTest {
       CachedData.update(next);
     }
     System.out.println("Created CharacterNotifications");
-    count = TestBase.getRandomInt(100) + 50;
-    for (int i = 0; i < count; i++) {
-      int sel = TestBase.getRandomInt(5);
-      CachedData next = new CharacterNotificationBody(
-          TestBase.getRandomLong(), TestBase.getRandomBoolean(), TestBase.getRandomText(1000), TestBase.getRandomBoolean());
-      for (int j = 0; j < sel; j++) {
-        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
-      }
-      next.setup(testAccount, testTime);
-      CachedData.update(next);
-    }
-    System.out.println("Created CharacterNotificationBodies");
     count = TestBase.getRandomInt(10) + 5;
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
-      CachedData next = new CharacterRole(TestBase.getRandomText(20), TestBase.getRandomLong(), TestBase.getRandomText(50));
+      CachedData next = new CharacterRole(TestBase.getRandomText(20), TestBase.getRandomText(50));
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
@@ -341,7 +344,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     count = TestBase.getRandomInt(10) + 5;
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
-      CachedData next = new CharacterTitle(TestBase.getRandomLong(), TestBase.getRandomText(50));
+      CachedData next = new CharacterTitle(TestBase.getRandomInt(), TestBase.getRandomText(50));
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
@@ -353,7 +356,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
       CachedData next = new ChatChannel(
-          TestBase.getUniqueRandomLong(), TestBase.getRandomLong(), TestBase.getRandomText(50), TestBase.getRandomText(50), TestBase.getRandomText(50),
+          TestBase.getUniqueRandomInteger(), TestBase.getRandomInt(), TestBase.getRandomText(50), TestBase.getRandomText(50),
           TestBase.getRandomBoolean(), TestBase.getRandomText(50));
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
@@ -370,7 +373,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
       int sel = TestBase.getRandomInt(5);
       int category = TestBase.getRandomInt(4);
       CachedData next = new ChatChannelMember(
-          TestBase.getUniqueRandomLong(), cats[category], TestBase.getUniqueRandomLong(), TestBase.getRandomText(50), TestBase.getRandomLong(),
+          TestBase.getUniqueRandomInteger(), cats[category], TestBase.getUniqueRandomInteger(), TestBase.getRandomText(50), TestBase.getRandomLong(),
           TestBase.getRandomText(50));
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
@@ -1184,8 +1187,8 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     CachedData.cleanup(testAccount, "CharacterContactNotification");
     CachedData.cleanup(testAccount, "CharacterMailMessage");
     CachedData.cleanup(testAccount, "CharacterMedal");
+    CachedData.cleanup(testAccount, "CharacterMedalGraphic");
     CachedData.cleanup(testAccount, "CharacterNotification");
-    CachedData.cleanup(testAccount, "CharacterNotificationBody");
     CachedData.cleanup(testAccount, "CharacterRole");
     CachedData.cleanup(testAccount, "CharacterLocation");
     CachedData.cleanup(testAccount, "CharacterSheetAttributes");

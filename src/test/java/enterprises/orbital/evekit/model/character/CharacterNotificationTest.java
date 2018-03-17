@@ -1,74 +1,48 @@
 package enterprises.orbital.evekit.model.character;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import enterprises.orbital.evekit.TestBase;
+import enterprises.orbital.evekit.account.AccountAccessMask;
+import enterprises.orbital.evekit.model.AbstractModelTester;
+import enterprises.orbital.evekit.model.AttributeSelector;
+import enterprises.orbital.evekit.model.CachedData;
 import org.junit.Assert;
 import org.junit.Test;
 
-import enterprises.orbital.evekit.TestBase;
-import enterprises.orbital.evekit.account.AccountAccessMask;
-import enterprises.orbital.evekit.account.SynchronizedEveAccount;
-import enterprises.orbital.evekit.model.AbstractModelTester;
-import enterprises.orbital.evekit.model.CachedData;
-import enterprises.orbital.evekit.model.character.CharacterNotification;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class CharacterNotificationTest extends AbstractModelTester<CharacterNotification> {
-  final long                                             notificationID = TestBase.getRandomInt(100000000);
-  final int                                              typeID         = TestBase.getRandomInt(100000000);
-  final long                                             senderID       = TestBase.getRandomInt(100000000);
-  final long                                             sentDate       = TestBase.getRandomInt(100000000);
-  final boolean                                          msgRead        = true;
+  private final long notificationID = TestBase.getRandomInt(100000000);
+  private final String type = TestBase.getRandomText(50);
+  private final int senderID = TestBase.getRandomInt(100000000);
+  private final String senderType = TestBase.getRandomText(50);
+  private final long sentDate = TestBase.getRandomInt(100000000);
+  private final boolean msgRead = true;
+  private final String text = TestBase.getRandomText(1000);
 
-  final ClassUnderTestConstructor<CharacterNotification> eol            = new ClassUnderTestConstructor<CharacterNotification>() {
+  final ClassUnderTestConstructor<CharacterNotification> eol = () -> new CharacterNotification(
+      notificationID, type, senderID, senderType, sentDate, msgRead, text);
 
-                                                                          @Override
-                                                                          public CharacterNotification getCUT() {
-                                                                            return new CharacterNotification(
-                                                                                notificationID, typeID, senderID, sentDate, msgRead);
-                                                                          }
-
-                                                                        };
-
-  final ClassUnderTestConstructor<CharacterNotification> live           = new ClassUnderTestConstructor<CharacterNotification>() {
-                                                                          @Override
-                                                                          public CharacterNotification getCUT() {
-                                                                            return new CharacterNotification(
-                                                                                notificationID, typeID + 1, senderID + 1, sentDate + 1, !msgRead);
-                                                                          }
-
-                                                                        };
+  final ClassUnderTestConstructor<CharacterNotification> live = () -> new CharacterNotification(
+      notificationID, type, senderID + 1, senderType, sentDate + 1, !msgRead, text);
 
   @Test
   public void testBasic() throws Exception {
-
-    runBasicTests(eol, new CtorVariants<CharacterNotification>() {
-
-      @Override
-      public CharacterNotification[] getVariants() {
-        return new CharacterNotification[] {
-            new CharacterNotification(notificationID + 1, typeID, senderID, sentDate, msgRead),
-            new CharacterNotification(notificationID, typeID + 1, senderID, sentDate, msgRead),
-            new CharacterNotification(notificationID, typeID, senderID + 1, sentDate, msgRead),
-            new CharacterNotification(notificationID, typeID, senderID, sentDate + 1, msgRead),
-            new CharacterNotification(notificationID, typeID, senderID, sentDate, !msgRead)
-        };
-      }
-
+    runBasicTests(eol, () -> new CharacterNotification[]{
+        new CharacterNotification(notificationID + 1, type, senderID, senderType, sentDate, msgRead, text),
+        new CharacterNotification(notificationID, type + "1", senderID, senderType, sentDate, msgRead, text),
+        new CharacterNotification(notificationID, type, senderID + 1, senderType, sentDate, msgRead, text),
+        new CharacterNotification(notificationID, type, senderID, senderType + "1", sentDate, msgRead, text),
+        new CharacterNotification(notificationID, type, senderID, senderType, sentDate + 1, msgRead, text),
+        new CharacterNotification(notificationID, type, senderID, senderType, sentDate, !msgRead, text),
+        new CharacterNotification(notificationID, type, senderID, senderType, sentDate, msgRead, text + "1"),
     }, AccountAccessMask.createMask(AccountAccessMask.ACCESS_NOTIFICATIONS));
   }
 
   @Test
   public void testGetLifeline() throws Exception {
-    runGetLifelineTest(eol, live, new ModelRetriever<CharacterNotification>() {
-
-      @Override
-      public CharacterNotification getModel(SynchronizedEveAccount account, long time) {
-        return CharacterNotification.get(account, time, notificationID);
-      }
-
-    });
+    runGetLifelineTest(eol, live, (account, time) -> CharacterNotification.get(account, time, notificationID));
   }
 
   @Test
@@ -82,74 +56,71 @@ public class CharacterNotificationTest extends AbstractModelTester<CharacterNoti
     // - unread limitation
 
     CharacterNotification existing;
-    Set<Long> listCheck = new HashSet<Long>();
+    Map<Long, CharacterNotification> listCheck = new HashMap<>();
 
-    existing = new CharacterNotification(notificationID, typeID, senderID, sentDate, msgRead);
+    existing = new CharacterNotification(notificationID, type, senderID, senderType, sentDate, msgRead, text);
     existing.setup(testAccount, 7777L);
-    CachedData.update(existing);
-    listCheck.add(notificationID);
+    existing = CachedData.update(existing);
+    listCheck.put(notificationID, existing);
 
-    existing = new CharacterNotification(notificationID + 10, typeID + 1, senderID + 1, sentDate + 10, msgRead);
+    existing = new CharacterNotification(notificationID + 10, type, senderID + 1, senderType, sentDate + 10, msgRead,
+                                         text);
     existing.setup(testAccount, 7777L);
-    CachedData.update(existing);
-    listCheck.add(notificationID + 10);
+    existing = CachedData.update(existing);
+    listCheck.put(notificationID + 10, existing);
 
-    existing = new CharacterNotification(notificationID + 20, typeID + 2, senderID + 2, sentDate + 20, msgRead);
+    existing = new CharacterNotification(notificationID + 20, type, senderID + 2, senderType, sentDate + 20, msgRead,
+                                         text);
     existing.setup(testAccount, 7777L);
-    CachedData.update(existing);
-    listCheck.add(notificationID + 20);
+    existing = CachedData.update(existing);
+    listCheck.put(notificationID + 20, existing);
 
-    existing = new CharacterNotification(notificationID + 30, typeID + 3, senderID + 3, sentDate + 30, msgRead);
+    existing = new CharacterNotification(notificationID + 30, type, senderID + 3, senderType, sentDate + 30, msgRead,
+                                         text);
     existing.setup(testAccount, 7777L);
-    CachedData.update(existing);
-    listCheck.add(notificationID + 30);
+    existing = CachedData.update(existing);
+    listCheck.put(notificationID + 30, existing);
 
     // Associated with different account
-    existing = new CharacterNotification(notificationID, typeID, senderID, sentDate, msgRead);
+    existing = new CharacterNotification(notificationID, type, senderID, senderType, sentDate, msgRead, text);
     existing.setup(otherAccount, 7777L);
     CachedData.update(existing);
 
     // Not live at the given time
-    existing = new CharacterNotification(notificationID + 5, typeID + 5, senderID + 5, sentDate + 5, msgRead);
+    existing = new CharacterNotification(notificationID + 5, type, senderID + 5, senderType, sentDate + 5, msgRead,
+                                         text);
     existing.setup(testAccount, 9999L);
     CachedData.update(existing);
 
     // EOL before the given time
-    existing = new CharacterNotification(notificationID + 3, typeID + 6, senderID + 6, sentDate + 6, msgRead);
+    existing = new CharacterNotification(notificationID + 3, type, senderID + 6, senderType, sentDate + 6, msgRead,
+                                         text);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
     CachedData.update(existing);
 
     // Unread at given time
-    existing = new CharacterNotification(notificationID + 40, typeID + 7, senderID + 7, sentDate + 40, false);
+    existing = new CharacterNotification(notificationID + 40, type, senderID + 7, senderType, sentDate + 40, false,
+                                         text);
     existing.setup(testAccount, 7777L);
-    CachedData.update(existing);
-    listCheck.add(notificationID + 40);
+    existing = CachedData.update(existing);
+    listCheck.put(notificationID + 40, existing);
 
     // Verify only unread message is returned
-    List<Long> result = CharacterNotification.getNotificationIDs(testAccount, 8888L, true, 5, 0);
-    Assert.assertEquals(1, result.size());
-    Assert.assertEquals(notificationID + 40, result.get(0).longValue());
-
-    // Verify all notification IDs are returned
-    result = CharacterNotification.getNotificationIDs(testAccount, 8888L, false, 10, 0);
-    Assert.assertEquals(listCheck.size(), result.size());
-    for (Long next : result) {
-      Assert.assertTrue(listCheck.contains(next));
+    List<CharacterNotification> result = CachedData.retrieveAll(8888L,
+                                                                (contid, at) -> CharacterNotification.accessQuery(
+                                                                    testAccount, contid, 1000, false, at,
+                                                                    AttributeSelector.any(),
+                                                                    AttributeSelector.any(),
+                                                                    AttributeSelector.any(),
+                                                                    AttributeSelector.any(),
+                                                                    AttributeSelector.any(),
+                                                                    AttributeSelector.any(),
+                                                                    AttributeSelector.any()));
+    Assert.assertEquals(5, result.size());
+    for (CharacterNotification next : result) {
+      Assert.assertTrue(listCheck.containsKey(next.getNotificationID()));
+      Assert.assertEquals(listCheck.get(next.getNotificationID()), next);
     }
-
-    // Verify limited set returned
-    result = CharacterNotification.getNotificationIDs(testAccount, 8888L, false, 2, sentDate - 1);
-    Assert.assertEquals(2, result.size());
-    Assert.assertEquals(notificationID, result.get(0).longValue());
-    Assert.assertEquals(notificationID + 10, result.get(1).longValue());
-
-    // Verify continuation ID returns proper set
-    result = CharacterNotification.getNotificationIDs(testAccount, 8888L, false, 100, sentDate + 10);
-    Assert.assertEquals(3, result.size());
-    Assert.assertEquals(notificationID + 20, result.get(0).longValue());
-    Assert.assertEquals(notificationID + 30, result.get(1).longValue());
-    Assert.assertEquals(notificationID + 40, result.get(2).longValue());
-
   }
 }
