@@ -1,77 +1,49 @@
 package enterprises.orbital.evekit.model.corporation;
 
+import enterprises.orbital.evekit.TestBase;
+import enterprises.orbital.evekit.account.AccountAccessMask;
+import enterprises.orbital.evekit.model.AbstractModelTester;
+import enterprises.orbital.evekit.model.AttributeSelector;
+import enterprises.orbital.evekit.model.CachedData;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-import enterprises.orbital.evekit.TestBase;
-import enterprises.orbital.evekit.account.AccountAccessMask;
-import enterprises.orbital.evekit.account.SynchronizedEveAccount;
-import enterprises.orbital.evekit.model.AbstractModelTester;
-import enterprises.orbital.evekit.model.CachedData;
-
 public class CorporationMemberMedalTest extends AbstractModelTester<CorporationMemberMedal> {
 
-  final int                                               medalID     = TestBase.getRandomInt(100000000);
-  final long                                              characterID = TestBase.getRandomInt(100000000);
-  final long                                              issued      = TestBase.getRandomInt(100000000);
-  final long                                              issuerID    = TestBase.getRandomInt(100000000);
-  final String                                            reason      = "test reason";
-  final String                                            status      = "test status";
+  private final int medalID = TestBase.getRandomInt(100000000);
+  private final int characterID = TestBase.getRandomInt(100000000);
+  private final long issued = TestBase.getRandomInt(100000000);
+  private final int issuerID = TestBase.getRandomInt(100000000);
+  private final String reason = "test reason";
+  private final String status = "test status";
 
-  final ClassUnderTestConstructor<CorporationMemberMedal> eol         = new ClassUnderTestConstructor<CorporationMemberMedal>() {
+  final ClassUnderTestConstructor<CorporationMemberMedal> eol = () -> new CorporationMemberMedal(
+      medalID, characterID, issued, issuerID, reason, status);
 
-                                                                        @Override
-                                                                        public CorporationMemberMedal getCUT() {
-                                                                          return new CorporationMemberMedal(
-                                                                              medalID, characterID, issued, issuerID, reason, status);
-                                                                        }
-
-                                                                      };
-
-  final ClassUnderTestConstructor<CorporationMemberMedal> live        = new ClassUnderTestConstructor<CorporationMemberMedal>() {
-                                                                        @Override
-                                                                        public CorporationMemberMedal getCUT() {
-                                                                          return new CorporationMemberMedal(
-                                                                              medalID, characterID, issued, issuerID + 1, reason, status);
-                                                                        }
-
-                                                                      };
+  final ClassUnderTestConstructor<CorporationMemberMedal> live = () -> new CorporationMemberMedal(
+      medalID, characterID, issued, issuerID + 1, reason, status);
 
   @Test
   public void testBasic() throws Exception {
-
-    runBasicTests(eol, new CtorVariants<CorporationMemberMedal>() {
-
-      @Override
-      public CorporationMemberMedal[] getVariants() {
-        return new CorporationMemberMedal[] {
-            new CorporationMemberMedal(medalID + 1, characterID, issued, issuerID, reason, status),
-            new CorporationMemberMedal(medalID, characterID + 1, issued, issuerID, reason, status),
-            new CorporationMemberMedal(medalID, characterID, issued + 1, issuerID, reason, status),
-            new CorporationMemberMedal(medalID, characterID, issued, issuerID + 1, reason, status),
-            new CorporationMemberMedal(medalID, characterID, issued, issuerID, reason + " 1", status),
-            new CorporationMemberMedal(medalID, characterID, issued, issuerID, reason, status + " 1")
-        };
-      }
-
+    runBasicTests(eol, () -> new CorporationMemberMedal[]{
+        new CorporationMemberMedal(medalID + 1, characterID, issued, issuerID, reason, status),
+        new CorporationMemberMedal(medalID, characterID + 1, issued, issuerID, reason, status),
+        new CorporationMemberMedal(medalID, characterID, issued + 1, issuerID, reason, status),
+        new CorporationMemberMedal(medalID, characterID, issued, issuerID + 1, reason, status),
+        new CorporationMemberMedal(medalID, characterID, issued, issuerID, reason + " 1", status),
+        new CorporationMemberMedal(medalID, characterID, issued, issuerID, reason, status + " 1")
     }, AccountAccessMask.createMask(AccountAccessMask.ACCESS_MEMBER_MEDALS));
   }
 
   @Test
   public void testGetLifeline() throws Exception {
 
-    runGetLifelineTest(eol, live, new ModelRetriever<CorporationMemberMedal>() {
-
-      @Override
-      public CorporationMemberMedal getModel(SynchronizedEveAccount account, long time) {
-        return CorporationMemberMedal.get(account, time, medalID, characterID, issued);
-      }
-
-    });
+    runGetLifelineTest(eol, live,
+                       (account, time) -> CorporationMemberMedal.get(account, time, medalID, characterID, issued));
   }
 
   @Test
@@ -83,7 +55,7 @@ public class CorporationMemberMedalTest extends AbstractModelTester<CorporationM
     // - max results limitation
     // - continuation ID
     CorporationMemberMedal existing;
-    Map<Long, CorporationMemberMedal> listCheck = new HashMap<Long, CorporationMemberMedal>();
+    Map<Long, CorporationMemberMedal> listCheck = new HashMap<>();
 
     existing = new CorporationMemberMedal(medalID, characterID, issued, issuerID, reason, status);
     existing.setup(testAccount, 7777L);
@@ -121,8 +93,13 @@ public class CorporationMemberMedalTest extends AbstractModelTester<CorporationM
     existing.evolve(null, 7977L);
     CachedData.update(existing);
 
-    // Verify all jobsare returned
-    List<CorporationMemberMedal> result = CorporationMemberMedal.getAllForward(testAccount, 8888L, 10, 0);
+    // Verify all medals are returned
+    List<CorporationMemberMedal> result = CachedData.retrieveAll(8888L,
+                                                                 (contid, at) -> CorporationMemberMedal.accessQuery(
+                                                                     testAccount, contid, 1000, false, at,
+                                                                     AttributeSelector.any(), AttributeSelector.any(),
+                                                                     AttributeSelector.any(), AttributeSelector.any(),
+                                                                     AttributeSelector.any(), AttributeSelector.any()));
     Assert.assertEquals(listCheck.size(), result.size());
     for (CorporationMemberMedal next : result) {
       long issued = next.getIssued();
@@ -131,13 +108,29 @@ public class CorporationMemberMedalTest extends AbstractModelTester<CorporationM
     }
 
     // Verify limited set returned
-    result = CorporationMemberMedal.getAllForward(testAccount, 8888L, 2, issued - 1);
+    result = CorporationMemberMedal.accessQuery(testAccount, 0, 2, false,
+                                                AttributeSelector.values(8888L),
+                                                AttributeSelector.any(),
+                                                AttributeSelector.any(),
+                                                AttributeSelector.range(
+                                                    issued - 1, Long.MAX_VALUE),
+                                                AttributeSelector.any(),
+                                                AttributeSelector.any(),
+                                                AttributeSelector.any());
     Assert.assertEquals(2, result.size());
     Assert.assertEquals(listCheck.get(issued), result.get(0));
     Assert.assertEquals(listCheck.get(issued + 10), result.get(1));
 
     // Verify continuation ID returns proper set
-    result = CorporationMemberMedal.getAllForward(testAccount, 8888L, 100, issued + 10);
+    result = CorporationMemberMedal.accessQuery(testAccount, 0, 100, false,
+                                                AttributeSelector.values(8888L),
+                                                AttributeSelector.any(),
+                                                AttributeSelector.any(),
+                                                AttributeSelector.range(
+                                                    issued + 10 + 1, Long.MAX_VALUE),
+                                                AttributeSelector.any(),
+                                                AttributeSelector.any(),
+                                                AttributeSelector.any());
     Assert.assertEquals(2, result.size());
     Assert.assertEquals(listCheck.get(issued + 20), result.get(0));
     Assert.assertEquals(listCheck.get(issued + 30), result.get(1));
@@ -153,7 +146,7 @@ public class CorporationMemberMedalTest extends AbstractModelTester<CorporationM
     // - max results limitation
     // - continuation ID
     CorporationMemberMedal existing;
-    Map<Long, CorporationMemberMedal> listCheck = new HashMap<Long, CorporationMemberMedal>();
+    Map<Long, CorporationMemberMedal> listCheck = new HashMap<>();
 
     existing = new CorporationMemberMedal(medalID, characterID, issued, issuerID, reason, status);
     existing.setup(testAccount, 7777L);
@@ -192,7 +185,12 @@ public class CorporationMemberMedalTest extends AbstractModelTester<CorporationM
     CachedData.update(existing);
 
     // Verify all jobsare returned
-    List<CorporationMemberMedal> result = CorporationMemberMedal.getAllBackward(testAccount, 8888L, 10, Long.MAX_VALUE);
+    List<CorporationMemberMedal> result = CorporationMemberMedal.accessQuery(
+        testAccount, Long.MAX_VALUE, 10, true,
+        AttributeSelector.values(8888L),
+        AttributeSelector.any(), AttributeSelector.any(),
+        AttributeSelector.any(), AttributeSelector.any(),
+        AttributeSelector.any(), AttributeSelector.any());
     Assert.assertEquals(listCheck.size(), result.size());
     for (CorporationMemberMedal next : result) {
       long issued = next.getIssued();
@@ -201,13 +199,28 @@ public class CorporationMemberMedalTest extends AbstractModelTester<CorporationM
     }
 
     // Verify limited set returned
-    result = CorporationMemberMedal.getAllBackward(testAccount, 8888L, 2, issued + 30 + 1);
+    result = CorporationMemberMedal.accessQuery(testAccount, Long.MAX_VALUE, 2, true, AttributeSelector.values(8888L),
+                                                AttributeSelector.any(),
+                                                AttributeSelector.any(),
+                                                AttributeSelector.range(0,
+                                                                        issued + 30 + 1),
+                                                AttributeSelector.any(),
+                                                AttributeSelector.any(),
+                                                AttributeSelector.any());
     Assert.assertEquals(2, result.size());
     Assert.assertEquals(listCheck.get(issued + 30), result.get(0));
     Assert.assertEquals(listCheck.get(issued + 20), result.get(1));
 
     // Verify continuation ID returns proper set
-    result = CorporationMemberMedal.getAllBackward(testAccount, 8888L, 100, issued + 20);
+    result = CorporationMemberMedal.accessQuery(testAccount, Long.MAX_VALUE, 100, true,
+                                                AttributeSelector.values(8888L),
+                                                AttributeSelector.any(),
+                                                AttributeSelector.any(),
+                                                AttributeSelector.range(0,
+                                                                        issued + 20 - 1),
+                                                AttributeSelector.any(),
+                                                AttributeSelector.any(),
+                                                AttributeSelector.any());
     Assert.assertEquals(2, result.size());
     Assert.assertEquals(listCheck.get(issued + 10), result.get(0));
     Assert.assertEquals(listCheck.get(issued), result.get(1));

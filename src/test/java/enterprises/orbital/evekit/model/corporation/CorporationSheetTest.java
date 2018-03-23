@@ -1,153 +1,136 @@
 package enterprises.orbital.evekit.model.corporation;
 
-import org.junit.Test;
-
 import enterprises.orbital.evekit.TestBase;
 import enterprises.orbital.evekit.account.AccountAccessMask;
-import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AbstractModelTester;
+import org.junit.Test;
 
 public class CorporationSheetTest extends AbstractModelTester<CorporationSheet> {
 
-  final long                                        allianceID      = TestBase.getRandomInt(100000000);
-  final String                                      allianceName    = "test alliance name";
-  final long                                        ceoID           = TestBase.getRandomInt(100000000);
-  final String                                      ceoName         = "test ceo name";
-  final long                                        corporationID   = TestBase.getRandomInt(100000000);
-  final String                                      corporationName = "test corporation name";
-  final String                                      description     = "test description";
-  final int                                         logoColor1      = TestBase.getRandomInt(100000000);
-  final int                                         logoColor2      = TestBase.getRandomInt(100000000);
-  final int                                         logoColor3      = TestBase.getRandomInt(100000000);
-  final int                                         logoGraphicID   = TestBase.getRandomInt(100000000);
-  final int                                         logoShape1      = TestBase.getRandomInt(100000000);
-  final int                                         logoShape2      = TestBase.getRandomInt(100000000);
-  final int                                         logoShape3      = TestBase.getRandomInt(100000000);
-  final int                                         memberCount     = TestBase.getRandomInt(100000000);
-  final int                                         memberLimit     = TestBase.getRandomInt(100000000);
-  final int                                         shares          = TestBase.getRandomInt(100000000);
-  final long                                        stationID       = TestBase.getRandomInt(100000000);
-  final String                                      stationName     = "test station name";
-  final double                                      taxRate         = TestBase.getRandomDouble(100000000);
-  final String                                      ticker          = "test ticker";
-  final String                                      url             = "test url";
+  private final int allianceID = TestBase.getRandomInt(100000000);
+  private final int ceoID = TestBase.getRandomInt(100000000);
+  private final long corporationID = TestBase.getRandomInt(100000000);
+  private final String corporationName = "test corporation name";
+  private final String description = "test description";
+  private final int memberCount = TestBase.getRandomInt(100000000);
+  private final long shares = TestBase.getRandomInt(100000000);
+  private final int stationID = TestBase.getRandomInt(100000000);
+  private final float taxRate = TestBase.getRandomFloat(10);
+  private final String ticker = "test ticker";
+  private final String url = "test url";
+  private final long dateFounded = TestBase.getRandomLong();
+  private final int creatorID = TestBase.getRandomInt();
+  private final int factionID = TestBase.getRandomInt();
+  private final String px64x64 = TestBase.getRandomText(50);
+  private final String px128x128 = TestBase.getRandomText(50);
+  private final String px256x256 = TestBase.getRandomText(50);
 
-  final ClassUnderTestConstructor<CorporationSheet> eol             = new ClassUnderTestConstructor<CorporationSheet>() {
+  final ClassUnderTestConstructor<CorporationSheet> eol = () -> new CorporationSheet(
+      allianceID, ceoID, corporationID, corporationName,
+      description, memberCount, shares, stationID,
+      taxRate, ticker, url, dateFounded, creatorID,
+      factionID, px64x64, px128x128, px256x256);
 
-                                                                      @Override
-                                                                      public CorporationSheet getCUT() {
-                                                                        return new CorporationSheet(
-                                                                            allianceID, allianceName, ceoID, ceoName, corporationID, corporationName,
-                                                                            description, logoColor1, logoColor2, logoColor3, logoGraphicID, logoShape1,
-                                                                            logoShape2, logoShape3, memberCount, memberLimit, shares, stationID, stationName,
-                                                                            taxRate, ticker, url);
-                                                                      }
-
-                                                                    };
-
-  final ClassUnderTestConstructor<CorporationSheet> live            = new ClassUnderTestConstructor<CorporationSheet>() {
-                                                                      @Override
-                                                                      public CorporationSheet getCUT() {
-                                                                        return new CorporationSheet(
-                                                                            allianceID, allianceName, ceoID + 1, ceoName, corporationID, corporationName,
-                                                                            description, logoColor1, logoColor2, logoColor3, logoGraphicID, logoShape1,
-                                                                            logoShape2, logoShape3, memberCount, memberLimit, shares, stationID, stationName,
-                                                                            taxRate, ticker, url);
-                                                                      }
-
-                                                                    };
+  final ClassUnderTestConstructor<CorporationSheet> live = () -> new CorporationSheet(
+      allianceID, ceoID + 1, corporationID, corporationName,
+      description, memberCount, shares, stationID,
+      taxRate, ticker, url, dateFounded, creatorID,
+      factionID, px64x64, px128x128, px256x256);
 
   @Test
   public void testBasic() throws Exception {
-
-    runBasicTests(eol, new CtorVariants<CorporationSheet>() {
-
-      @Override
-      public CorporationSheet[] getVariants() {
-        return new CorporationSheet[] {
-            new CorporationSheet(
-                allianceID + 1, allianceName, ceoID, ceoName, corporationID, corporationName, description, logoColor1, logoColor2, logoColor3, logoGraphicID,
-                logoShape1, logoShape2, logoShape3, memberCount, memberLimit, shares, stationID, stationName, taxRate, ticker, url),
-            new CorporationSheet(
-                allianceID, allianceName + " 1", ceoID, ceoName, corporationID, corporationName, description, logoColor1, logoColor2, logoColor3, logoGraphicID,
-                logoShape1, logoShape2, logoShape3, memberCount, memberLimit, shares, stationID, stationName, taxRate, ticker, url),
-            new CorporationSheet(
-                allianceID, allianceName, ceoID + 1, ceoName, corporationID, corporationName, description, logoColor1, logoColor2, logoColor3, logoGraphicID,
-                logoShape1, logoShape2, logoShape3, memberCount, memberLimit, shares, stationID, stationName, taxRate, ticker, url),
-            new CorporationSheet(
-                allianceID, allianceName, ceoID, ceoName + " 1", corporationID, corporationName, description, logoColor1, logoColor2, logoColor3, logoGraphicID,
-                logoShape1, logoShape2, logoShape3, memberCount, memberLimit, shares, stationID, stationName, taxRate, ticker, url),
-            new CorporationSheet(
-                allianceID, allianceName, ceoID, ceoName, corporationID + 1, corporationName, description, logoColor1, logoColor2, logoColor3, logoGraphicID,
-                logoShape1, logoShape2, logoShape3, memberCount, memberLimit, shares, stationID, stationName, taxRate, ticker, url),
-            new CorporationSheet(
-                allianceID, allianceName, ceoID, ceoName, corporationID, corporationName + " 1", description, logoColor1, logoColor2, logoColor3, logoGraphicID,
-                logoShape1, logoShape2, logoShape3, memberCount, memberLimit, shares, stationID, stationName, taxRate, ticker, url),
-            new CorporationSheet(
-                allianceID, allianceName, ceoID, ceoName, corporationID, corporationName, description + " 1", logoColor1, logoColor2, logoColor3, logoGraphicID,
-                logoShape1, logoShape2, logoShape3, memberCount, memberLimit, shares, stationID, stationName, taxRate, ticker, url),
-            new CorporationSheet(
-                allianceID, allianceName, ceoID, ceoName, corporationID, corporationName, description, logoColor1 + 1, logoColor2, logoColor3, logoGraphicID,
-                logoShape1, logoShape2, logoShape3, memberCount, memberLimit, shares, stationID, stationName, taxRate, ticker, url),
-            new CorporationSheet(
-                allianceID, allianceName, ceoID, ceoName, corporationID, corporationName, description, logoColor1, logoColor2 + 1, logoColor3, logoGraphicID,
-                logoShape1, logoShape2, logoShape3, memberCount, memberLimit, shares, stationID, stationName, taxRate, ticker, url),
-            new CorporationSheet(
-                allianceID, allianceName, ceoID, ceoName, corporationID, corporationName, description, logoColor1, logoColor2, logoColor3 + 1, logoGraphicID,
-                logoShape1, logoShape2, logoShape3, memberCount, memberLimit, shares, stationID, stationName, taxRate, ticker, url),
-            new CorporationSheet(
-                allianceID, allianceName, ceoID, ceoName, corporationID, corporationName, description, logoColor1, logoColor2, logoColor3, logoGraphicID + 1,
-                logoShape1, logoShape2, logoShape3, memberCount, memberLimit, shares, stationID, stationName, taxRate, ticker, url),
-            new CorporationSheet(
-                allianceID, allianceName, ceoID, ceoName, corporationID, corporationName, description, logoColor1, logoColor2, logoColor3, logoGraphicID,
-                logoShape1 + 1, logoShape2, logoShape3, memberCount, memberLimit, shares, stationID, stationName, taxRate, ticker, url),
-            new CorporationSheet(
-                allianceID, allianceName, ceoID, ceoName, corporationID, corporationName, description, logoColor1, logoColor2, logoColor3, logoGraphicID,
-                logoShape1, logoShape2 + 1, logoShape3, memberCount, memberLimit, shares, stationID, stationName, taxRate, ticker, url),
-            new CorporationSheet(
-                allianceID, allianceName, ceoID, ceoName, corporationID, corporationName, description, logoColor1, logoColor2, logoColor3, logoGraphicID,
-                logoShape1, logoShape2, logoShape3 + 1, memberCount, memberLimit, shares, stationID, stationName, taxRate, ticker, url),
-            new CorporationSheet(
-                allianceID, allianceName, ceoID, ceoName, corporationID, corporationName, description, logoColor1, logoColor2, logoColor3, logoGraphicID,
-                logoShape1, logoShape2, logoShape3, memberCount + 1, memberLimit, shares, stationID, stationName, taxRate, ticker, url),
-            new CorporationSheet(
-                allianceID, allianceName, ceoID, ceoName, corporationID, corporationName, description, logoColor1, logoColor2, logoColor3, logoGraphicID,
-                logoShape1, logoShape2, logoShape3, memberCount, memberLimit + 1, shares, stationID, stationName, taxRate, ticker, url),
-            new CorporationSheet(
-                allianceID, allianceName, ceoID, ceoName, corporationID, corporationName, description, logoColor1, logoColor2, logoColor3, logoGraphicID,
-                logoShape1, logoShape2, logoShape3, memberCount, memberLimit, shares + 1, stationID, stationName, taxRate, ticker, url),
-            new CorporationSheet(
-                allianceID, allianceName, ceoID, ceoName, corporationID, corporationName, description, logoColor1, logoColor2, logoColor3, logoGraphicID,
-                logoShape1, logoShape2, logoShape3, memberCount, memberLimit, shares, stationID + 1, stationName, taxRate, ticker, url),
-            new CorporationSheet(
-                allianceID, allianceName, ceoID, ceoName, corporationID, corporationName, description, logoColor1, logoColor2, logoColor3, logoGraphicID,
-                logoShape1, logoShape2, logoShape3, memberCount, memberLimit, shares, stationID, stationName + " 1", taxRate, ticker, url),
-            new CorporationSheet(
-                allianceID, allianceName, ceoID, ceoName, corporationID, corporationName, description, logoColor1, logoColor2, logoColor3, logoGraphicID,
-                logoShape1, logoShape2, logoShape3, memberCount, memberLimit, shares, stationID, stationName, taxRate + 1, ticker, url),
-            new CorporationSheet(
-                allianceID, allianceName, ceoID, ceoName, corporationID, corporationName, description, logoColor1, logoColor2, logoColor3, logoGraphicID,
-                logoShape1, logoShape2, logoShape3, memberCount, memberLimit, shares, stationID, stationName, taxRate, ticker + " 1", url),
-            new CorporationSheet(
-                allianceID, allianceName, ceoID, ceoName, corporationID, corporationName, description, logoColor1, logoColor2, logoColor3, logoGraphicID,
-                logoShape1, logoShape2, logoShape3, memberCount, memberLimit, shares, stationID, stationName, taxRate, ticker, url + " 1")
-        };
-      }
-
+    runBasicTests(eol, () -> new CorporationSheet[]{
+        new CorporationSheet(
+            allianceID + 1, ceoID, corporationID, corporationName,
+            description, memberCount, shares, stationID,
+            taxRate, ticker, url, dateFounded, creatorID,
+            factionID, px64x64, px128x128, px256x256),
+        new CorporationSheet(
+            allianceID, ceoID + 1, corporationID, corporationName,
+            description, memberCount, shares, stationID,
+            taxRate, ticker, url, dateFounded, creatorID,
+            factionID, px64x64, px128x128, px256x256),
+        new CorporationSheet(
+            allianceID, ceoID, corporationID + 1, corporationName,
+            description, memberCount, shares, stationID,
+            taxRate, ticker, url, dateFounded, creatorID,
+            factionID, px64x64, px128x128, px256x256),
+        new CorporationSheet(
+            allianceID, ceoID, corporationID, corporationName + "1",
+            description, memberCount, shares, stationID,
+            taxRate, ticker, url, dateFounded, creatorID,
+            factionID, px64x64, px128x128, px256x256),
+        new CorporationSheet(
+            allianceID, ceoID, corporationID, corporationName,
+            description + "1", memberCount, shares, stationID,
+            taxRate, ticker, url, dateFounded, creatorID,
+            factionID, px64x64, px128x128, px256x256),
+        new CorporationSheet(
+            allianceID, ceoID, corporationID, corporationName,
+            description, memberCount + 1, shares, stationID,
+            taxRate, ticker, url, dateFounded, creatorID,
+            factionID, px64x64, px128x128, px256x256),
+        new CorporationSheet(
+            allianceID, ceoID, corporationID, corporationName,
+            description, memberCount, shares + 1, stationID,
+            taxRate, ticker, url, dateFounded, creatorID,
+            factionID, px64x64, px128x128, px256x256),
+        new CorporationSheet(
+            allianceID, ceoID, corporationID, corporationName,
+            description, memberCount, shares, stationID + 1,
+            taxRate, ticker, url, dateFounded, creatorID,
+            factionID, px64x64, px128x128, px256x256),
+        new CorporationSheet(
+            allianceID, ceoID, corporationID, corporationName,
+            description, memberCount, shares, stationID,
+            taxRate + 0.1F, ticker, url, dateFounded, creatorID,
+            factionID, px64x64, px128x128, px256x256),
+        new CorporationSheet(
+            allianceID, ceoID, corporationID, corporationName,
+            description, memberCount, shares, stationID,
+            taxRate, ticker + "1", url, dateFounded, creatorID,
+            factionID, px64x64, px128x128, px256x256),
+        new CorporationSheet(
+            allianceID, ceoID, corporationID, corporationName,
+            description, memberCount, shares, stationID,
+            taxRate, ticker, url + "1", dateFounded, creatorID,
+            factionID, px64x64, px128x128, px256x256),
+        new CorporationSheet(
+            allianceID, ceoID, corporationID, corporationName,
+            description, memberCount, shares, stationID,
+            taxRate, ticker, url, dateFounded + 1, creatorID,
+            factionID, px64x64, px128x128, px256x256),
+        new CorporationSheet(
+            allianceID, ceoID, corporationID, corporationName,
+            description, memberCount, shares, stationID,
+            taxRate, ticker, url, dateFounded, creatorID + 1,
+            factionID, px64x64, px128x128, px256x256),
+        new CorporationSheet(
+            allianceID, ceoID, corporationID, corporationName,
+            description, memberCount, shares, stationID,
+            taxRate, ticker, url, dateFounded, creatorID,
+            factionID + 1, px64x64, px128x128, px256x256),
+        new CorporationSheet(
+            allianceID, ceoID, corporationID, corporationName,
+            description, memberCount, shares, stationID,
+            taxRate, ticker, url, dateFounded, creatorID,
+            factionID, px64x64 + "1", px128x128, px256x256),
+        new CorporationSheet(
+            allianceID, ceoID, corporationID, corporationName,
+            description, memberCount, shares, stationID,
+            taxRate, ticker, url, dateFounded, creatorID,
+            factionID, px64x64, px128x128 + "1", px256x256),
+        new CorporationSheet(
+            allianceID, ceoID, corporationID, corporationName,
+            description, memberCount, shares, stationID,
+            taxRate, ticker, url, dateFounded, creatorID,
+            factionID, px64x64, px128x128, px256x256 + "1")
     }, AccountAccessMask.createMask(AccountAccessMask.ACCESS_CORPORATION_SHEET));
   }
 
   @Test
   public void testGetLifeline() throws Exception {
-
-    runGetLifelineTest(eol, live, new ModelRetriever<CorporationSheet>() {
-
-      @Override
-      public CorporationSheet getModel(SynchronizedEveAccount account, long time) {
-        return CorporationSheet.get(account, time);
-      }
-
-    });
+    runGetLifelineTest(eol, live, CorporationSheet::get);
   }
 
 }

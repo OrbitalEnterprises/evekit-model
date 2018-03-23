@@ -887,7 +887,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
       CachedData next = new CorporationMedal(
-          TestBase.getRandomInt(), TestBase.getRandomText(50), TestBase.getRandomText(50), TestBase.getRandomLong(), TestBase.getRandomLong());
+          TestBase.getRandomInt(), TestBase.getRandomText(50), TestBase.getRandomText(50), TestBase.getRandomLong(), TestBase.getRandomInt());
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
@@ -929,7 +929,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
       CachedData next = new CorporationMemberMedal(
-          TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomText(50),
+          TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomInt(), TestBase.getRandomText(50),
           TestBase.getRandomText(50));
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
@@ -943,10 +943,12 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
       CachedData next = new CorporationSheet(
-          TestBase.getRandomLong(), TestBase.getRandomText(50), TestBase.getRandomLong(), TestBase.getRandomText(50), TestBase.getRandomLong(),
-          TestBase.getRandomText(50), TestBase.getRandomText(50), TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt(),
-          TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt(),
-          TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomText(50), TestBase.getRandomDouble(100000000), TestBase.getRandomText(50),
+          TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomLong(),
+          TestBase.getRandomText(50), TestBase.getRandomText(50), TestBase.getRandomInt(),
+          TestBase.getRandomLong(), TestBase.getRandomInt(),
+          TestBase.getRandomFloat(10), TestBase.getRandomText(50), TestBase.getRandomText(50),
+          TestBase.getRandomLong(), TestBase.getRandomInt(), TestBase.getRandomInt(),
+          TestBase.getRandomText(50), TestBase.getRandomText(50),
           TestBase.getRandomText(50));
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
@@ -1016,6 +1018,18 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     }
     System.out.println("Created Fuels");
 
+    count = TestBase.getRandomInt(10) + 20;
+    for (int i = 0; i < count; i++) {
+      int sel = TestBase.getRandomInt(5);
+      CachedData next = new MemberLimit(TestBase.getRandomInt());
+      for (int j = 0; j < sel; j++) {
+        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
+      }
+      next.setup(testAccount, testTime);
+      CachedData.update(next);
+    }
+    System.out.println("Created MemberLimits");
+
     count = TestBase.getRandomInt(500) + 100;
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
@@ -1079,9 +1093,9 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
       CachedData next = new MemberTracking(
-          TestBase.getRandomLong(), TestBase.getRandomText(50), TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomText(50),
-          TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomText(50), TestBase.getRandomLong(),
-          TestBase.getRandomText(50), TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomText(50));
+          TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomLong(),
+          TestBase.getRandomLong(), TestBase.getRandomLong(),
+          TestBase.getRandomInt(), TestBase.getRandomLong());
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
@@ -1244,6 +1258,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     CachedData.cleanup(testAccount, "Division");
     CachedData.cleanup(testAccount, "Facility");
     CachedData.cleanup(testAccount, "Fuel");
+    CachedData.cleanup(testAccount, "MemberLimit");
     CachedData.cleanup(testAccount, "MemberSecurity");
     CachedData.cleanup(testAccount, "MemberSecurityLog");
     CachedData.cleanup(testAccount, "MemberTracking");
