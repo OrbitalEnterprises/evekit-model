@@ -16,7 +16,7 @@ import enterprises.orbital.evekit.model.CachedData;
 public class RoleTest extends AbstractModelTester<Role> {
 
   final long                            roleID          = TestBase.getRandomInt(100000000);
-  final String                          roleDescription = "test role description";
+  final String                          roleDescription = "test role name";
   final String                          roleName        = "test role name";
 
   final ClassUnderTestConstructor<Role> eol             = new ClassUnderTestConstructor<Role>() {

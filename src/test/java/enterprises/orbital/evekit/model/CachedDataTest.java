@@ -1144,8 +1144,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
       CachedData next = new Shareholder(
-          TestBase.getRandomLong(), TestBase.getRandomBoolean(), TestBase.getRandomLong(), TestBase.getRandomText(50), TestBase.getRandomText(50),
-          TestBase.getRandomInt());
+          TestBase.getRandomInt(), TestBase.getRandomText(50), TestBase.getRandomInt());
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }

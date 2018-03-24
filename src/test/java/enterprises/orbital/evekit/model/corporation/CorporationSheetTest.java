@@ -11,7 +11,7 @@ public class CorporationSheetTest extends AbstractModelTester<CorporationSheet> 
   private final int ceoID = TestBase.getRandomInt(100000000);
   private final long corporationID = TestBase.getRandomInt(100000000);
   private final String corporationName = "test corporation name";
-  private final String description = "test description";
+  private final String description = "test name";
   private final int memberCount = TestBase.getRandomInt(100000000);
   private final long shares = TestBase.getRandomInt(100000000);
   private final int stationID = TestBase.getRandomInt(100000000);

@@ -15,7 +15,7 @@ import java.util.Map;
 public class CorporationMedalTest extends AbstractModelTester<CorporationMedal> {
 
   private final int medalID = TestBase.getRandomInt(100000000);
-  private final String description = "test description";
+  private final String description = "test name";
   private final String title = "test title";
   private final long created = TestBase.getRandomInt(100000000);
   private final int creatorID = TestBase.getRandomInt(100000000);

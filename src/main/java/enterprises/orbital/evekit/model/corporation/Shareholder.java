@@ -1,19 +1,5 @@
 package enterprises.orbital.evekit.model.corporation;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.persistence.Entity;
-import javax.persistence.Index;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.NoResultException;
-import javax.persistence.Table;
-import javax.persistence.TypedQuery;
-
-import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
@@ -21,45 +7,40 @@ import enterprises.orbital.evekit.model.AttributeParameters;
 import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
+import javax.persistence.*;
+import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 @Entity
 @Table(
     name = "evekit_data_shareholder",
     indexes = {
         @Index(
             name = "shareholderIDIndex",
-            columnList = "shareholderID",
-            unique = false),
+            columnList = "shareholderID"),
     })
 @NamedQueries({
     @NamedQuery(
         name = "Shareholder.getByShareholderID",
         query = "SELECT c FROM Shareholder c where c.owner = :owner and c.shareholderID = :holder and c.lifeStart <= :point and c.lifeEnd > :point"),
-    @NamedQuery(
-        name = "Shareholder.getAll",
-        query = "SELECT c FROM Shareholder c where c.owner = :owner and c.lifeStart <= :point and c.lifeEnd > :point order by c.cid asc"),
 })
-// 2 hour cache time - API caches for 1 hour
 public class Shareholder extends CachedData {
-  private static final Logger log  = Logger.getLogger(Shareholder.class.getName());
+  private static final Logger log = Logger.getLogger(Shareholder.class.getName());
   private static final byte[] MASK = AccountAccessMask.createMask(AccountAccessMask.ACCESS_SHAREHOLDERS);
-  private long                shareholderID;
-  private boolean             isCorporation;
-  private long                shareholderCorporationID;
-  private String              shareholderCorporationName;
-  private String              shareholderName;
-  private int                 shares;
+
+  private int shareholderID;
+  private String shareholderType;
+  private long shares;
 
   @SuppressWarnings("unused")
   protected Shareholder() {}
 
-  public Shareholder(long shareholderID, boolean isCorporation, long shareholderCorporationID, String shareholderCorporationName, String shareholderName,
-                     int shares) {
-    super();
+  public Shareholder(int shareholderID, String shareholderType, long shares) {
     this.shareholderID = shareholderID;
-    this.isCorporation = isCorporation;
-    this.shareholderCorporationID = shareholderCorporationID;
-    this.shareholderCorporationName = shareholderCorporationName;
-    this.shareholderName = shareholderName;
+    this.shareholderType = shareholderType;
     this.shares = shares;
   }
 
@@ -76,11 +57,11 @@ public class Shareholder extends CachedData {
    */
   @Override
   public boolean equivalent(
-                            CachedData sup) {
+      CachedData sup) {
     if (!(sup instanceof Shareholder)) return false;
     Shareholder other = (Shareholder) sup;
-    return shareholderID == other.shareholderID && isCorporation == other.isCorporation && shareholderCorporationID == other.shareholderCorporationID
-        && nullSafeObjectCompare(shareholderCorporationName, other.shareholderCorporationName) && nullSafeObjectCompare(shareholderName, other.shareholderName)
+    return shareholderID == other.shareholderID
+        && nullSafeObjectCompare(shareholderType, other.shareholderType)
         && shares == other.shares;
   }
 
@@ -92,165 +73,113 @@ public class Shareholder extends CachedData {
     return MASK;
   }
 
-  public long getShareholderID() {
+  public int getShareholderID() {
     return shareholderID;
   }
 
-  public boolean isCorporation() {
-    return isCorporation;
+  public String getShareholderType() {
+    return shareholderType;
   }
 
-  public long getShareholderCorporationID() {
-    return shareholderCorporationID;
-  }
-
-  public String getShareholderCorporationName() {
-    return shareholderCorporationName;
-  }
-
-  public String getShareholderName() {
-    return shareholderName;
-  }
-
-  public int getShares() {
+  public long getShares() {
     return shares;
   }
 
   @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + (isCorporation ? 1231 : 1237);
-    result = prime * result + (int) (shareholderCorporationID ^ (shareholderCorporationID >>> 32));
-    result = prime * result + ((shareholderCorporationName == null) ? 0 : shareholderCorporationName.hashCode());
-    result = prime * result + (int) (shareholderID ^ (shareholderID >>> 32));
-    result = prime * result + ((shareholderName == null) ? 0 : shareholderName.hashCode());
-    result = prime * result + shares;
-    return result;
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    Shareholder that = (Shareholder) o;
+    return shareholderID == that.shareholderID &&
+        shares == that.shares &&
+        Objects.equals(shareholderType, that.shareholderType);
   }
 
   @Override
-  public boolean equals(
-                        Object obj) {
-    if (this == obj) return true;
-    if (!super.equals(obj)) return false;
-    if (getClass() != obj.getClass()) return false;
-    Shareholder other = (Shareholder) obj;
-    if (isCorporation != other.isCorporation) return false;
-    if (shareholderCorporationID != other.shareholderCorporationID) return false;
-    if (shareholderCorporationName == null) {
-      if (other.shareholderCorporationName != null) return false;
-    } else if (!shareholderCorporationName.equals(other.shareholderCorporationName)) return false;
-    if (shareholderID != other.shareholderID) return false;
-    if (shareholderName == null) {
-      if (other.shareholderName != null) return false;
-    } else if (!shareholderName.equals(other.shareholderName)) return false;
-    if (shares != other.shares) return false;
-    return true;
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), shareholderID, shareholderType, shares);
   }
 
   @Override
   public String toString() {
-    return "Shareholder [shareholderID=" + shareholderID + ", isCorporation=" + isCorporation + ", shareholderCorporationID=" + shareholderCorporationID
-        + ", shareholderCorporationName=" + shareholderCorporationName + ", shareholderName=" + shareholderName + ", shares=" + shares + ", owner=" + owner
-        + ", lifeStart=" + lifeStart + ", lifeEnd=" + lifeEnd + "]";
+    return "Shareholder{" +
+        "shareholderID=" + shareholderID +
+        ", shareholderType='" + shareholderType + '\'' +
+        ", shares=" + shares +
+        '}';
   }
 
   public static Shareholder get(
-                                final SynchronizedEveAccount owner,
-                                final long time,
-                                final long shareholderID) {
+      final SynchronizedEveAccount owner,
+      final long time,
+      final int shareholderID) throws IOException {
     try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<Shareholder>() {
-        @Override
-        public Shareholder run() throws Exception {
-          TypedQuery<Shareholder> getter = EveKitUserAccountProvider.getFactory().getEntityManager().createNamedQuery("Shareholder.getByShareholderID",
-                                                                                                                      Shareholder.class);
-          getter.setParameter("owner", owner);
-          getter.setParameter("holder", shareholderID);
-          getter.setParameter("point", time);
-          try {
-            return getter.getSingleResult();
-          } catch (NoResultException e) {
-            return null;
-          }
-        }
-      });
+      return EveKitUserAccountProvider.getFactory()
+                                      .runTransaction(() -> {
+                                        TypedQuery<Shareholder> getter = EveKitUserAccountProvider.getFactory()
+                                                                                                  .getEntityManager()
+                                                                                                  .createNamedQuery(
+                                                                                                      "Shareholder.getByShareholderID",
+                                                                                                      Shareholder.class);
+                                        getter.setParameter("owner", owner);
+                                        getter.setParameter("holder", shareholderID);
+                                        getter.setParameter("point", time);
+                                        try {
+                                          return getter.getSingleResult();
+                                        } catch (NoResultException e) {
+                                          return null;
+                                        }
+                                      });
     } catch (Exception e) {
+      if (e.getCause() instanceof IOException) throw (IOException) e.getCause();
       log.log(Level.SEVERE, "query error", e);
+      throw new IOException(e.getCause());
     }
-    return null;
-  }
-
-  public static List<Shareholder> getAll(
-                                         final SynchronizedEveAccount owner,
-                                         final long time) {
-    try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<Shareholder>>() {
-        @Override
-        public List<Shareholder> run() throws Exception {
-          TypedQuery<Shareholder> getter = EveKitUserAccountProvider.getFactory().getEntityManager().createNamedQuery("Shareholder.getAll", Shareholder.class);
-          getter.setParameter("owner", owner);
-          getter.setParameter("point", time);
-          return getter.getResultList();
-        }
-      });
-    } catch (Exception e) {
-      log.log(Level.SEVERE, "query error", e);
-    }
-    return Collections.emptyList();
   }
 
   public static List<Shareholder> accessQuery(
-                                              final SynchronizedEveAccount owner,
-                                              final long contid,
-                                              final int maxresults,
-                                              final boolean reverse,
-                                              final AttributeSelector at,
-                                              final AttributeSelector shareholderID,
-                                              final AttributeSelector isCorporation,
-                                              final AttributeSelector shareholderCorporationID,
-                                              final AttributeSelector shareholderCorporationName,
-                                              final AttributeSelector shareholderName,
-                                              final AttributeSelector shares) {
+      final SynchronizedEveAccount owner,
+      final long contid,
+      final int maxresults,
+      final boolean reverse,
+      final AttributeSelector at,
+      final AttributeSelector shareholderID,
+      final AttributeSelector shareholderType,
+      final AttributeSelector shares) throws IOException {
     try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<Shareholder>>() {
-        @Override
-        public List<Shareholder> run() throws Exception {
-          StringBuilder qs = new StringBuilder();
-          qs.append("SELECT c FROM Shareholder c WHERE ");
-          // Constrain to specified owner
-          qs.append("c.owner = :owner");
-          // Constrain lifeline
-          AttributeSelector.addLifelineSelector(qs, "c", at);
-          // Constrain attributes
-          AttributeParameters p = new AttributeParameters("att");
-          AttributeSelector.addLongSelector(qs, "c", "shareholderID", shareholderID);
-          AttributeSelector.addBooleanSelector(qs, "c", "isCorporation", isCorporation);
-          AttributeSelector.addLongSelector(qs, "c", "shareholderCorporationID", shareholderCorporationID);
-          AttributeSelector.addStringSelector(qs, "c", "shareholderCorporationName", shareholderCorporationName, p);
-          AttributeSelector.addStringSelector(qs, "c", "shareholderName", shareholderName, p);
-          AttributeSelector.addIntSelector(qs, "c", "shares", shares);
-          // Set CID constraint and ordering
-          if (reverse) {
-            qs.append(" and c.cid < ").append(contid);
-            qs.append(" order by cid desc");
-          } else {
-            qs.append(" and c.cid > ").append(contid);
-            qs.append(" order by cid asc");
-          }
-          // Return result
-          TypedQuery<Shareholder> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), Shareholder.class);
-          query.setParameter("owner", owner);
-          p.fillParams(query);
-          query.setMaxResults(maxresults);
-          return query.getResultList();
-        }
-      });
+      return EveKitUserAccountProvider.getFactory()
+                                      .runTransaction(() -> {
+                                        StringBuilder qs = new StringBuilder();
+                                        qs.append("SELECT c FROM Shareholder c WHERE ");
+                                        // Constrain to specified owner
+                                        qs.append("c.owner = :owner");
+                                        // Constrain lifeline
+                                        AttributeSelector.addLifelineSelector(qs, "c", at);
+                                        // Constrain attributes
+                                        AttributeParameters p = new AttributeParameters("att");
+                                        AttributeSelector.addIntSelector(qs, "c", "shareholderID", shareholderID);
+                                        AttributeSelector.addStringSelector(qs, "c", "shareholderType", shareholderType,
+                                                                            p);
+                                        AttributeSelector.addLongSelector(qs, "c", "shares", shares);
+                                        // Set CID constraint and ordering
+                                        setCIDOrdering(qs, contid, reverse);
+                                        // Return result
+                                        TypedQuery<Shareholder> query = EveKitUserAccountProvider.getFactory()
+                                                                                                 .getEntityManager()
+                                                                                                 .createQuery(
+                                                                                                     qs.toString(),
+                                                                                                     Shareholder.class);
+                                        query.setParameter("owner", owner);
+                                        p.fillParams(query);
+                                        query.setMaxResults(maxresults);
+                                        return query.getResultList();
+                                      });
     } catch (Exception e) {
+      if (e.getCause() instanceof IOException) throw (IOException) e.getCause();
       log.log(Level.SEVERE, "query error", e);
+      throw new IOException(e.getCause());
     }
-    return Collections.emptyList();
   }
 
 }
