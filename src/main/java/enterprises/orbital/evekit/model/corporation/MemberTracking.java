@@ -31,7 +31,7 @@ import java.util.logging.Logger;
         query = "SELECT c FROM MemberTracking c where c.owner = :owner and c.characterID = :char and c.lifeStart <= :point and c.lifeEnd > :point"),
 })
 public class MemberTracking extends CachedData {
-  private static final Logger log = Logger.getLogger(MemberSecurity.class.getName());
+  private static final Logger log = Logger.getLogger(MemberTracking.class.getName());
   private static final byte[] MASK = AccountAccessMask.createMask(AccountAccessMask.ACCESS_MEMBER_TRACKING);
 
   private int characterID;

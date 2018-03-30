@@ -961,31 +961,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     count = TestBase.getRandomInt(10) + 5;
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
-      CorporationTitle next = new CorporationTitle(TestBase.getRandomLong(), TestBase.getRandomText(50));
-      for (int j = 0; j < TestBase.getRandomInt(5) + 2; j++) {
-        next.getGrantableRoles().add(TestBase.getRandomLong());
-      }
-      for (int j = 0; j < TestBase.getRandomInt(5) + 2; j++) {
-        next.getGrantableRolesAtBase().add(TestBase.getRandomLong());
-      }
-      for (int j = 0; j < TestBase.getRandomInt(5) + 2; j++) {
-        next.getGrantableRolesAtHQ().add(TestBase.getRandomLong());
-      }
-      for (int j = 0; j < TestBase.getRandomInt(5) + 2; j++) {
-        next.getGrantableRolesAtOther().add(TestBase.getRandomLong());
-      }
-      for (int j = 0; j < TestBase.getRandomInt(5) + 2; j++) {
-        next.getRoles().add(TestBase.getRandomLong());
-      }
-      for (int j = 0; j < TestBase.getRandomInt(5) + 2; j++) {
-        next.getRolesAtBase().add(TestBase.getRandomLong());
-      }
-      for (int j = 0; j < TestBase.getRandomInt(5) + 2; j++) {
-        next.getRolesAtHQ().add(TestBase.getRandomLong());
-      }
-      for (int j = 0; j < TestBase.getRandomInt(5) + 2; j++) {
-        next.getRolesAtOther().add(TestBase.getRandomLong());
-      }
+      CorporationTitle next = new CorporationTitle(TestBase.getRandomInt(), TestBase.getRandomText(50));
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
@@ -993,6 +969,20 @@ public class CachedDataTest extends AbstractAccountBasedTest {
       CachedData.update(next);
     }
     System.out.println("Created CorporationTitles");
+
+    count = TestBase.getRandomInt(10) + 5;
+    for (int i = 0; i < count; i++) {
+      int sel = TestBase.getRandomInt(5);
+      CorporationTitleRole next = new CorporationTitleRole(TestBase.getRandomInt(), TestBase.getRandomText(50),
+                                                           TestBase.getRandomBoolean(), TestBase.getRandomBoolean(),
+                                                           TestBase.getRandomBoolean(), TestBase.getRandomBoolean());
+      for (int j = 0; j < sel; j++) {
+        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
+      }
+      next.setup(testAccount, testTime);
+      CachedData.update(next);
+    }
+    System.out.println("Created CorporationTitleRoles");
 
     count = TestBase.getRandomInt(10) + 5;
     for (int i = 0; i < count; i++) {
@@ -1021,6 +1011,18 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     count = TestBase.getRandomInt(10) + 20;
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
+      CachedData next = new Member(TestBase.getRandomInt());
+      for (int j = 0; j < sel; j++) {
+        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
+      }
+      next.setup(testAccount, testTime);
+      CachedData.update(next);
+    }
+    System.out.println("Created Memberss");
+
+    count = TestBase.getRandomInt(10) + 20;
+    for (int i = 0; i < count; i++) {
+      int sel = TestBase.getRandomInt(5);
       CachedData next = new MemberLimit(TestBase.getRandomInt());
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
@@ -1030,64 +1032,46 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     }
     System.out.println("Created MemberLimits");
 
-    count = TestBase.getRandomInt(500) + 100;
+    count = TestBase.getRandomInt(10) + 20;
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
-      MemberSecurity next = new MemberSecurity(TestBase.getRandomLong(), TestBase.getRandomText(50));
-      for (int j = 0; j < TestBase.getRandomInt(5) + 2; j++) {
-        next.getGrantableRoles().add(TestBase.getRandomLong());
-      }
-      for (int j = 0; j < TestBase.getRandomInt(5) + 2; j++) {
-        next.getGrantableRolesAtBase().add(TestBase.getRandomLong());
-      }
-      for (int j = 0; j < TestBase.getRandomInt(5) + 2; j++) {
-        next.getGrantableRolesAtHQ().add(TestBase.getRandomLong());
-      }
-      for (int j = 0; j < TestBase.getRandomInt(5) + 2; j++) {
-        next.getGrantableRolesAtOther().add(TestBase.getRandomLong());
-      }
-      for (int j = 0; j < TestBase.getRandomInt(5) + 2; j++) {
-        next.getRoles().add(TestBase.getRandomLong());
-      }
-      for (int j = 0; j < TestBase.getRandomInt(5) + 2; j++) {
-        next.getRolesAtBase().add(TestBase.getRandomLong());
-      }
-      for (int j = 0; j < TestBase.getRandomInt(5) + 2; j++) {
-        next.getRolesAtHQ().add(TestBase.getRandomLong());
-      }
-      for (int j = 0; j < TestBase.getRandomInt(5) + 2; j++) {
-        next.getRolesAtOther().add(TestBase.getRandomLong());
-      }
-      for (int j = 0; j < TestBase.getRandomInt(5) + 2; j++) {
-        next.getTitles().add(TestBase.getRandomLong());
-      }
+      CachedData next = new MemberTitle(TestBase.getRandomInt(), TestBase.getRandomInt());
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
       CachedData.update(next);
     }
-    System.out.println("Created MemberSecuritys");
+    System.out.println("Created MemberTitles");
+
+    count = TestBase.getRandomInt(500) + 100;
+    for (int i = 0; i < count; i++) {
+      int sel = TestBase.getRandomInt(5);
+      MemberRole next = new MemberRole(TestBase.getRandomInt(), TestBase.getRandomText(50),
+                                       TestBase.getRandomBoolean(), TestBase.getRandomBoolean(),
+                                       TestBase.getRandomBoolean(), TestBase.getRandomBoolean());
+      for (int j = 0; j < sel; j++) {
+        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
+      }
+      next.setup(testAccount, testTime);
+      CachedData.update(next);
+    }
+    System.out.println("Created MemberRoles");
 
     count = TestBase.getRandomInt(2000) + 500;
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
-      MemberSecurityLog next = new MemberSecurityLog(
-          TestBase.getRandomLong(), TestBase.getRandomLong(), TestBase.getRandomText(50), TestBase.getRandomLong(), TestBase.getRandomText(50),
-          TestBase.getRandomText(50));
-      for (int j = 0; j < TestBase.getRandomInt(5) + 2; j++) {
-        next.getNewRoles().add(TestBase.getRandomLong());
-      }
-      for (int j = 0; j < TestBase.getRandomInt(5) + 2; j++) {
-        next.getOldRoles().add(TestBase.getRandomLong());
-      }
+      MemberRoleHistory next = new MemberRoleHistory(
+          TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomInt(),
+          TestBase.getRandomText(50), TestBase.getRandomText(50),
+          TestBase.getRandomBoolean());
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
       next.setup(testAccount, testTime);
       CachedData.update(next);
     }
-    System.out.println("Created MemberSecurityLogs");
+    System.out.println("Created MemberRoleHistorys");
 
     count = TestBase.getRandomInt(500) + 100;
     for (int i = 0; i < count; i++) {
@@ -1103,42 +1087,6 @@ public class CachedDataTest extends AbstractAccountBasedTest {
       CachedData.update(next);
     }
     System.out.println("Created MemberTrackings");
-
-    count = TestBase.getRandomInt(100) + 20;
-    for (int i = 0; i < count; i++) {
-      int sel = TestBase.getRandomInt(5);
-      CachedData next = new Role(TestBase.getRandomLong(), TestBase.getRandomText(50), TestBase.getRandomText(50));
-      for (int j = 0; j < sel; j++) {
-        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
-      }
-      next.setup(testAccount, testTime);
-      CachedData.update(next);
-    }
-    System.out.println("Created Roles");
-
-    count = TestBase.getRandomInt(100) + 20;
-    for (int i = 0; i < count; i++) {
-      int sel = TestBase.getRandomInt(5);
-      CachedData next = new SecurityRole(TestBase.getRandomLong(), TestBase.getRandomText(50));
-      for (int j = 0; j < sel; j++) {
-        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
-      }
-      next.setup(testAccount, testTime);
-      CachedData.update(next);
-    }
-    System.out.println("Created SecurityRoles");
-
-    count = TestBase.getRandomInt(100) + 20;
-    for (int i = 0; i < count; i++) {
-      int sel = TestBase.getRandomInt(5);
-      CachedData next = new SecurityTitle(TestBase.getRandomLong(), TestBase.getRandomText(100));
-      for (int j = 0; j < sel; j++) {
-        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
-      }
-      next.setup(testAccount, testTime);
-      CachedData.update(next);
-    }
-    System.out.println("Created SecurityTitles");
 
     count = TestBase.getRandomInt(1000) + 200;
     for (int i = 0; i < count; i++) {
@@ -1253,19 +1201,19 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     CachedData.cleanup(testAccount, "CorporationMemberMedal");
     CachedData.cleanup(testAccount, "CorporationSheet");
     CachedData.cleanup(testAccount, "CorporationTitle");
+    CachedData.cleanup(testAccount, "CorporationTitleRole");
     CachedData.cleanup(testAccount, "CustomsOffice");
     CachedData.cleanup(testAccount, "Division");
     CachedData.cleanup(testAccount, "Facility");
     CachedData.cleanup(testAccount, "Fuel");
+    CachedData.cleanup(testAccount, "Member");
     CachedData.cleanup(testAccount, "MemberLimit");
-    CachedData.cleanup(testAccount, "MemberSecurity");
-    CachedData.cleanup(testAccount, "MemberSecurityLog");
+    CachedData.cleanup(testAccount, "MemberTitle");
+    CachedData.cleanup(testAccount, "MemberRole");
+    CachedData.cleanup(testAccount, "MemberRoleHistory");
     CachedData.cleanup(testAccount, "MemberTracking");
     CachedData.cleanup(testAccount, "Outpost");
     CachedData.cleanup(testAccount, "OutpostServiceDetail");
-    CachedData.cleanup(testAccount, "Role");
-    CachedData.cleanup(testAccount, "SecurityRole");
-    CachedData.cleanup(testAccount, "SecurityTitle");
     CachedData.cleanup(testAccount, "Shareholder");
     CachedData.cleanup(testAccount, "Starbase");
     CachedData.cleanup(testAccount, "StarbaseDetail");

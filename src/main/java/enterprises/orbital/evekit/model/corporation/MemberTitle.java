@@ -3,7 +3,6 @@ package enterprises.orbital.evekit.model.corporation;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
-import enterprises.orbital.evekit.model.AttributeParameters;
 import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
@@ -16,30 +15,30 @@ import java.util.logging.Logger;
 
 @Entity
 @Table(
-    name = "evekit_data_corporation_title",
+    name = "evekit_data_corporation_member_title",
     indexes = {
         @Index(
-            name = "titleIDIndex",
-            columnList = "titleID"),
+            name = "memberTitleCharacterIDIndex",
+            columnList = "characterID"),
     })
 @NamedQueries({
     @NamedQuery(
-        name = "CorporationTitle.getByTitleID",
-        query = "SELECT c FROM CorporationTitle c where c.owner = :owner and c.titleID = :title and c.lifeStart <= :point and c.lifeEnd > :point"),
+        name = "MemberTitle.get",
+        query = "SELECT c FROM MemberTitle c where c.owner = :owner and c.characterID = :character and c.titleID = :title and c.lifeStart <= :point and c.lifeEnd > :point"),
 })
-public class CorporationTitle extends CachedData {
-  private static final Logger log = Logger.getLogger(CorporationTitle.class.getName());
-  private static final byte[] MASK = AccountAccessMask.createMask(AccountAccessMask.ACCESS_CORPORATION_TITLES);
+public class MemberTitle extends CachedData {
+  private static final Logger log = Logger.getLogger(MemberTitle.class.getName());
+  private static final byte[] MASK = AccountAccessMask.createMask(AccountAccessMask.ACCESS_MEMBER_SECURITY);
 
+  private int characterID;
   private int titleID;
-  private String titleName;
 
   @SuppressWarnings("unused")
-  protected CorporationTitle() {}
+  protected MemberTitle() {}
 
-  public CorporationTitle(int titleID, String titleName) {
+  public MemberTitle(int characterID, int titleID) {
+    this.characterID = characterID;
     this.titleID = titleID;
-    this.titleName = titleName;
   }
 
   /**
@@ -56,9 +55,9 @@ public class CorporationTitle extends CachedData {
   @Override
   public boolean equivalent(
       CachedData sup) {
-    if (!(sup instanceof CorporationTitle)) return false;
-    CorporationTitle other = (CorporationTitle) sup;
-    return titleID == other.titleID && nullSafeObjectCompare(titleName, other.titleName);
+    if (!(sup instanceof MemberTitle)) return false;
+    MemberTitle other = (MemberTitle) sup;
+    return characterID == other.characterID && titleID == other.titleID;
   }
 
   /**
@@ -69,12 +68,12 @@ public class CorporationTitle extends CachedData {
     return MASK;
   }
 
-  public int getTitleID() {
-    return titleID;
+  public int getCharacterID() {
+    return characterID;
   }
 
-  public String getTitleName() {
-    return titleName;
+  public int getTitleID() {
+    return titleID;
   }
 
   @Override
@@ -82,37 +81,39 @@ public class CorporationTitle extends CachedData {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
-    CorporationTitle that = (CorporationTitle) o;
-    return titleID == that.titleID &&
-        Objects.equals(titleName, that.titleName);
+    MemberTitle that = (MemberTitle) o;
+    return characterID == that.characterID &&
+        titleID == that.titleID;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), titleID, titleName);
+    return Objects.hash(super.hashCode(), characterID, titleID);
   }
 
   @Override
   public String toString() {
-    return "CorporationTitle{" +
-        "titleID=" + titleID +
-        ", titleName='" + titleName + '\'' +
+    return "MemberTitle{" +
+        "characterID=" + characterID +
+        ", titleID=" + titleID +
         '}';
   }
 
-  public static CorporationTitle get(
+  public static MemberTitle get(
       final SynchronizedEveAccount owner,
       final long time,
+      final int characterID,
       final int titleID) throws IOException {
     try {
       return EveKitUserAccountProvider.getFactory()
                                       .runTransaction(() -> {
-                                        TypedQuery<CorporationTitle> getter = EveKitUserAccountProvider.getFactory()
-                                                                                                       .getEntityManager()
-                                                                                                       .createNamedQuery(
-                                                                                                           "CorporationTitle.getByTitleID",
-                                                                                                           CorporationTitle.class);
+                                        TypedQuery<MemberTitle> getter = EveKitUserAccountProvider.getFactory()
+                                                                                                  .getEntityManager()
+                                                                                                  .createNamedQuery(
+                                                                                                      "MemberTitle.get",
+                                                                                                      MemberTitle.class);
                                         getter.setParameter("owner", owner);
+                                        getter.setParameter("character", characterID);
                                         getter.setParameter("title", titleID);
                                         getter.setParameter("point", time);
                                         try {
@@ -128,37 +129,35 @@ public class CorporationTitle extends CachedData {
     }
   }
 
-  public static List<CorporationTitle> accessQuery(
+  public static List<MemberTitle> accessQuery(
       final SynchronizedEveAccount owner,
       final long contid,
       final int maxresults,
       final boolean reverse,
       final AttributeSelector at,
-      final AttributeSelector titleID,
-      final AttributeSelector titleName) throws IOException {
+      final AttributeSelector characterID,
+      final AttributeSelector titleID) throws IOException {
     try {
       return EveKitUserAccountProvider.getFactory()
                                       .runTransaction(() -> {
                                         StringBuilder qs = new StringBuilder();
-                                        qs.append("SELECT c FROM CorporationTitle c WHERE ");
+                                        qs.append("SELECT c FROM MemberTitle c WHERE ");
                                         // Constrain to specified owner
                                         qs.append("c.owner = :owner");
                                         // Constrain lifeline
                                         AttributeSelector.addLifelineSelector(qs, "c", at);
                                         // Constrain attributes
-                                        AttributeParameters p = new AttributeParameters("att");
+                                        AttributeSelector.addIntSelector(qs, "c", "characterID", characterID);
                                         AttributeSelector.addIntSelector(qs, "c", "titleID", titleID);
-                                        AttributeSelector.addStringSelector(qs, "c", "titleName", titleName, p);
                                         // Set CID constraint and ordering
                                         setCIDOrdering(qs, contid, reverse);
                                         // Return result
-                                        TypedQuery<CorporationTitle> query = EveKitUserAccountProvider.getFactory()
-                                                                                                      .getEntityManager()
-                                                                                                      .createQuery(
-                                                                                                          qs.toString(),
-                                                                                                          CorporationTitle.class);
+                                        TypedQuery<MemberTitle> query = EveKitUserAccountProvider.getFactory()
+                                                                                                 .getEntityManager()
+                                                                                                 .createQuery(
+                                                                                                     qs.toString(),
+                                                                                                     MemberTitle.class);
                                         query.setParameter("owner", owner);
-                                        p.fillParams(query);
                                         query.setMaxResults(maxresults);
                                         return query.getResultList();
                                       });
