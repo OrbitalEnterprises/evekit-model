@@ -1,85 +1,41 @@
 package enterprises.orbital.evekit.model.corporation;
 
+import enterprises.orbital.evekit.TestBase;
+import enterprises.orbital.evekit.account.AccountAccessMask;
+import enterprises.orbital.evekit.model.AbstractModelTester;
+import enterprises.orbital.evekit.model.AttributeSelector;
+import enterprises.orbital.evekit.model.CachedData;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-import enterprises.orbital.evekit.TestBase;
-import enterprises.orbital.evekit.account.AccountAccessMask;
-import enterprises.orbital.evekit.account.SynchronizedEveAccount;
-import enterprises.orbital.evekit.model.AbstractModelTester;
-import enterprises.orbital.evekit.model.CachedData;
-
 public class FacilityTest extends AbstractModelTester<Facility> {
 
-  final long                                facilityID       = TestBase.getRandomInt(100000000);
-  final int                                 typeID           = TestBase.getRandomInt(100000000);
-  final String                              typeName         = "test type name";
-  final int                                 solarSystemID    = TestBase.getRandomInt(100000000);
-  final String                              solarSystemName  = "test solar system name";
-  final int                                 regionID         = TestBase.getRandomInt(100000000);
-  final String                              regionName       = "test region name";
-  final int                                 starbaseModifier = TestBase.getRandomInt(100000000);
-  final double                              tax              = TestBase.getRandomDouble(100000000);
+  private final long facilityID = TestBase.getRandomInt(100000000);
+  private final int typeID = TestBase.getRandomInt(100000000);
+  private final int solarSystemID = TestBase.getRandomInt(100000000);
 
-  final ClassUnderTestConstructor<Facility> eol              = new ClassUnderTestConstructor<Facility>() {
+  final ClassUnderTestConstructor<Facility> eol = () -> new Facility(
+      facilityID, typeID, solarSystemID);
 
-                                                               @Override
-                                                               public Facility getCUT() {
-                                                                 return new Facility(
-                                                                     facilityID, typeID, typeName, solarSystemID, solarSystemName, regionID, regionName,
-                                                                     starbaseModifier, tax);
-                                                               }
-
-                                                             };
-
-  final ClassUnderTestConstructor<Facility> live             = new ClassUnderTestConstructor<Facility>() {
-                                                               @Override
-                                                               public Facility getCUT() {
-                                                                 return new Facility(
-                                                                     facilityID, typeID + 1, typeName, solarSystemID, solarSystemName, regionID, regionName,
-                                                                     starbaseModifier, tax);
-                                                               }
-
-                                                             };
+  final ClassUnderTestConstructor<Facility> live = () -> new Facility(
+      facilityID, typeID + 1, solarSystemID);
 
   @Test
   public void testBasic() throws Exception {
-
-    runBasicTests(eol, new CtorVariants<Facility>() {
-
-      @Override
-      public Facility[] getVariants() {
-        return new Facility[] {
-            new Facility(facilityID + 1, typeID, typeName, solarSystemID, solarSystemName, regionID, regionName, starbaseModifier, tax),
-            new Facility(facilityID, typeID + 1, typeName, solarSystemID, solarSystemName, regionID, regionName, starbaseModifier, tax),
-            new Facility(facilityID, typeID, typeName + " 1", solarSystemID, solarSystemName, regionID, regionName, starbaseModifier, tax),
-            new Facility(facilityID, typeID, typeName, solarSystemID + 1, solarSystemName, regionID, regionName, starbaseModifier, tax),
-            new Facility(facilityID, typeID, typeName, solarSystemID, solarSystemName + " 1", regionID, regionName, starbaseModifier, tax),
-            new Facility(facilityID, typeID, typeName, solarSystemID, solarSystemName, regionID + 1, regionName, starbaseModifier, tax),
-            new Facility(facilityID, typeID, typeName, solarSystemID, solarSystemName, regionID, regionName + " 1", starbaseModifier, tax),
-            new Facility(facilityID, typeID, typeName, solarSystemID, solarSystemName, regionID, regionName, starbaseModifier + 1, tax),
-            new Facility(facilityID, typeID, typeName, solarSystemID, solarSystemName, regionID, regionName, starbaseModifier, tax + 1)
-        };
-      }
-
+    runBasicTests(eol, () -> new Facility[]{
+        new Facility(facilityID + 1, typeID, solarSystemID),
+        new Facility(facilityID, typeID + 1, solarSystemID),
+        new Facility(facilityID, typeID, solarSystemID + 1),
     }, AccountAccessMask.createMask(AccountAccessMask.ACCESS_INDUSTRY_JOBS));
   }
 
   @Test
   public void testGetLifeline() throws Exception {
-
-    runGetLifelineTest(eol, live, new ModelRetriever<Facility>() {
-
-      @Override
-      public Facility getModel(SynchronizedEveAccount account, long time) {
-        return Facility.get(account, time, facilityID);
-      }
-
-    });
+    runGetLifelineTest(eol, live, (account, time) -> Facility.get(account, time, facilityID));
   }
 
   @Test
@@ -88,35 +44,40 @@ public class FacilityTest extends AbstractModelTester<Facility> {
     // - facilities for a different account
     // - facilities not live at the given time
     Facility existing;
-    Map<Long, Facility> listCheck = new HashMap<Long, Facility>();
+    Map<Long, Facility> listCheck = new HashMap<>();
 
-    existing = new Facility(facilityID, typeID, typeName, solarSystemID, solarSystemName, regionID, regionName, starbaseModifier, tax);
+    existing = new Facility(facilityID, typeID, solarSystemID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(facilityID, existing);
 
-    existing = new Facility(facilityID + 1, typeID, typeName, solarSystemID, solarSystemName, regionID, regionName, starbaseModifier, tax);
+    existing = new Facility(facilityID + 1, typeID, solarSystemID);
     existing.setup(testAccount, 7777L);
     existing = CachedData.update(existing);
     listCheck.put(facilityID + 1, existing);
 
     // Associated with different account
-    existing = new Facility(facilityID + 2, typeID, typeName, solarSystemID, solarSystemName, regionID, regionName, starbaseModifier, tax);
+    existing = new Facility(facilityID + 2, typeID, solarSystemID);
     existing.setup(otherAccount, 7777L);
     CachedData.update(existing);
 
     // Not live at the given time
-    existing = new Facility(facilityID + 3, typeID, typeName, solarSystemID, solarSystemName, regionID, regionName, starbaseModifier, tax);
+    existing = new Facility(facilityID + 3, typeID, solarSystemID);
     existing.setup(testAccount, 9999L);
     CachedData.update(existing);
 
     // EOL before the given time
-    existing = new Facility(facilityID + 4, typeID, typeName, solarSystemID, solarSystemName, regionID, regionName, starbaseModifier, tax);
+    existing = new Facility(facilityID + 4, typeID, solarSystemID);
     existing.setup(testAccount, 7777L);
     existing.evolve(null, 7977L);
     CachedData.update(existing);
 
-    List<Facility> result = Facility.getAll(testAccount, 8888L);
+    List<Facility> result = CachedData.retrieveAll(8888L,
+                                                   (contid, at) -> Facility.accessQuery(testAccount, contid, 1000,
+                                                                                        false, at,
+                                                                                        AttributeSelector.any(),
+                                                                                        AttributeSelector.any(),
+                                                                                        AttributeSelector.any()));
     Assert.assertEquals(listCheck.size(), result.size());
     for (Facility next : result) {
       long facilityID = next.getFacilityID();

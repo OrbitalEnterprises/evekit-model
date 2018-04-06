@@ -1,63 +1,48 @@
 package enterprises.orbital.evekit.model.corporation;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.persistence.Entity;
-import javax.persistence.Index;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.NoResultException;
-import javax.persistence.Table;
-import javax.persistence.TypedQuery;
-
-import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
+import javax.persistence.*;
+import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 @Entity
 @Table(
     name = "evekit_data_fuel",
     indexes = {
         @Index(
-            name = "itemIDIndex",
-            columnList = "itemID",
-            unique = false),
+            name = "starbaseIDIndex",
+            columnList = "starbaseID"),
         @Index(
             name = "typeIDIndex",
-            columnList = "typeID",
-            unique = false),
+            columnList = "typeID"),
     })
 @NamedQueries({
     @NamedQuery(
         name = "Fuel.getByItemAndTypeID",
-        query = "SELECT c FROM Fuel c where c.owner = :owner and c.itemID = :item and c.typeID = :type and c.lifeStart <= :point and c.lifeEnd > :point"),
-    @NamedQuery(
-        name = "Fuel.getAllByItemID",
-        query = "SELECT c FROM Fuel c where c.owner = :owner and c.itemID = :item and c.lifeStart <= :point and c.lifeEnd > :point order by c.cid asc"),
-    @NamedQuery(
-        name = "Fuel.getAll",
-        query = "SELECT c FROM Fuel c where c.owner = :owner and c.lifeStart <= :point and c.lifeEnd > :point order by c.cid asc"),
+        query = "SELECT c FROM Fuel c where c.owner = :owner and c.starbaseID = :sb and c.typeID = :tp and c.lifeStart <= :point and c.lifeEnd > :point"),
 })
-// 2 hour cache time - API caches for 1 hour
 public class Fuel extends CachedData {
-  private static final Logger log  = Logger.getLogger(Fuel.class.getName());
+  private static final Logger log = Logger.getLogger(Fuel.class.getName());
   private static final byte[] MASK = AccountAccessMask.createMask(AccountAccessMask.ACCESS_STARBASE_LIST);
-  private long                itemID;
-  private int                 typeID;
-  private int                 quantity;
+
+  private long starbaseID;
+  private int typeID;
+  private int quantity;
 
   @SuppressWarnings("unused")
   protected Fuel() {}
 
-  public Fuel(long itemID, int typeID, int quantity) {
+  public Fuel(long starbaseID, int typeID, int quantity) {
     super();
-    this.itemID = itemID;
+    this.starbaseID = starbaseID;
     this.typeID = typeID;
     this.quantity = quantity;
   }
@@ -75,10 +60,10 @@ public class Fuel extends CachedData {
    */
   @Override
   public boolean equivalent(
-                            CachedData sup) {
+      CachedData sup) {
     if (!(sup instanceof Fuel)) return false;
     Fuel other = (Fuel) sup;
-    return itemID == other.itemID && typeID == other.typeID && quantity == other.quantity;
+    return starbaseID == other.starbaseID && typeID == other.typeID && quantity == other.quantity;
   }
 
   /**
@@ -89,8 +74,8 @@ public class Fuel extends CachedData {
     return MASK;
   }
 
-  public long getItemID() {
-    return itemID;
+  public long getStarbaseID() {
+    return starbaseID;
   }
 
   public int getTypeID() {
@@ -102,143 +87,98 @@ public class Fuel extends CachedData {
   }
 
   @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + (int) (itemID ^ (itemID >>> 32));
-    result = prime * result + quantity;
-    result = prime * result + typeID;
-    return result;
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    Fuel fuel = (Fuel) o;
+    return starbaseID == fuel.starbaseID &&
+        typeID == fuel.typeID &&
+        quantity == fuel.quantity;
   }
 
   @Override
-  public boolean equals(
-                        Object obj) {
-    if (this == obj) return true;
-    if (!super.equals(obj)) return false;
-    if (getClass() != obj.getClass()) return false;
-    Fuel other = (Fuel) obj;
-    if (itemID != other.itemID) return false;
-    if (quantity != other.quantity) return false;
-    if (typeID != other.typeID) return false;
-    return true;
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), starbaseID, typeID, quantity);
   }
 
   @Override
   public String toString() {
-    return "Fuel [itemID=" + itemID + ", typeID=" + typeID + ", quantity=" + quantity + ", owner=" + owner + ", lifeStart=" + lifeStart + ", lifeEnd=" + lifeEnd
-        + "]";
+    return "Fuel{" +
+        "starbaseID=" + starbaseID +
+        ", typeID=" + typeID +
+        ", quantity=" + quantity +
+        '}';
   }
 
   public static Fuel get(
-                         final SynchronizedEveAccount owner,
-                         final long time,
-                         final long itemID,
-                         final int typeID) {
+      final SynchronizedEveAccount owner,
+      final long time,
+      final long starbaseID,
+      final int typeID) throws IOException {
     try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<Fuel>() {
-        @Override
-        public Fuel run() throws Exception {
-          TypedQuery<Fuel> getter = EveKitUserAccountProvider.getFactory().getEntityManager().createNamedQuery("Fuel.getByItemAndTypeID", Fuel.class);
-          getter.setParameter("owner", owner);
-          getter.setParameter("item", itemID);
-          getter.setParameter("type", typeID);
-          getter.setParameter("point", time);
-          try {
-            return getter.getSingleResult();
-          } catch (NoResultException e) {
-            return null;
-          }
-        }
-      });
+      return EveKitUserAccountProvider.getFactory()
+                                      .runTransaction(() -> {
+                                        TypedQuery<Fuel> getter = EveKitUserAccountProvider.getFactory()
+                                                                                           .getEntityManager()
+                                                                                           .createNamedQuery(
+                                                                                               "Fuel.getByItemAndTypeID",
+                                                                                               Fuel.class);
+                                        getter.setParameter("owner", owner);
+                                        getter.setParameter("sb", starbaseID);
+                                        getter.setParameter("tp", typeID);
+                                        getter.setParameter("point", time);
+                                        try {
+                                          return getter.getSingleResult();
+                                        } catch (NoResultException e) {
+                                          return null;
+                                        }
+                                      });
     } catch (Exception e) {
+      if (e.getCause() instanceof IOException) throw (IOException) e.getCause();
       log.log(Level.SEVERE, "query error", e);
+      throw new IOException(e.getCause());
     }
-    return null;
-  }
-
-  public static List<Fuel> getAllByItemID(
-                                          final SynchronizedEveAccount owner,
-                                          final long time,
-                                          final long itemID) {
-    try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<Fuel>>() {
-        @Override
-        public List<Fuel> run() throws Exception {
-          TypedQuery<Fuel> getter = EveKitUserAccountProvider.getFactory().getEntityManager().createNamedQuery("Fuel.getAllByItemID", Fuel.class);
-          getter.setParameter("owner", owner);
-          getter.setParameter("item", itemID);
-          getter.setParameter("point", time);
-          return getter.getResultList();
-        }
-      });
-    } catch (Exception e) {
-      log.log(Level.SEVERE, "query error", e);
-    }
-    return Collections.emptyList();
-  }
-
-  public static List<Fuel> getAll(
-                                  final SynchronizedEveAccount owner,
-                                  final long time) {
-    try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<Fuel>>() {
-        @Override
-        public List<Fuel> run() throws Exception {
-          TypedQuery<Fuel> getter = EveKitUserAccountProvider.getFactory().getEntityManager().createNamedQuery("Fuel.getAll", Fuel.class);
-          getter.setParameter("owner", owner);
-          getter.setParameter("point", time);
-          return getter.getResultList();
-        }
-      });
-    } catch (Exception e) {
-      log.log(Level.SEVERE, "query error", e);
-    }
-    return Collections.emptyList();
   }
 
   public static List<Fuel> accessQuery(
-                                       final SynchronizedEveAccount owner,
-                                       final long contid,
-                                       final int maxresults,
-                                       final boolean reverse,
-                                       final AttributeSelector at,
-                                       final AttributeSelector itemID,
-                                       final AttributeSelector typeID,
-                                       final AttributeSelector quantity) {
+      final SynchronizedEveAccount owner,
+      final long contid,
+      final int maxresults,
+      final boolean reverse,
+      final AttributeSelector at,
+      final AttributeSelector starbaseID,
+      final AttributeSelector typeID,
+      final AttributeSelector quantity) throws IOException {
     try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<Fuel>>() {
-        @Override
-        public List<Fuel> run() throws Exception {
-          StringBuilder qs = new StringBuilder();
-          qs.append("SELECT c FROM Fuel c WHERE ");
-          // Constrain to specified owner
-          qs.append("c.owner = :owner");
-          // Constrain lifeline
-          AttributeSelector.addLifelineSelector(qs, "c", at);
-          // Constrain attributes
-          AttributeSelector.addLongSelector(qs, "c", "itemID", itemID);
-          AttributeSelector.addIntSelector(qs, "c", "typeID", typeID);
-          AttributeSelector.addIntSelector(qs, "c", "quantity", quantity);
-          // Set CID constraint and ordering
-          if (reverse) {
-            qs.append(" and c.cid < ").append(contid);
-            qs.append(" order by cid desc");
-          } else {
-            qs.append(" and c.cid > ").append(contid);
-            qs.append(" order by cid asc");
-          }
-          // Return result
-          TypedQuery<Fuel> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), Fuel.class);
-          query.setParameter("owner", owner);
-          query.setMaxResults(maxresults);
-          return query.getResultList();
-        }
-      });
+      return EveKitUserAccountProvider.getFactory()
+                                      .runTransaction(() -> {
+                                        StringBuilder qs = new StringBuilder();
+                                        qs.append("SELECT c FROM Fuel c WHERE ");
+                                        // Constrain to specified owner
+                                        qs.append("c.owner = :owner");
+                                        // Constrain lifeline
+                                        AttributeSelector.addLifelineSelector(qs, "c", at);
+                                        // Constrain attributes
+                                        AttributeSelector.addLongSelector(qs, "c", "starbaseID", starbaseID);
+                                        AttributeSelector.addIntSelector(qs, "c", "typeID", typeID);
+                                        AttributeSelector.addIntSelector(qs, "c", "quantity", quantity);
+                                        // Set CID constraint and ordering
+                                        setCIDOrdering(qs, contid, reverse);
+                                        // Return result
+                                        TypedQuery<Fuel> query = EveKitUserAccountProvider.getFactory()
+                                                                                          .getEntityManager()
+                                                                                          .createQuery(qs.toString(),
+                                                                                                       Fuel.class);
+                                        query.setParameter("owner", owner);
+                                        query.setMaxResults(maxresults);
+                                        return query.getResultList();
+                                      });
     } catch (Exception e) {
+      if (e.getCause() instanceof IOException) throw (IOException) e.getCause();
       log.log(Level.SEVERE, "query error", e);
+      throw new IOException(e.getCause());
     }
-    return Collections.emptyList();
   }
 
 }

@@ -1,18 +1,5 @@
 package enterprises.orbital.evekit.model.corporation;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.persistence.Entity;
-import javax.persistence.Index;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.NoResultException;
-import javax.persistence.Table;
-import javax.persistence.TypedQuery;
-
 import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
@@ -21,63 +8,66 @@ import enterprises.orbital.evekit.model.AttributeParameters;
 import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
+import javax.persistence.*;
+import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 @Entity
 @Table(
     name = "evekit_data_customs_office",
     indexes = {
         @Index(
-            name = "itemIDIndex",
-            columnList = "itemID",
-            unique = false),
+            name = "officeIDIndex",
+            columnList = "officeID"),
     })
 @NamedQueries({
     @NamedQuery(
         name = "CustomsOffice.getByItemID",
-        query = "SELECT c FROM CustomsOffice c where c.owner = :owner and c.itemID = :item and c.lifeStart <= :point and c.lifeEnd > :point"),
-    @NamedQuery(
-        name = "CustomsOffice.getAll",
-        query = "SELECT c FROM CustomsOffice c where c.owner = :owner and c.lifeStart <= :point and c.lifeEnd > :point order by c.cid asc"),
+        query = "SELECT c FROM CustomsOffice c where c.owner = :owner and c.officeID = :item and c.lifeStart <= :point and c.lifeEnd > :point"),
 })
-// 2 hour cache time - API caches for 1 hour
 public class CustomsOffice extends CachedData {
-  private static final Logger log  = Logger.getLogger(CustomsOffice.class.getName());
+  private static final Logger log = Logger.getLogger(CustomsOffice.class.getName());
   private static final byte[] MASK = AccountAccessMask.createMask(AccountAccessMask.ACCESS_ASSETS);
-  private long                itemID;
-  private int                 solarSystemID;
-  private String              solarSystemName;
-  private int                 reinforceHour;
-  private boolean             allowAlliance;
-  private boolean             allowStandings;
-  private double              standingLevel;
-  private double              taxRateAlliance;
-  private double              taxRateCorp;
-  private double              taxRateStandingHigh;
-  private double              taxRateStandingGood;
-  private double              taxRateStandingNeutral;
-  private double              taxRateStandingBad;
-  private double              taxRateStandingHorrible;
+
+  private long officeID;
+  private int solarSystemID;
+  private int reinforceExitStart;
+  private int reinforceExitEnd;
+  private boolean allowAlliance;
+  private boolean allowStandings;
+  private String standingLevel;
+  private float taxRateAlliance;
+  private float taxRateCorp;
+  private float taxRateStandingExcellent;
+  private float taxRateStandingGood;
+  private float taxRateStandingNeutral;
+  private float taxRateStandingBad;
+  private float taxRateStandingTerrible;
 
   @SuppressWarnings("unused")
   protected CustomsOffice() {}
 
-  public CustomsOffice(long itemID, int solarSystemID, String solarSystemName, int reinforceHour, boolean allowAlliance, boolean allowStandings,
-                       double standingLevel, double taxRateAlliance, double taxRateCorp, double taxRateStandingHigh, double taxRateStandingGood,
-                       double taxRateStandingNeutral, double taxRateStandingBad, double taxRateStandingHorrible) {
-    super();
-    this.itemID = itemID;
+  public CustomsOffice(long officeID, int solarSystemID, int reinforceExitStart, int reinforceExitEnd,
+                       boolean allowAlliance, boolean allowStandings, String standingLevel, float taxRateAlliance,
+                       float taxRateCorp, float taxRateStandingExcellent, float taxRateStandingGood,
+                       float taxRateStandingNeutral, float taxRateStandingBad, float taxRateStandingTerrible) {
+    this.officeID = officeID;
     this.solarSystemID = solarSystemID;
-    this.solarSystemName = solarSystemName;
-    this.reinforceHour = reinforceHour;
+    this.reinforceExitStart = reinforceExitStart;
+    this.reinforceExitEnd = reinforceExitEnd;
     this.allowAlliance = allowAlliance;
     this.allowStandings = allowStandings;
     this.standingLevel = standingLevel;
     this.taxRateAlliance = taxRateAlliance;
     this.taxRateCorp = taxRateCorp;
-    this.taxRateStandingHigh = taxRateStandingHigh;
+    this.taxRateStandingExcellent = taxRateStandingExcellent;
     this.taxRateStandingGood = taxRateStandingGood;
     this.taxRateStandingNeutral = taxRateStandingNeutral;
     this.taxRateStandingBad = taxRateStandingBad;
-    this.taxRateStandingHorrible = taxRateStandingHorrible;
+    this.taxRateStandingTerrible = taxRateStandingTerrible;
   }
 
   /**
@@ -93,15 +83,23 @@ public class CustomsOffice extends CachedData {
    */
   @Override
   public boolean equivalent(
-                            CachedData sup) {
+      CachedData sup) {
     if (!(sup instanceof CustomsOffice)) return false;
     CustomsOffice other = (CustomsOffice) sup;
-    return itemID == other.itemID && solarSystemID == other.solarSystemID && nullSafeObjectCompare(solarSystemName, other.solarSystemName)
-        && reinforceHour == other.reinforceHour && allowAlliance == other.allowAlliance && allowStandings == other.allowStandings
-        && standingLevel == other.standingLevel && taxRateAlliance == other.taxRateAlliance && taxRateCorp == other.taxRateCorp
-        && taxRateStandingHigh == other.taxRateStandingHigh && taxRateStandingGood == other.taxRateStandingGood
-        && taxRateStandingNeutral == other.taxRateStandingNeutral && taxRateStandingBad == other.taxRateStandingBad
-        && taxRateStandingHorrible == other.taxRateStandingHorrible;
+    return officeID == other.officeID
+        && solarSystemID == other.solarSystemID
+        && reinforceExitStart == other.reinforceExitStart
+        && reinforceExitEnd == other.reinforceExitEnd
+        && allowAlliance == other.allowAlliance
+        && allowStandings == other.allowStandings
+        && nullSafeObjectCompare(standingLevel, other.standingLevel)
+        && Float.compare(taxRateAlliance, other.taxRateAlliance) == 0
+        && Float.compare(taxRateCorp, other.taxRateCorp) == 0
+        && Float.compare(taxRateStandingExcellent, other.taxRateStandingExcellent) == 0
+        && Float.compare(taxRateStandingGood, other.taxRateStandingGood) == 0
+        && Float.compare(taxRateStandingNeutral, other.taxRateStandingNeutral) == 0
+        && Float.compare(taxRateStandingBad, other.taxRateStandingBad) == 0
+        && Float.compare(taxRateStandingTerrible, other.taxRateStandingTerrible) == 0;
   }
 
   /**
@@ -112,20 +110,20 @@ public class CustomsOffice extends CachedData {
     return MASK;
   }
 
-  public long getItemID() {
-    return itemID;
+  public long getOfficeID() {
+    return officeID;
   }
 
   public int getSolarSystemID() {
     return solarSystemID;
   }
 
-  public String getSolarSystemName() {
-    return solarSystemName;
+  public int getReinforceExitStart() {
+    return reinforceExitStart;
   }
 
-  public int getReinforceHour() {
-    return reinforceHour;
+  public int getReinforceExitEnd() {
+    return reinforceExitEnd;
   }
 
   public boolean isAllowAlliance() {
@@ -136,215 +134,191 @@ public class CustomsOffice extends CachedData {
     return allowStandings;
   }
 
-  public double getStandingLevel() {
+  public String getStandingLevel() {
     return standingLevel;
   }
 
-  public double getTaxRateAlliance() {
+  public float getTaxRateAlliance() {
     return taxRateAlliance;
   }
 
-  public double getTaxRateCorp() {
+  public float getTaxRateCorp() {
     return taxRateCorp;
   }
 
-  public double getTaxRateStandingHigh() {
-    return taxRateStandingHigh;
+  public float getTaxRateStandingExcellent() {
+    return taxRateStandingExcellent;
   }
 
-  public double getTaxRateStandingGood() {
+  public float getTaxRateStandingGood() {
     return taxRateStandingGood;
   }
 
-  public double getTaxRateStandingNeutral() {
+  public float getTaxRateStandingNeutral() {
     return taxRateStandingNeutral;
   }
 
-  public double getTaxRateStandingBad() {
+  public float getTaxRateStandingBad() {
     return taxRateStandingBad;
   }
 
-  public double getTaxRateStandingHorrible() {
-    return taxRateStandingHorrible;
+  public float getTaxRateStandingTerrible() {
+    return taxRateStandingTerrible;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+    CustomsOffice that = (CustomsOffice) o;
+    return officeID == that.officeID &&
+        solarSystemID == that.solarSystemID &&
+        reinforceExitStart == that.reinforceExitStart &&
+        reinforceExitEnd == that.reinforceExitEnd &&
+        allowAlliance == that.allowAlliance &&
+        allowStandings == that.allowStandings &&
+        Float.compare(that.taxRateAlliance, taxRateAlliance) == 0 &&
+        Float.compare(that.taxRateCorp, taxRateCorp) == 0 &&
+        Float.compare(that.taxRateStandingExcellent, taxRateStandingExcellent) == 0 &&
+        Float.compare(that.taxRateStandingGood, taxRateStandingGood) == 0 &&
+        Float.compare(that.taxRateStandingNeutral, taxRateStandingNeutral) == 0 &&
+        Float.compare(that.taxRateStandingBad, taxRateStandingBad) == 0 &&
+        Float.compare(that.taxRateStandingTerrible, taxRateStandingTerrible) == 0 &&
+        Objects.equals(standingLevel, that.standingLevel);
   }
 
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + (allowAlliance ? 1231 : 1237);
-    result = prime * result + (allowStandings ? 1231 : 1237);
-    result = prime * result + (int) (itemID ^ (itemID >>> 32));
-    result = prime * result + reinforceHour;
-    result = prime * result + solarSystemID;
-    result = prime * result + ((solarSystemName == null) ? 0 : solarSystemName.hashCode());
-    long temp;
-    temp = Double.doubleToLongBits(standingLevel);
-    result = prime * result + (int) (temp ^ (temp >>> 32));
-    temp = Double.doubleToLongBits(taxRateAlliance);
-    result = prime * result + (int) (temp ^ (temp >>> 32));
-    temp = Double.doubleToLongBits(taxRateCorp);
-    result = prime * result + (int) (temp ^ (temp >>> 32));
-    temp = Double.doubleToLongBits(taxRateStandingBad);
-    result = prime * result + (int) (temp ^ (temp >>> 32));
-    temp = Double.doubleToLongBits(taxRateStandingGood);
-    result = prime * result + (int) (temp ^ (temp >>> 32));
-    temp = Double.doubleToLongBits(taxRateStandingHigh);
-    result = prime * result + (int) (temp ^ (temp >>> 32));
-    temp = Double.doubleToLongBits(taxRateStandingHorrible);
-    result = prime * result + (int) (temp ^ (temp >>> 32));
-    temp = Double.doubleToLongBits(taxRateStandingNeutral);
-    result = prime * result + (int) (temp ^ (temp >>> 32));
-    return result;
-  }
-
-  @Override
-  public boolean equals(
-                        Object obj) {
-    if (this == obj) return true;
-    if (!super.equals(obj)) return false;
-    if (getClass() != obj.getClass()) return false;
-    CustomsOffice other = (CustomsOffice) obj;
-    if (allowAlliance != other.allowAlliance) return false;
-    if (allowStandings != other.allowStandings) return false;
-    if (itemID != other.itemID) return false;
-    if (reinforceHour != other.reinforceHour) return false;
-    if (solarSystemID != other.solarSystemID) return false;
-    if (solarSystemName == null) {
-      if (other.solarSystemName != null) return false;
-    } else if (!solarSystemName.equals(other.solarSystemName)) return false;
-    if (Double.doubleToLongBits(standingLevel) != Double.doubleToLongBits(other.standingLevel)) return false;
-    if (Double.doubleToLongBits(taxRateAlliance) != Double.doubleToLongBits(other.taxRateAlliance)) return false;
-    if (Double.doubleToLongBits(taxRateCorp) != Double.doubleToLongBits(other.taxRateCorp)) return false;
-    if (Double.doubleToLongBits(taxRateStandingBad) != Double.doubleToLongBits(other.taxRateStandingBad)) return false;
-    if (Double.doubleToLongBits(taxRateStandingGood) != Double.doubleToLongBits(other.taxRateStandingGood)) return false;
-    if (Double.doubleToLongBits(taxRateStandingHigh) != Double.doubleToLongBits(other.taxRateStandingHigh)) return false;
-    if (Double.doubleToLongBits(taxRateStandingHorrible) != Double.doubleToLongBits(other.taxRateStandingHorrible)) return false;
-    if (Double.doubleToLongBits(taxRateStandingNeutral) != Double.doubleToLongBits(other.taxRateStandingNeutral)) return false;
-    return true;
+    return Objects.hash(super.hashCode(), officeID, solarSystemID, reinforceExitStart, reinforceExitEnd, allowAlliance,
+                        allowStandings, standingLevel, taxRateAlliance, taxRateCorp, taxRateStandingExcellent,
+                        taxRateStandingGood, taxRateStandingNeutral, taxRateStandingBad, taxRateStandingTerrible);
   }
 
   @Override
   public String toString() {
-    return "CustomsOffice [itemID=" + itemID + ", solarSystemID=" + solarSystemID + ", solarSystemName=" + solarSystemName + ", reinforceHour=" + reinforceHour
-        + ", allowAlliance=" + allowAlliance + ", allowStandings=" + allowStandings + ", standingLevel=" + standingLevel + ", taxRateAlliance="
-        + taxRateAlliance + ", taxRateCorp=" + taxRateCorp + ", taxRateStandingHigh=" + taxRateStandingHigh + ", taxRateStandingGood=" + taxRateStandingGood
-        + ", taxRateStandingNeutral=" + taxRateStandingNeutral + ", taxRateStandingBad=" + taxRateStandingBad + ", taxRateStandingHorrible="
-        + taxRateStandingHorrible + ", owner=" + owner + ", lifeStart=" + lifeStart + ", lifeEnd=" + lifeEnd + "]";
+    return "CustomsOffice{" +
+        "officeID=" + officeID +
+        ", solarSystemID=" + solarSystemID +
+        ", reinforceExitStart=" + reinforceExitStart +
+        ", reinforceExitEnd=" + reinforceExitEnd +
+        ", allowAlliance=" + allowAlliance +
+        ", allowStandings=" + allowStandings +
+        ", standingLevel='" + standingLevel + '\'' +
+        ", taxRateAlliance=" + taxRateAlliance +
+        ", taxRateCorp=" + taxRateCorp +
+        ", taxRateStandingExcellent=" + taxRateStandingExcellent +
+        ", taxRateStandingGood=" + taxRateStandingGood +
+        ", taxRateStandingNeutral=" + taxRateStandingNeutral +
+        ", taxRateStandingBad=" + taxRateStandingBad +
+        ", taxRateStandingTerrible=" + taxRateStandingTerrible +
+        '}';
   }
 
   public static CustomsOffice get(
-                                  final SynchronizedEveAccount owner,
-                                  final long time,
-                                  final long itemID) {
+      final SynchronizedEveAccount owner,
+      final long time,
+      final long officeID) throws IOException {
     try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<CustomsOffice>() {
-        @Override
-        public CustomsOffice run() throws Exception {
-          TypedQuery<CustomsOffice> getter = EveKitUserAccountProvider.getFactory().getEntityManager().createNamedQuery("CustomsOffice.getByItemID",
-                                                                                                                        CustomsOffice.class);
-          getter.setParameter("owner", owner);
-          getter.setParameter("item", itemID);
-          getter.setParameter("point", time);
-          try {
-            return getter.getSingleResult();
-          } catch (NoResultException e) {
-            return null;
-          }
-        }
-      });
+      return EveKitUserAccountProvider.getFactory()
+                                      .runTransaction(() -> {
+                                        TypedQuery<CustomsOffice> getter = EveKitUserAccountProvider.getFactory()
+                                                                                                    .getEntityManager()
+                                                                                                    .createNamedQuery(
+                                                                                                        "CustomsOffice.getByItemID",
+                                                                                                        CustomsOffice.class);
+                                        getter.setParameter("owner", owner);
+                                        getter.setParameter("item", officeID);
+                                        getter.setParameter("point", time);
+                                        try {
+                                          return getter.getSingleResult();
+                                        } catch (NoResultException e) {
+                                          return null;
+                                        }
+                                      });
     } catch (Exception e) {
+      if (e.getCause() instanceof IOException) throw (IOException) e.getCause();
       log.log(Level.SEVERE, "query error", e);
+      throw new IOException(e.getCause());
     }
-    return null;
-  }
-
-  public static List<CustomsOffice> getAll(
-                                           final SynchronizedEveAccount owner,
-                                           final long time) {
-    try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<CustomsOffice>>() {
-        @Override
-        public List<CustomsOffice> run() throws Exception {
-          TypedQuery<CustomsOffice> getter = EveKitUserAccountProvider.getFactory().getEntityManager().createNamedQuery("CustomsOffice.getAll",
-                                                                                                                        CustomsOffice.class);
-          getter.setParameter("owner", owner);
-          getter.setParameter("point", time);
-          return getter.getResultList();
-        }
-      });
-    } catch (Exception e) {
-      log.log(Level.SEVERE, "query error", e);
-    }
-    return Collections.emptyList();
   }
 
   public static List<CustomsOffice> accessQuery(
-                                                final SynchronizedEveAccount owner,
-                                                final long contid,
-                                                final int maxresults,
-                                                final boolean reverse,
-                                                final AttributeSelector at,
-                                                final AttributeSelector itemID,
-                                                final AttributeSelector solarSystemID,
-                                                final AttributeSelector solarSystemName,
-                                                final AttributeSelector reinforceHour,
-                                                final AttributeSelector allowAlliance,
-                                                final AttributeSelector allowStandings,
-                                                final AttributeSelector standingLevel,
-                                                final AttributeSelector taxRateAlliance,
-                                                final AttributeSelector taxRateCorp,
-                                                final AttributeSelector taxRateStandingHigh,
-                                                final AttributeSelector taxRateStandingGood,
-                                                final AttributeSelector taxRateStandingNeutral,
-                                                final AttributeSelector taxRateStandingBad,
-                                                final AttributeSelector taxRateStandingHorrible) {
+      final SynchronizedEveAccount owner,
+      final long contid,
+      final int maxresults,
+      final boolean reverse,
+      final AttributeSelector at,
+      final AttributeSelector officeID,
+      final AttributeSelector solarSystemID,
+      final AttributeSelector reinforceExitStart,
+      final AttributeSelector reinforceExitEnd,
+      final AttributeSelector allowAlliance,
+      final AttributeSelector allowStandings,
+      final AttributeSelector standingLevel,
+      final AttributeSelector taxRateAlliance,
+      final AttributeSelector taxRateCorp,
+      final AttributeSelector taxRateStandingExcellent,
+      final AttributeSelector taxRateStandingGood,
+      final AttributeSelector taxRateStandingNeutral,
+      final AttributeSelector taxRateStandingBad,
+      final AttributeSelector taxRateStandingTerrible) throws IOException {
     try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(new RunInTransaction<List<CustomsOffice>>() {
-        @Override
-        public List<CustomsOffice> run() throws Exception {
-          StringBuilder qs = new StringBuilder();
-          qs.append("SELECT c FROM CustomsOffice c WHERE ");
-          // Constrain to specified owner
-          qs.append("c.owner = :owner");
-          // Constrain lifeline
-          AttributeSelector.addLifelineSelector(qs, "c", at);
-          // Constrain attributes
-          AttributeParameters p = new AttributeParameters("att");
-          AttributeSelector.addLongSelector(qs, "c", "itemID", itemID);
-          AttributeSelector.addIntSelector(qs, "c", "solarSystemID", solarSystemID);
-          AttributeSelector.addStringSelector(qs, "c", "solarSystemName", solarSystemName, p);
-          AttributeSelector.addIntSelector(qs, "c", "reinforceHour", reinforceHour);
-          AttributeSelector.addBooleanSelector(qs, "c", "allowAlliance", allowAlliance);
-          AttributeSelector.addBooleanSelector(qs, "c", "allowStandings", allowStandings);
-          AttributeSelector.addDoubleSelector(qs, "c", "standingLevel", standingLevel);
-          AttributeSelector.addDoubleSelector(qs, "c", "taxRateAlliance", taxRateAlliance);
-          AttributeSelector.addDoubleSelector(qs, "c", "taxRateCorp", taxRateCorp);
-          AttributeSelector.addDoubleSelector(qs, "c", "taxRateStandingHigh", taxRateStandingHigh);
-          AttributeSelector.addDoubleSelector(qs, "c", "taxRateStandingGood", taxRateStandingGood);
-          AttributeSelector.addDoubleSelector(qs, "c", "taxRateStandingNeutral", taxRateStandingNeutral);
-          AttributeSelector.addDoubleSelector(qs, "c", "taxRateStandingBad", taxRateStandingBad);
-          AttributeSelector.addDoubleSelector(qs, "c", "taxRateStandingHorrible", taxRateStandingHorrible);
-          // Set CID constraint and ordering
-          if (reverse) {
-            qs.append(" and c.cid < ").append(contid);
-            qs.append(" order by cid desc");
-          } else {
-            qs.append(" and c.cid > ").append(contid);
-            qs.append(" order by cid asc");
-          }
-          // Return result
-          TypedQuery<CustomsOffice> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), CustomsOffice.class);
-          query.setParameter("owner", owner);
-          p.fillParams(query);
-          query.setMaxResults(maxresults);
-          return query.getResultList();
-        }
-      });
+      return EveKitUserAccountProvider.getFactory()
+                                      .runTransaction(new RunInTransaction<List<CustomsOffice>>() {
+                                        @Override
+                                        public List<CustomsOffice> run() throws Exception {
+                                          StringBuilder qs = new StringBuilder();
+                                          qs.append("SELECT c FROM CustomsOffice c WHERE ");
+                                          // Constrain to specified owner
+                                          qs.append("c.owner = :owner");
+                                          // Constrain lifeline
+                                          AttributeSelector.addLifelineSelector(qs, "c", at);
+                                          // Constrain attributes
+                                          AttributeParameters p = new AttributeParameters("att");
+                                          AttributeSelector.addLongSelector(qs, "c", "officeID", officeID);
+                                          AttributeSelector.addIntSelector(qs, "c", "solarSystemID", solarSystemID);
+                                          AttributeSelector.addIntSelector(qs, "c", "reinforceExitStart",
+                                                                           reinforceExitStart);
+                                          AttributeSelector.addIntSelector(qs, "c", "reinforceExitEnd",
+                                                                           reinforceExitEnd);
+                                          AttributeSelector.addBooleanSelector(qs, "c", "allowAlliance", allowAlliance);
+                                          AttributeSelector.addBooleanSelector(qs, "c", "allowStandings",
+                                                                               allowStandings);
+                                          AttributeSelector.addStringSelector(qs, "c", "standingLevel", standingLevel,
+                                                                              p);
+                                          AttributeSelector.addFloatSelector(qs, "c", "taxRateAlliance",
+                                                                             taxRateAlliance);
+                                          AttributeSelector.addFloatSelector(qs, "c", "taxRateCorp", taxRateCorp);
+                                          AttributeSelector.addFloatSelector(qs, "c", "taxRateStandingExcellent",
+                                                                             taxRateStandingExcellent);
+                                          AttributeSelector.addFloatSelector(qs, "c", "taxRateStandingGood",
+                                                                             taxRateStandingGood);
+                                          AttributeSelector.addFloatSelector(qs, "c", "taxRateStandingNeutral",
+                                                                             taxRateStandingNeutral);
+                                          AttributeSelector.addFloatSelector(qs, "c", "taxRateStandingBad",
+                                                                             taxRateStandingBad);
+                                          AttributeSelector.addFloatSelector(qs, "c", "taxRateStandingTerrible",
+                                                                             taxRateStandingTerrible);
+                                          // Set CID constraint and ordering
+                                          setCIDOrdering(qs, contid, reverse);
+                                          // Return result
+                                          TypedQuery<CustomsOffice> query = EveKitUserAccountProvider.getFactory()
+                                                                                                     .getEntityManager()
+                                                                                                     .createQuery(
+                                                                                                         qs.toString(),
+                                                                                                         CustomsOffice.class);
+                                          query.setParameter("owner", owner);
+                                          p.fillParams(query);
+                                          query.setMaxResults(maxresults);
+                                          return query.getResultList();
+                                        }
+                                      });
     } catch (Exception e) {
+      if (e.getCause() instanceof IOException) throw (IOException) e.getCause();
       log.log(Level.SEVERE, "query error", e);
+      throw new IOException(e.getCause());
     }
-    return Collections.emptyList();
   }
 
 }
