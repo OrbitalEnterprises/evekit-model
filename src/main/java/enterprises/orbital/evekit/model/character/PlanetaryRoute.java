@@ -78,7 +78,8 @@ public class PlanetaryRoute extends CachedData {
     if (!(sup instanceof PlanetaryRoute)) return false;
     PlanetaryRoute other = (PlanetaryRoute) sup;
     return planetID == other.planetID && routeID == other.routeID && sourcePinID == other.sourcePinID && destinationPinID == other.destinationPinID
-        && contentTypeID == other.contentTypeID && (Float.compare(quantity, other.quantity) == 0)
+        && contentTypeID == other.contentTypeID
+        && floatCompare(quantity, other.quantity,0.00001F)
         && nullSafeListCompare(waypoints, other.waypoints);
   }
 

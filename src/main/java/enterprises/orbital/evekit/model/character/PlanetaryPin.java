@@ -131,8 +131,10 @@ public class PlanetaryPin extends CachedData {
     return planetID == other.planetID && pinID == other.pinID && typeID == other.typeID
         && schematicID == other.schematicID && lastCycleStart == other.lastCycleStart && cycleTime == other.cycleTime
         && quantityPerCycle == other.quantityPerCycle && installTime == other.installTime && expiryTime == other.expiryTime
-        && productTypeID == other.productTypeID && Float.compare(longitude, other.longitude) == 0
-        && Float.compare(latitude, other.latitude) == 0 && Float.compare(headRadius, other.headRadius) == 0
+        && productTypeID == other.productTypeID
+        && floatCompare(longitude, other.longitude,0.00001F)
+        && floatCompare(latitude, other.latitude,0.00001F)
+        && floatCompare(headRadius, other.headRadius,0.00001F)
         && nullSafeObjectCompare(heads, other.heads) && nullSafeObjectCompare(contents, other.contents);
   }
 

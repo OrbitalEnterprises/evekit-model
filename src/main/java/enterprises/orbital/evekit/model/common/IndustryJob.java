@@ -167,7 +167,7 @@ public class IndustryJob extends CachedData {
         && stationID == other.stationID && activityID == other.activityID && blueprintID == other.blueprintID
         && blueprintTypeID == other.blueprintTypeID && blueprintLocationID == other.blueprintLocationID
         && outputLocationID == other.outputLocationID && runs == other.runs && nullSafeObjectCompare(cost, other.cost)
-        && licensedRuns == other.licensedRuns && Float.compare(probability, other.probability) == 0 && productTypeID == other.productTypeID
+        && licensedRuns == other.licensedRuns && floatCompare(probability, other.probability, 0.00001F) && productTypeID == other.productTypeID
         && nullSafeObjectCompare(status, other.status) && timeInSeconds == other.timeInSeconds
         && startDate == other.startDate && endDate == other.endDate && pauseDate == other.pauseDate && completedDate == other.completedDate
         && completedCharacterID == other.completedCharacterID && successfulRuns == other.successfulRuns;

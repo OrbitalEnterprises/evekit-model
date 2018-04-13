@@ -3,6 +3,7 @@ package enterprises.orbital.evekit.model.character;
 import enterprises.orbital.evekit.TestBase;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.model.AbstractModelTester;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class CharacterSheetTest extends AbstractModelTester<CharacterSheet> {
@@ -76,6 +77,20 @@ public class CharacterSheetTest extends AbstractModelTester<CharacterSheet> {
 
   @Test
   public void testGetLifeline() throws Exception {
-    runGetLifelineTest(eol, live, (account, time) -> CharacterSheet.get(account, time));
+    runGetLifelineTest(eol, live, CharacterSheet::get);
   }
+
+  @Test
+  public void testEquivalence() {
+    final float SEC_ONE = 5.010537F;
+    final float SEC_TWO = 5.010531F;
+    CharacterSheet sheetOne = new CharacterSheet(
+        characterID, name, corporationID, raceID, doB, bloodlineID, ancestryID, gender, allianceID,
+        factionID, description, SEC_ONE);
+    CharacterSheet sheetTwo = new CharacterSheet(
+        characterID, name, corporationID, raceID, doB, bloodlineID, ancestryID, gender, allianceID,
+        factionID, description, SEC_TWO);
+    Assert.assertTrue(sheetOne.equivalent(sheetTwo));
+  }
+
 }

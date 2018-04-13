@@ -117,11 +117,10 @@ public class Bookmark extends CachedData {
                                                                other.folderName) && folderCreatorID == other.folderCreatorID
         && bookmarkID == other.bookmarkID && bookmarkCreatorID == other.bookmarkCreatorID && created == other.created && itemID == other.itemID
         && typeID == other.typeID && locationID == other.locationID &&
-        Double.compare(x, other.x) == 0 &&
-        Double.compare(y, other.y) == 0 &&
-        Double.compare(z, other.z) == 0 &&
-        nullSafeObjectCompare(
-        memo, other.memo)
+        doubleCompare(x, other.x, 0.000000001D) &&
+        doubleCompare(y, other.y, 0.000000001D) &&
+        doubleCompare(z, other.z, 0.000000001D) &&
+        nullSafeObjectCompare(memo, other.memo)
         && nullSafeObjectCompare(note, other.note);
   }
 

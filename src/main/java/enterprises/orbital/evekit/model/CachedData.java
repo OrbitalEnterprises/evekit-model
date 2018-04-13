@@ -179,6 +179,14 @@ public abstract class CachedData {
     return true;
   }
 
+  public static boolean floatCompare(float v1, float v2, float precision) {
+    return Math.abs(v1 - v2) < precision;
+  }
+
+  public static boolean doubleCompare(double v1, double v2, double precision) {
+    return Math.abs(v1 - v2) < precision;
+  }
+
   /**
    * Initialize this CachedData object.
    * 

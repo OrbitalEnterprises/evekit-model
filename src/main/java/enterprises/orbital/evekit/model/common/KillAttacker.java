@@ -83,7 +83,7 @@ public class KillAttacker extends CachedData {
     return killID == other.killID && attackerCharacterID == other.attackerCharacterID && allianceID == other.allianceID
         && attackerCorporationID == other.attackerCorporationID && damageDone == other.damageDone
         && factionID == other.factionID &&
-        Float.compare(securityStatus, other.securityStatus) == 0 && shipTypeID == other.shipTypeID
+        floatCompare(securityStatus, other.securityStatus, 0.00001F) && shipTypeID == other.shipTypeID
         && weaponTypeID == other.weaponTypeID && finalBlow == other.finalBlow;
   }
 

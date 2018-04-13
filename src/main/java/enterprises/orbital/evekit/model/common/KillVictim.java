@@ -77,9 +77,9 @@ public class KillVictim extends CachedData {
     return killID == other.killID && allianceID == other.allianceID && killCharacterID == other.killCharacterID
         && killCorporationID == other.killCorporationID && damageTaken == other.damageTaken
         && factionID == other.factionID && shipTypeID == other.shipTypeID
-        && Double.compare(x, other.x) == 0
-        && Double.compare(y, other.y) == 0
-        && Double.compare(z, other.z) == 0;
+        && doubleCompare(x, other.x,0.00000001D)
+        && doubleCompare(y, other.y,0.00000001D)
+        && doubleCompare(z, other.z,0.00000001D);
   }
 
   /**

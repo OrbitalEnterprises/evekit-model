@@ -1,5 +1,7 @@
 package enterprises.orbital.evekit.model.character;
 
+import enterprises.orbital.evekit.model.CachedData;
+
 import javax.persistence.Embeddable;
 import java.util.Objects;
 
@@ -47,8 +49,8 @@ public class PlanetaryPinHead {
     if (o == null || getClass() != o.getClass()) return false;
     PlanetaryPinHead that = (PlanetaryPinHead) o;
     return headID == that.headID &&
-        Float.compare(that.latitude, latitude) == 0 &&
-        Float.compare(that.longitude, longitude) == 0;
+        CachedData.floatCompare(that.latitude, latitude,0.00001F) &&
+        CachedData.floatCompare(that.longitude, longitude,0.00001F);
   }
 
   @Override

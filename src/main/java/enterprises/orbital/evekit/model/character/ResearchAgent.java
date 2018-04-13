@@ -2,8 +2,6 @@ package enterprises.orbital.evekit.model.character;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import enterprises.orbital.base.OrbitalProperties;
-import enterprises.orbital.base.PersistentProperty;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
@@ -83,8 +81,8 @@ public class ResearchAgent extends CachedData {
     if (!(sup instanceof ResearchAgent)) return false;
     ResearchAgent other = (ResearchAgent) sup;
     return agentID == other.agentID &&
-        Float.compare(pointsPerDay, other.pointsPerDay) == 0 &&
-        Float.compare(remainderPoints, other.remainderPoints) == 0
+        floatCompare(pointsPerDay, other.pointsPerDay, 0.00001F) &&
+        floatCompare(remainderPoints, other.remainderPoints, 0.00001F)
         && researchStartDate == other.researchStartDate && skillTypeID == other.skillTypeID;
   }
 
@@ -155,8 +153,9 @@ public class ResearchAgent extends CachedData {
                                       .runTransaction(() -> {
                                         TypedQuery<ResearchAgent> getter = EveKitUserAccountProvider.getFactory()
                                                                                                     .getEntityManager()
-                                                                                                    .createNamedQuery("ResearchAgent.getByAgentID",
-                                                                                                                      ResearchAgent.class);
+                                                                                                    .createNamedQuery(
+                                                                                                        "ResearchAgent.getByAgentID",
+                                                                                                        ResearchAgent.class);
                                         getter.setParameter("owner", owner);
                                         getter.setParameter("aid", agentID);
                                         getter.setParameter("point", time);
@@ -197,14 +196,17 @@ public class ResearchAgent extends CachedData {
                                         AttributeSelector.addIntSelector(qs, "c", "agentID", agentID);
                                         AttributeSelector.addFloatSelector(qs, "c", "pointsPerDay", pointsPerDay);
                                         AttributeSelector.addFloatSelector(qs, "c", "remainderPoints", remainderPoints);
-                                        AttributeSelector.addLongSelector(qs, "c", "researchStartDate", researchStartDate);
+                                        AttributeSelector.addLongSelector(qs, "c", "researchStartDate",
+                                                                          researchStartDate);
                                         AttributeSelector.addIntSelector(qs, "c", "skillTypeID", skillTypeID);
                                         // Set CID constraint and ordering
                                         setCIDOrdering(qs, contid, reverse);
                                         // Return result
                                         TypedQuery<ResearchAgent> query = EveKitUserAccountProvider.getFactory()
                                                                                                    .getEntityManager()
-                                                                                                   .createQuery(qs.toString(), ResearchAgent.class);
+                                                                                                   .createQuery(
+                                                                                                       qs.toString(),
+                                                                                                       ResearchAgent.class);
                                         query.setParameter("owner", owner);
                                         query.setMaxResults(maxresults);
                                         return query.getResultList();

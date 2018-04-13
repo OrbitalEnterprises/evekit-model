@@ -74,7 +74,7 @@ public class Contact extends CachedData {
     Contact other = (Contact) sup;
     return nullSafeObjectCompare(list, other.list) &&
         contactID == other.contactID &&
-        Double.compare(standing, other.standing) == 0 &&
+        floatCompare(standing, other.standing,0.00001F) &&
         nullSafeObjectCompare(contactType, other.contactType) &&
         inWatchlist == other.inWatchlist &&
         isBlocked == other.isBlocked &&

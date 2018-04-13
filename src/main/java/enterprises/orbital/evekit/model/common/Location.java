@@ -71,9 +71,9 @@ public class Location extends CachedData {
     Location other = (Location) sup;
     return itemID == other.itemID && nullSafeObjectCompare(itemName,
                                                            other.itemName)
-        && Double.compare(x, other.x) == 0
-        && Double.compare(y, other.y) == 0
-        && Double.compare(z, other.z) == 0;
+        && doubleCompare(x, other.x, 0.000000001D)
+        && doubleCompare(y, other.y, 0.000000001D)
+        && doubleCompare(z, other.z, 0.000000001D);
   }
 
   /**

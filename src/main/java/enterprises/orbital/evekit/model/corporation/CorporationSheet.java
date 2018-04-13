@@ -109,9 +109,9 @@ public class CorporationSheet extends CachedData {
         && nullSafeObjectCompare(corporationName, other.corporationName) && nullSafeObjectCompare(description,
                                                                                                   other.description)
         && memberCount == other.memberCount && shares == other.shares && stationID == other.stationID
-        && Float.compare(taxRate, other.taxRate) == 0 && nullSafeObjectCompare(ticker,
-                                                                               other.ticker) && nullSafeObjectCompare(
-        url, other.url)
+        && floatCompare(taxRate, other.taxRate, 0.00001F)
+        && nullSafeObjectCompare(ticker, other.ticker)
+        && nullSafeObjectCompare(url, other.url)
         && dateFounded == other.dateFounded
         && creatorID == other.creatorID
         && factionID == other.factionID

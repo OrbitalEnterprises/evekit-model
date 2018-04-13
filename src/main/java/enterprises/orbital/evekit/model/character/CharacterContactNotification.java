@@ -84,7 +84,7 @@ public class CharacterContactNotification extends CachedData {
     CharacterContactNotification other = (CharacterContactNotification) sup;
     return notificationID == other.notificationID && senderID == other.senderID
         && sentDate == other.sentDate
-        && Float.compare(standingLevel, other.standingLevel) == 0
+        && floatCompare(standingLevel, other.standingLevel, 0.00001F)
         && nullSafeObjectCompare(messageData, other.messageData);
   }
 

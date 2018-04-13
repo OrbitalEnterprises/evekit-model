@@ -104,7 +104,7 @@ public class CharacterSheet extends CachedData {
         allianceID == other.allianceID &&
         factionID == other.factionID &&
         nullSafeObjectCompare(description, other.description) &&
-        Float.compare(securityStatus, other.securityStatus) == 0;
+        floatCompare(securityStatus, other.securityStatus, 0.00001F);
   }
 
   /**

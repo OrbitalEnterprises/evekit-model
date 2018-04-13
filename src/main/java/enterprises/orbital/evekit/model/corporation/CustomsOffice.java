@@ -93,13 +93,13 @@ public class CustomsOffice extends CachedData {
         && allowAlliance == other.allowAlliance
         && allowStandings == other.allowStandings
         && nullSafeObjectCompare(standingLevel, other.standingLevel)
-        && Float.compare(taxRateAlliance, other.taxRateAlliance) == 0
-        && Float.compare(taxRateCorp, other.taxRateCorp) == 0
-        && Float.compare(taxRateStandingExcellent, other.taxRateStandingExcellent) == 0
-        && Float.compare(taxRateStandingGood, other.taxRateStandingGood) == 0
-        && Float.compare(taxRateStandingNeutral, other.taxRateStandingNeutral) == 0
-        && Float.compare(taxRateStandingBad, other.taxRateStandingBad) == 0
-        && Float.compare(taxRateStandingTerrible, other.taxRateStandingTerrible) == 0;
+        && floatCompare(taxRateAlliance, other.taxRateAlliance,0.00001F)
+        && floatCompare(taxRateCorp, other.taxRateCorp,0.00001F)
+        && floatCompare(taxRateStandingExcellent, other.taxRateStandingExcellent,0.00001F)
+        && floatCompare(taxRateStandingGood, other.taxRateStandingGood,0.00001F)
+        && floatCompare(taxRateStandingNeutral, other.taxRateStandingNeutral,0.00001F)
+        && floatCompare(taxRateStandingBad, other.taxRateStandingBad,0.00001F)
+        && floatCompare(taxRateStandingTerrible, other.taxRateStandingTerrible,0.00001F);
   }
 
   /**

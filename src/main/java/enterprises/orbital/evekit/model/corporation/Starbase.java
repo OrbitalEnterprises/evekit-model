@@ -152,8 +152,8 @@ public class Starbase extends CachedData {
         allowCorporationMembers == other.allowCorporationMembers &&
         allowAllianceMembers == other.allowAllianceMembers &&
         useAllianceStandings == other.useAllianceStandings &&
-        Float.compare(attackStandingThreshold, other.attackStandingThreshold) == 0 &&
-        Float.compare(attackSecurityStatusThreshold, other.attackSecurityStatusThreshold) == 0 &&
+        floatCompare(attackStandingThreshold, other.attackStandingThreshold,0.00001F) &&
+        floatCompare(attackSecurityStatusThreshold, other.attackSecurityStatusThreshold,0.00001F) &&
         attackIfOtherSecurityStatusDropping == other.attackIfOtherSecurityStatusDropping &&
         attackIfAtWar == other.attackIfAtWar;
   }

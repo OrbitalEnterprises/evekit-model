@@ -178,7 +178,7 @@ public class Contract extends CachedData {
         && nullSafeObjectCompare(price, other.price) && nullSafeObjectCompare(reward,
                                                                               other.reward) && nullSafeObjectCompare(
         collateral, other.collateral)
-        && nullSafeObjectCompare(buyout, other.buyout) && Double.compare(volume, other.volume) == 0;
+        && nullSafeObjectCompare(buyout, other.buyout) && doubleCompare(volume, other.volume, 0.00001D);
   }
 
   /**
