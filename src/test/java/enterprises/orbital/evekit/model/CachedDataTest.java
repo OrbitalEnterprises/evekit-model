@@ -382,6 +382,33 @@ public class CachedDataTest extends AbstractAccountBasedTest {
       CachedData.update(next);
     }
     System.out.println("Created ChatChannelMembers");
+
+    count = TestBase.getRandomInt(50) + 50;
+    for (int i = 0; i < count; i++) {
+      int sel = TestBase.getRandomInt(5);
+      CachedData next = new Fitting(
+          TestBase.getUniqueRandomInteger(), TestBase.getRandomText(50), TestBase.getRandomText(50), TestBase.getRandomInt());
+      for (int j = 0; j < sel; j++) {
+        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
+      }
+      next.setup(testAccount, testTime);
+      CachedData.update(next);
+    }
+    System.out.println("Created Fittings");
+
+    count = TestBase.getRandomInt(50) + 50;
+    for (int i = 0; i < count; i++) {
+      int sel = TestBase.getRandomInt(5);
+      CachedData next = new FittingItem(
+          TestBase.getUniqueRandomInteger(), TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt());
+      for (int j = 0; j < sel; j++) {
+        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
+      }
+      next.setup(testAccount, testTime);
+      CachedData.update(next);
+    }
+    System.out.println("Created FittingItems");
+
     count = TestBase.getRandomInt(1000) + 200;
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
@@ -547,6 +574,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
       Asset parent = assetParents.poll();
       count = TestBase.getRandomInt(5);
       for (int j = 0; j < count; j++) {
+        assert parent != null;
         Asset child = new Asset(
             TestBase.getUniqueRandomLong(), parent.getItemID(), TestBase.getRandomText(50),
             TestBase.getRandomText(50), TestBase.getRandomInt(), TestBase.getRandomInt(),
@@ -746,6 +774,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
       KillItem parent = killItemParents.poll();
       count = TestBase.getRandomInt(5);
       for (int j = 0; j < count; j++) {
+        assert parent != null;
         KillItem child = new KillItem(
             TestBase.getUniqueRandomInteger(), TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomLong(),
             TestBase.getRandomInt(), j, parent.getSequence());
@@ -1151,6 +1180,8 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     CachedData.cleanup(testAccount, "CharacterTitle");
     CachedData.cleanup(testAccount, "ChatChannel");
     CachedData.cleanup(testAccount, "ChatChannelMember");
+    CachedData.cleanup(testAccount, "Fitting");
+    CachedData.cleanup(testAccount, "FittingItem");
     CachedData.cleanup(testAccount, "Implant");
     CachedData.cleanup(testAccount, "JumpClone");
     CachedData.cleanup(testAccount, "JumpCloneImplant");
