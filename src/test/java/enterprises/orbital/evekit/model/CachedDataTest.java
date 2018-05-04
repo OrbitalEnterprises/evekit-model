@@ -852,14 +852,11 @@ public class CachedDataTest extends AbstractAccountBasedTest {
       int sel = TestBase.getRandomInt(5);
       CachedData next = new WalletJournal(
           TestBase.getRandomInt(), TestBase.getRandomLong(), TestBase.getRandomLong(),
-          TestBase.getRandomText(50), TestBase.getRandomInt(), TestBase.getRandomText(50),
-          TestBase.getRandomInt(), TestBase.getRandomText(50),
+          TestBase.getRandomText(50), TestBase.getRandomInt(), TestBase.getRandomInt(),
           TestBase.getRandomText(50), TestBase.getRandomLong(),
           TestBase.getRandomBigDecimal(100000000), TestBase.getRandomBigDecimal(100000000), TestBase.getRandomText(50), TestBase.getRandomInt(),
-          TestBase.getRandomBigDecimal(100000000), TestBase.getRandomLong(), TestBase.getRandomLong(),
-          TestBase.getRandomText(50), TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt(),
-          TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt(), TestBase.getRandomInt(),
-          TestBase.getRandomInt(), TestBase.getRandomInt());
+          TestBase.getRandomBigDecimal(100000000), TestBase.getRandomLong(), TestBase.getRandomText(50),
+          TestBase.getRandomText(50));
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
