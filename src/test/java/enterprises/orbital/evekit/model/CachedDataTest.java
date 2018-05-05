@@ -386,6 +386,19 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     count = TestBase.getRandomInt(50) + 50;
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
+      CachedData next = new LoyaltyPoints(
+          TestBase.getUniqueRandomInteger(), TestBase.getRandomInt());
+      for (int j = 0; j < sel; j++) {
+        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
+      }
+      next.setup(testAccount, testTime);
+      CachedData.update(next);
+    }
+    System.out.println("Created LoyaltyPoints");
+
+    count = TestBase.getRandomInt(50) + 50;
+    for (int i = 0; i < count; i++) {
+      int sel = TestBase.getRandomInt(5);
       CachedData next = new Fitting(
           TestBase.getUniqueRandomInteger(), TestBase.getRandomText(50), TestBase.getRandomText(50), TestBase.getRandomInt());
       for (int j = 0; j < sel; j++) {
@@ -1182,6 +1195,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     CachedData.cleanup(testAccount, "Implant");
     CachedData.cleanup(testAccount, "JumpClone");
     CachedData.cleanup(testAccount, "JumpCloneImplant");
+    CachedData.cleanup(testAccount, "LoyaltyPoints");
     CachedData.cleanup(testAccount, "MailingList");
     CachedData.cleanup(testAccount, "MailLabel");
     CachedData.cleanup(testAccount, "PlanetaryColony");
