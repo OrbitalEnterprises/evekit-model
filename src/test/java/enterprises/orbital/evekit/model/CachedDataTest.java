@@ -399,6 +399,72 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     count = TestBase.getRandomInt(50) + 50;
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
+      CachedData next = new MiningLedger(
+          TestBase.getUniqueRandomLong(),
+          TestBase.getRandomInt(),
+          TestBase.getRandomInt(),
+          TestBase.getRandomLong());
+      for (int j = 0; j < sel; j++) {
+        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
+      }
+      next.setup(testAccount, testTime);
+      CachedData.update(next);
+    }
+    System.out.println("Created MiningLedgers");
+
+    count = TestBase.getRandomInt(50) + 50;
+    for (int i = 0; i < count; i++) {
+      int sel = TestBase.getRandomInt(5);
+      CachedData next = new MiningExtraction(
+          TestBase.getUniqueRandomInteger(),
+          TestBase.getRandomLong(),
+          TestBase.getRandomLong(),
+          TestBase.getRandomLong(),
+          TestBase.getRandomLong());
+      for (int j = 0; j < sel; j++) {
+        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
+      }
+      next.setup(testAccount, testTime);
+      CachedData.update(next);
+    }
+    System.out.println("Created MiningExtractions");
+
+    count = TestBase.getRandomInt(50) + 50;
+    for (int i = 0; i < count; i++) {
+      int sel = TestBase.getRandomInt(5);
+      CachedData next = new MiningObserver(
+          TestBase.getUniqueRandomLong(),
+          TestBase.getRandomText(50),
+          TestBase.getRandomLong());
+      for (int j = 0; j < sel; j++) {
+        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
+      }
+      next.setup(testAccount, testTime);
+      CachedData.update(next);
+    }
+    System.out.println("Created MiningObservers");
+
+    count = TestBase.getRandomInt(50) + 50;
+    for (int i = 0; i < count; i++) {
+      int sel = TestBase.getRandomInt(5);
+      CachedData next = new MiningObservation(
+          TestBase.getUniqueRandomLong(),
+          TestBase.getRandomInt(),
+          TestBase.getRandomInt(),
+          TestBase.getRandomInt(),
+          TestBase.getRandomLong(),
+          TestBase.getRandomLong());
+      for (int j = 0; j < sel; j++) {
+        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
+      }
+      next.setup(testAccount, testTime);
+      CachedData.update(next);
+    }
+    System.out.println("Created MiningObservations");
+
+    count = TestBase.getRandomInt(50) + 50;
+    for (int i = 0; i < count; i++) {
+      int sel = TestBase.getRandomInt(5);
       CachedData next = new Fitting(
           TestBase.getUniqueRandomInteger(), TestBase.getRandomText(50), TestBase.getRandomText(50), TestBase.getRandomInt());
       for (int j = 0; j < sel; j++) {
@@ -1198,6 +1264,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     CachedData.cleanup(testAccount, "LoyaltyPoints");
     CachedData.cleanup(testAccount, "MailingList");
     CachedData.cleanup(testAccount, "MailLabel");
+    CachedData.cleanup(testAccount, "MiningLedger");
     CachedData.cleanup(testAccount, "PlanetaryColony");
     CachedData.cleanup(testAccount, "PlanetaryLink");
     CachedData.cleanup(testAccount, "PlanetaryPin");
@@ -1242,6 +1309,9 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     CachedData.cleanup(testAccount, "MemberRole");
     CachedData.cleanup(testAccount, "MemberRoleHistory");
     CachedData.cleanup(testAccount, "MemberTracking");
+    CachedData.cleanup(testAccount, "MiningExtraction");
+    CachedData.cleanup(testAccount, "MiningObserver");
+    CachedData.cleanup(testAccount, "MiningObservation");
     CachedData.cleanup(testAccount, "Shareholder");
     CachedData.cleanup(testAccount, "Starbase");
 
