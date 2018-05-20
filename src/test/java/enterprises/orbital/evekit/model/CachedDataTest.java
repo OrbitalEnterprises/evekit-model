@@ -100,6 +100,125 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     System.out.println("Created Implants");
     count = TestBase.getRandomInt(5) + 1;
     for (int i = 0; i < count; i++) {
+      CachedData next = new CharacterFleet(TestBase.getUniqueRandomLong(),
+                                           TestBase.getRandomText(50),
+                                           TestBase.getRandomLong(),
+                                           TestBase.getRandomLong());
+      for (int j = 0; j < 1; j++) {
+        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
+      }
+      next.setup(testAccount, testTime);
+      CachedData.update(next);
+    }
+    System.out.println("Created CharacterFleets");
+    count = TestBase.getRandomInt(5) + 1;
+    for (int i = 0; i < count; i++) {
+      CachedData next = new FleetInfo(TestBase.getUniqueRandomLong(),
+                                      TestBase.getRandomBoolean(),
+                                      TestBase.getRandomBoolean(),
+                                      TestBase.getRandomBoolean(),
+                                      TestBase.getRandomText(1000));
+      for (int j = 0; j < 1; j++) {
+        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
+      }
+      next.setup(testAccount, testTime);
+      CachedData.update(next);
+    }
+    System.out.println("Created Fleet Info");
+    count = TestBase.getRandomInt(5) + 1;
+    for (int i = 0; i < count; i++) {
+      CachedData next = new FleetMember(TestBase.getUniqueRandomLong(),
+                                        TestBase.getUniqueRandomInteger(),
+                                        TestBase.getRandomLong(),
+                                        TestBase.getRandomText(50),
+                                        TestBase.getRandomText(50),
+                                        TestBase.getRandomInt(),
+                                        TestBase.getRandomInt(),
+                                        TestBase.getRandomLong(),
+                                        TestBase.getRandomLong(),
+                                        TestBase.getRandomBoolean(),
+                                        TestBase.getRandomLong());
+      for (int j = 0; j < 1; j++) {
+        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
+      }
+      next.setup(testAccount, testTime);
+      CachedData.update(next);
+    }
+    System.out.println("Created Fleet Members");
+    count = TestBase.getRandomInt(5) + 1;
+    for (int i = 0; i < count; i++) {
+      CachedData next = new FleetWing(TestBase.getUniqueRandomLong(),
+                                      TestBase.getUniqueRandomLong(),
+                                      TestBase.getRandomText(50));
+      for (int j = 0; j < 1; j++) {
+        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
+      }
+      next.setup(testAccount, testTime);
+      CachedData.update(next);
+    }
+    System.out.println("Created Fleet Wings");
+    count = TestBase.getRandomInt(5) + 1;
+    for (int i = 0; i < count; i++) {
+      CachedData next = new FleetSquad(TestBase.getUniqueRandomLong(),
+                                       TestBase.getUniqueRandomLong(),
+                                       TestBase.getUniqueRandomLong(),
+                                       TestBase.getRandomText(50));
+      for (int j = 0; j < 1; j++) {
+        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
+      }
+      next.setup(testAccount, testTime);
+      CachedData.update(next);
+    }
+    System.out.println("Created Fleet Squads");
+    count = TestBase.getRandomInt(5) + 1;
+    for (int i = 0; i < count; i++) {
+      CachedData next = new Opportunity(TestBase.getUniqueRandomInteger(),
+                                        TestBase.getRandomLong());
+      for (int j = 0; j < 1; j++) {
+        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
+      }
+      next.setup(testAccount, testTime);
+      CachedData.update(next);
+    }
+    System.out.println("Created Opportunities");
+    count = TestBase.getRandomInt(5) + 1;
+    for (int i = 0; i < count; i++) {
+      CachedData next = new Structure(TestBase.getUniqueRandomLong(),
+                                      TestBase.getRandomInt(),
+                                      TestBase.getRandomLong(),
+                                      TestBase.getRandomLong(),
+                                      TestBase.getRandomInt(),
+                                      TestBase.getRandomInt(),
+                                      TestBase.getRandomInt(),
+                                      TestBase.getRandomInt(),
+                                      TestBase.getRandomInt(),
+                                      TestBase.getRandomText(50),
+                                      TestBase.getRandomLong(),
+                                      TestBase.getRandomLong(),
+                                      TestBase.getRandomInt(),
+                                      TestBase.getRandomInt(),
+                                      TestBase.getRandomLong());
+      for (int j = 0; j < 1; j++) {
+        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
+      }
+      next.setup(testAccount, testTime);
+      CachedData.update(next);
+    }
+    System.out.println("Created Structures");
+    count = TestBase.getRandomInt(5) + 1;
+    for (int i = 0; i < count; i++) {
+      CachedData next = new StructureService(TestBase.getUniqueRandomLong(),
+                                             TestBase.getRandomText(50),
+                                             TestBase.getRandomText(50));
+      for (int j = 0; j < 1; j++) {
+        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
+      }
+      next.setup(testAccount, testTime);
+      CachedData.update(next);
+    }
+    System.out.println("Created Structure Services");
+    count = TestBase.getRandomInt(5) + 1;
+    for (int i = 0; i < count; i++) {
       CachedData next = new JumpClone(TestBase.getUniqueRandomInteger(), TestBase.getRandomInt(), TestBase.getRandomText(50), TestBase.getRandomText(50));
       for (int j = 0; j < 1; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
@@ -1239,6 +1358,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     CachedData.cleanup(testAccount, "CalendarEventAttendee");
     CachedData.cleanup(testAccount, "Capsuleer");
     CachedData.cleanup(testAccount, "CharacterContactNotification");
+    CachedData.cleanup(testAccount, "CharacterFleet");
     CachedData.cleanup(testAccount, "CharacterMailMessage");
     CachedData.cleanup(testAccount, "CharacterMedal");
     CachedData.cleanup(testAccount, "CharacterMedalGraphic");
@@ -1258,6 +1378,10 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     CachedData.cleanup(testAccount, "ChatChannelMember");
     CachedData.cleanup(testAccount, "Fitting");
     CachedData.cleanup(testAccount, "FittingItem");
+    CachedData.cleanup(testAccount, "FleetInfo");
+    CachedData.cleanup(testAccount, "FleetMember");
+    CachedData.cleanup(testAccount, "FleetSquad");
+    CachedData.cleanup(testAccount, "FleetWing");
     CachedData.cleanup(testAccount, "Implant");
     CachedData.cleanup(testAccount, "JumpClone");
     CachedData.cleanup(testAccount, "JumpCloneImplant");
@@ -1265,6 +1389,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     CachedData.cleanup(testAccount, "MailingList");
     CachedData.cleanup(testAccount, "MailLabel");
     CachedData.cleanup(testAccount, "MiningLedger");
+    CachedData.cleanup(testAccount, "Opportunity");
     CachedData.cleanup(testAccount, "PlanetaryColony");
     CachedData.cleanup(testAccount, "PlanetaryLink");
     CachedData.cleanup(testAccount, "PlanetaryPin");
@@ -1314,6 +1439,8 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     CachedData.cleanup(testAccount, "MiningObservation");
     CachedData.cleanup(testAccount, "Shareholder");
     CachedData.cleanup(testAccount, "Starbase");
+    CachedData.cleanup(testAccount, "Structure");
+    CachedData.cleanup(testAccount, "StructureService");
 
     // Verify all elements have been deleted.
     System.out.println("Verifying delete worked properly.");
