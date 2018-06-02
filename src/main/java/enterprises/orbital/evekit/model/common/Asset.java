@@ -50,12 +50,13 @@ public class Asset extends CachedData {
   private int quantity;
   private boolean singleton;
   private String blueprintType;
+  private boolean blueprintCopy;
 
   @SuppressWarnings("unused")
   protected Asset() {}
 
   public Asset(long itemID, long locationID, String locationType, String locationFlag, int typeID, int quantity,
-               boolean singleton, String blueprintType) {
+               boolean singleton, String blueprintType, boolean blueprintCopy) {
     this.itemID = itemID;
     this.locationID = locationID;
     this.locationType = locationType;
@@ -64,6 +65,7 @@ public class Asset extends CachedData {
     this.quantity = quantity;
     this.singleton = singleton;
     this.blueprintType = blueprintType;
+    this.blueprintCopy = blueprintCopy;
   }
 
   /**
@@ -86,7 +88,8 @@ public class Asset extends CachedData {
         nullSafeObjectCompare(locationType, other.locationType) &&
         nullSafeObjectCompare(locationFlag, other.locationFlag) &&
         typeID == other.typeID && quantity == other.quantity &&
-        singleton == other.singleton && nullSafeObjectCompare(blueprintType, other.blueprintType);
+        singleton == other.singleton && nullSafeObjectCompare(blueprintType, other.blueprintType) &&
+        blueprintCopy == other.blueprintCopy;
   }
 
   /**
@@ -129,6 +132,10 @@ public class Asset extends CachedData {
     return blueprintType;
   }
 
+  public boolean isBlueprintCopy() {
+    return blueprintCopy;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -140,6 +147,7 @@ public class Asset extends CachedData {
         typeID == asset.typeID &&
         quantity == asset.quantity &&
         singleton == asset.singleton &&
+        blueprintCopy == asset.blueprintCopy &&
         Objects.equals(locationType, asset.locationType) &&
         Objects.equals(locationFlag, asset.locationFlag) &&
         Objects.equals(blueprintType, asset.blueprintType);
@@ -147,8 +155,9 @@ public class Asset extends CachedData {
 
   @Override
   public int hashCode() {
+
     return Objects.hash(super.hashCode(), itemID, locationID, locationType, locationFlag, typeID, quantity, singleton,
-                        blueprintType);
+                        blueprintType, blueprintCopy);
   }
 
   @Override
@@ -162,6 +171,7 @@ public class Asset extends CachedData {
         ", quantity=" + quantity +
         ", singleton=" + singleton +
         ", blueprintType='" + blueprintType + '\'' +
+        ", blueprintCopy=" + blueprintCopy +
         '}';
   }
 
@@ -297,7 +307,8 @@ public class Asset extends CachedData {
       final AttributeSelector typeID,
       final AttributeSelector quantity,
       final AttributeSelector singleton,
-      final AttributeSelector blueprintType) throws IOException {
+      final AttributeSelector blueprintType,
+      final AttributeSelector blueprintCopy) throws IOException {
     try {
       return EveKitUserAccountProvider.getFactory()
                                       .runTransaction(() -> {
@@ -317,6 +328,7 @@ public class Asset extends CachedData {
                                         AttributeSelector.addLongSelector(qs, "c", "quantity", quantity);
                                         AttributeSelector.addBooleanSelector(qs, "c", "singleton", singleton);
                                         AttributeSelector.addStringSelector(qs, "c", "blueprintType", blueprintType, p);
+                                        AttributeSelector.addBooleanSelector(qs, "c", "blueprintCopy", blueprintCopy);
                                         // Set CID constraint and ordering
                                         setCIDOrdering(qs, contid, reverse);
                                         // Return result

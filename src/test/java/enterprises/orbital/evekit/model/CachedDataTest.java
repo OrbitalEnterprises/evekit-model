@@ -756,7 +756,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
       CachedData next = new Asset(
           TestBase.getUniqueRandomLong(), TestBase.getUniqueRandomLong(), TestBase.getRandomText(50),
           TestBase.getRandomText(50), TestBase.getRandomInt(), TestBase.getRandomInt(),
-          TestBase.getRandomBoolean(), TestBase.getRandomText(50));
+          TestBase.getRandomBoolean(), TestBase.getRandomText(50), TestBase.getRandomBoolean());
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
@@ -776,7 +776,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
         Asset child = new Asset(
             TestBase.getUniqueRandomLong(), parent.getItemID(), TestBase.getRandomText(50),
             TestBase.getRandomText(50), TestBase.getRandomInt(), TestBase.getRandomInt(),
-            TestBase.getRandomBoolean(), TestBase.getRandomText(50));
+            TestBase.getRandomBoolean(), TestBase.getRandomText(50), TestBase.getRandomBoolean());
         assetParents.add(child);
         currentContained++;
         int sel = TestBase.getRandomInt(5);
