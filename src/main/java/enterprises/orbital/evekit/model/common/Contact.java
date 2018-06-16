@@ -9,8 +9,10 @@ import enterprises.orbital.evekit.model.CachedData;
 
 import javax.persistence.*;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,20 +42,24 @@ public class Contact extends CachedData {
   private String contactType;
   private boolean inWatchlist;
   private boolean isBlocked;
-  private long labelID;
+
+  @ElementCollection(fetch = FetchType.EAGER)
+  @CollectionTable(name = "contact_label", joinColumns = @JoinColumn(name = "contact_cid"))
+  @Column(name = "labelID")
+  private Set<Long> labels = new HashSet<>();
 
   @SuppressWarnings("unused")
   protected Contact() {}
 
   public Contact(String list, int contactID, float standing, String contactType, boolean inWatchlist,
-                 boolean isBlocked, long labelID) {
+                 boolean isBlocked, Set<Long> labels) {
     this.list = list;
     this.contactID = contactID;
     this.standing = standing;
     this.contactType = contactType;
     this.inWatchlist = inWatchlist;
     this.isBlocked = isBlocked;
-    this.labelID = labelID;
+    this.labels = labels;
   }
 
   /**
@@ -74,11 +80,11 @@ public class Contact extends CachedData {
     Contact other = (Contact) sup;
     return nullSafeObjectCompare(list, other.list) &&
         contactID == other.contactID &&
-        floatCompare(standing, other.standing,0.00001F) &&
+        floatCompare(standing, other.standing, 0.00001F) &&
         nullSafeObjectCompare(contactType, other.contactType) &&
         inWatchlist == other.inWatchlist &&
         isBlocked == other.isBlocked &&
-        labelID == other.labelID;
+        nullSafeObjectCompare(labels, other.labels);
   }
 
   /**
@@ -113,8 +119,8 @@ public class Contact extends CachedData {
     return isBlocked;
   }
 
-  public long getLabelID() {
-    return labelID;
+  public Set<Long> getLabels() {
+    return labels;
   }
 
   @Override
@@ -127,26 +133,27 @@ public class Contact extends CachedData {
         Float.compare(contact.standing, standing) == 0 &&
         inWatchlist == contact.inWatchlist &&
         isBlocked == contact.isBlocked &&
-        labelID == contact.labelID &&
         Objects.equals(list, contact.list) &&
-        Objects.equals(contactType, contact.contactType);
+        Objects.equals(contactType, contact.contactType) &&
+        Objects.equals(labels, contact.labels);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), list, contactID, standing, contactType, inWatchlist, isBlocked, labelID);
+
+    return Objects.hash(super.hashCode(), list, contactID, standing, contactType, inWatchlist, isBlocked, labels);
   }
 
   @Override
   public String toString() {
     return "Contact{" +
-        "category='" + list + '\'' +
+        "list='" + list + '\'' +
         ", contactID=" + contactID +
         ", standing=" + standing +
         ", contactType='" + contactType + '\'' +
         ", inWatchlist=" + inWatchlist +
         ", isBlocked=" + isBlocked +
-        ", labelID=" + labelID +
+        ", labels=" + labels +
         '}';
   }
 
@@ -206,7 +213,8 @@ public class Contact extends CachedData {
       return EveKitUserAccountProvider.getFactory()
                                       .runTransaction(() -> {
                                         StringBuilder qs = new StringBuilder();
-                                        qs.append("SELECT c FROM Contact c WHERE ");
+                                        qs.append("SELECT DISTINCT c FROM Contact c ");
+                                        qs.append("JOIN c.labels d WHERE ");
                                         // Constrain to specified owner
                                         qs.append("c.owner = :owner");
                                         // Constrain lifeline
@@ -219,7 +227,7 @@ public class Contact extends CachedData {
                                         AttributeSelector.addStringSelector(qs, "c", "contactType", contactType, p);
                                         AttributeSelector.addBooleanSelector(qs, "c", "inWatchlist", inWatchlist);
                                         AttributeSelector.addBooleanSelector(qs, "c", "isBlocked", isBlocked);
-                                        AttributeSelector.addLongSelector(qs, "c", "labelID", labelID);
+                                        AttributeSelector.addLongSelector(qs, null, "d", labelID);
                                         // Set CID constraint and ordering
                                         setCIDOrdering(qs, contid, reverse);
                                         // Return result

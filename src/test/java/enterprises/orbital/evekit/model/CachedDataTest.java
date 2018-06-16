@@ -792,10 +792,13 @@ public class CachedDataTest extends AbstractAccountBasedTest {
     count = TestBase.getRandomInt(1000) + 200;
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
-      CachedData next = new Contact(
+      Contact next = new Contact(
           TestBase.getRandomText(30), TestBase.getRandomInt(), TestBase.getRandomFloat(100000000),
           TestBase.getRandomText(50), TestBase.getRandomBoolean(), TestBase.getRandomBoolean(),
-          TestBase.getRandomLong());
+          new HashSet<>());
+      for (int j = 0; j < TestBase.getRandomInt(5) + 5; j++) {
+        next.getLabels().add(TestBase.getUniqueRandomLong());
+      }
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }
