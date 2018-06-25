@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 @NamedQueries({
     @NamedQuery(
         name = "FittingItem.get",
-        query = "SELECT c FROM FittingItem c where c.owner = :owner and c.fittingID = :fid and c.typeID = :tid and c.lifeStart <= :point and c.lifeEnd > :point"),
+        query = "SELECT c FROM FittingItem c where c.owner = :owner and c.fittingID = :fid and c.typeID = :tid and c.flag = :flag and c.lifeStart <= :point and c.lifeEnd > :point"),
 })
 public class FittingItem extends CachedData {
   private static final Logger log = Logger.getLogger(FittingItem.class.getName());
@@ -123,7 +123,8 @@ public class FittingItem extends CachedData {
       final SynchronizedEveAccount owner,
       final long time,
       final int fittingID,
-      final int typeID) throws IOException {
+      final int typeID,
+      final int flag) throws IOException {
     try {
       return EveKitUserAccountProvider.getFactory()
                                       .runTransaction(() -> {
@@ -135,6 +136,7 @@ public class FittingItem extends CachedData {
                                         getter.setParameter("owner", owner);
                                         getter.setParameter("fid", fittingID);
                                         getter.setParameter("tid", typeID);
+                                        getter.setParameter("flag", flag);
                                         getter.setParameter("point", time);
                                         try {
                                           return getter.getSingleResult();

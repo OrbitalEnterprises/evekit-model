@@ -23,7 +23,7 @@ public class FittingItemTest extends AbstractModelTester<FittingItem> {
       fittingID, typeID, flag, quantity);
 
   final ClassUnderTestConstructor<FittingItem> live = () -> new FittingItem(
-      fittingID, typeID, flag + 1, quantity);
+      fittingID, typeID, flag, quantity + 1);
 
   @Test
   public void testBasic() throws Exception {
@@ -37,7 +37,7 @@ public class FittingItemTest extends AbstractModelTester<FittingItem> {
 
   @Test
   public void testGetLifeline() throws Exception {
-    runGetLifelineTest(eol, live, (account, time) -> FittingItem.get(account, time, fittingID, typeID));
+    runGetLifelineTest(eol, live, (account, time) -> FittingItem.get(account, time, fittingID, typeID, flag));
   }
 
   @Test
