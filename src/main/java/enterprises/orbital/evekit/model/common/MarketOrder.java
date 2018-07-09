@@ -63,6 +63,7 @@ public class MarketOrder extends CachedData {
       scale = 2)
   private BigDecimal escrow;
   private long issued = -1;
+  private int issuedBy = 0;
   private int minVolume;
   private String orderState;
   @Column(
@@ -96,8 +97,9 @@ public class MarketOrder extends CachedData {
   protected MarketOrder() {}
 
   public MarketOrder(long orderID, int walletDivision, boolean bid, long charID, int duration,
-                     BigDecimal escrow, long issued, int minVolume, String orderState, BigDecimal price, String orderRange,
-                     int typeID, int volEntered, int volRemaining, int regionID, long locationID, boolean isCorp) {
+                     BigDecimal escrow, long issued, int issuedBy, int minVolume, String orderState, BigDecimal price,
+                     String orderRange, int typeID, int volEntered, int volRemaining, int regionID, long locationID,
+                     boolean isCorp) {
     this.orderID = orderID;
     this.walletDivision = walletDivision;
     this.bid = bid;
@@ -105,6 +107,7 @@ public class MarketOrder extends CachedData {
     this.duration = duration;
     this.escrow = escrow;
     this.issued = issued;
+    this.issuedBy = issuedBy;
     this.minVolume = minVolume;
     this.orderState = orderState;
     this.price = price;
@@ -135,12 +138,24 @@ public class MarketOrder extends CachedData {
       CachedData sup) {
     if (!(sup instanceof MarketOrder)) return false;
     MarketOrder other = (MarketOrder) sup;
-    return orderID == other.orderID && walletDivision == other.walletDivision && bid == other.bid && charID == other.charID && duration == other.duration
-        && nullSafeObjectCompare(escrow,
-                                 other.escrow) && issued == other.issued && minVolume == other.minVolume && nullSafeObjectCompare(orderState,other.orderState)
-        && nullSafeObjectCompare(price, other.price) && nullSafeObjectCompare(orderRange, other.orderRange) && typeID == other.typeID
-        && volEntered == other.volEntered && volRemaining == other.volRemaining && regionID == other.regionID &&
-        locationID == other.locationID && isCorp == other.isCorp;
+    return orderID == other.orderID &&
+        walletDivision == other.walletDivision &&
+        bid == other.bid &&
+        charID == other.charID &&
+        duration == other.duration &&
+        nullSafeObjectCompare(escrow, other.escrow) &&
+        issued == other.issued &&
+        issuedBy == other.issuedBy &&
+        minVolume == other.minVolume &&
+        nullSafeObjectCompare(orderState, other.orderState) &&
+        nullSafeObjectCompare(price, other.price) &&
+        nullSafeObjectCompare(orderRange, other.orderRange) &&
+        typeID == other.typeID &&
+        volEntered == other.volEntered &&
+        volRemaining == other.volRemaining &&
+        regionID == other.regionID &&
+        locationID == other.locationID &&
+        isCorp == other.isCorp;
   }
 
   /**
@@ -174,6 +189,8 @@ public class MarketOrder extends CachedData {
   public long getIssued() {
     return issued;
   }
+
+  public int getIssuedBy() { return issuedBy; }
 
   public int getMinVolume() {
     return minVolume;
@@ -231,6 +248,7 @@ public class MarketOrder extends CachedData {
         charID == that.charID &&
         duration == that.duration &&
         issued == that.issued &&
+        issuedBy == that.issuedBy &&
         minVolume == that.minVolume &&
         typeID == that.typeID &&
         volEntered == that.volEntered &&
@@ -246,8 +264,10 @@ public class MarketOrder extends CachedData {
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), orderID, walletDivision, bid, charID, duration, escrow, issued, minVolume,
-                        orderState, price, orderRange, typeID, volEntered, volRemaining, regionID, locationID, isCorp);
+    return Objects.hash(super.hashCode(), orderID, walletDivision, bid, charID, duration, escrow, issued, issuedBy,
+                        minVolume, orderState, price, orderRange, typeID, volEntered, volRemaining, regionID,
+                        locationID,
+                        isCorp);
   }
 
   @Override
@@ -260,6 +280,7 @@ public class MarketOrder extends CachedData {
         ", duration=" + duration +
         ", escrow=" + escrow +
         ", issued=" + issued +
+        ", issuedBy=" + issuedBy +
         ", minVolume=" + minVolume +
         ", orderState='" + orderState + '\'' +
         ", price=" + price +
@@ -270,6 +291,7 @@ public class MarketOrder extends CachedData {
         ", regionID=" + regionID +
         ", locationID=" + locationID +
         ", isCorp=" + isCorp +
+        ", issuedDate=" + issuedDate +
         '}';
   }
 
@@ -442,6 +464,7 @@ public class MarketOrder extends CachedData {
       final AttributeSelector duration,
       final AttributeSelector escrow,
       final AttributeSelector issued,
+      final AttributeSelector issuedBy,
       final AttributeSelector minVolume,
       final AttributeSelector orderState,
       final AttributeSelector price,
@@ -470,6 +493,7 @@ public class MarketOrder extends CachedData {
                                         AttributeSelector.addIntSelector(qs, "c", "duration", duration);
                                         AttributeSelector.addDoubleSelector(qs, "c", "escrow", escrow);
                                         AttributeSelector.addLongSelector(qs, "c", "issued", issued);
+                                        AttributeSelector.addIntSelector(qs, "c", "issuedBy", issuedBy);
                                         AttributeSelector.addIntSelector(qs, "c", "minVolume", minVolume);
                                         AttributeSelector.addStringSelector(qs, "c", "orderState", orderState, p);
                                         AttributeSelector.addDoubleSelector(qs, "c", "price", price);
