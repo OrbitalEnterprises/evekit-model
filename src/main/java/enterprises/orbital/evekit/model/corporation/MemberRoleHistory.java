@@ -1,14 +1,18 @@
 package enterprises.orbital.evekit.model.corporation;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AttributeParameters;
 import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.*;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -41,6 +45,15 @@ public class MemberRoleHistory extends CachedData {
   private String roleName;
   private boolean old;
 
+  @Transient
+  @ApiModelProperty(
+      value = "changedAt Date")
+  @JsonProperty("changedAtDate")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+  private Date changedAtDate;
+
   @SuppressWarnings("unused")
   protected MemberRoleHistory() {}
 
@@ -60,6 +73,7 @@ public class MemberRoleHistory extends CachedData {
   @Override
   public void prepareTransient() {
     fixDates();
+    changedAtDate = assignDateField(changedAt);
   }
 
   /**
