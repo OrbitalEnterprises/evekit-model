@@ -251,17 +251,6 @@ public class CachedDataTest extends AbstractAccountBasedTest {
       CachedData.update(next);
     }
     System.out.println("Created CalendarEventAttendees");
-    count = 1;
-    for (int i = 0; i < count; i++) {
-      int sel = TestBase.getRandomInt(5);
-      CachedData next = Capsuleer.getOrCreateCapsuleer(testAccount);
-      for (int j = 0; j < sel; j++) {
-        assert next != null;
-        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
-      }
-      CachedData.update(next);
-    }
-    System.out.println("Created Capsuleers");
     count = TestBase.getRandomInt(100) + 50;
     for (int i = 0; i < count; i++) {
       int sel = TestBase.getRandomInt(5);
@@ -1140,20 +1129,6 @@ public class CachedDataTest extends AbstractAccountBasedTest {
       CachedData.update(next);
     }
     System.out.println("Created ContainerLogs");
-
-    count = 1;
-    for (int i = 0; i < count; i++) {
-      int sel = TestBase.getRandomInt(5);
-      CachedData next = Corporation.getOrCreateCorporation(testAccount);
-      for (int j = 0; j < sel; j++) {
-        assert next != null;
-        next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
-      }
-      assert next != null;
-      next.setup(testAccount, testTime);
-      CachedData.update(next);
-    }
-    System.out.println("Created Corporations");
 
     count = TestBase.getRandomInt(10) + 5;
     for (int i = 0; i < count; i++) {
