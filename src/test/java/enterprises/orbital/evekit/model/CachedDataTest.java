@@ -1200,7 +1200,7 @@ public class CachedDataTest extends AbstractAccountBasedTest {
           TestBase.getRandomFloat(10), TestBase.getRandomText(50), TestBase.getRandomText(50),
           TestBase.getRandomLong(), TestBase.getRandomInt(), TestBase.getRandomInt(),
           TestBase.getRandomText(50), TestBase.getRandomText(50),
-          TestBase.getRandomText(50));
+          TestBase.getRandomText(50), TestBase.getRandomBoolean());
       for (int j = 0; j < sel; j++) {
         next.setMetaData(TestBase.getRandomText(30), TestBase.getRandomText(30));
       }

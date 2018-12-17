@@ -50,6 +50,7 @@ public class CorporationSheet extends CachedData {
   private String px64x64;
   private String px128x128;
   private String px256x256;
+  private boolean warEligible;
 
   @Transient
   @ApiModelProperty(
@@ -67,7 +68,7 @@ public class CorporationSheet extends CachedData {
   public CorporationSheet(int allianceID, int ceoID, long corporationID, String corporationName,
                           String description, int memberCount, long shares, int stationID, float taxRate,
                           String ticker, String url, long dateFounded, int creatorID, int factionID,
-                          String px64x64, String px128x128, String px256x256) {
+                          String px64x64, String px128x128, String px256x256, boolean warEligible) {
     this.allianceID = allianceID;
     this.ceoID = ceoID;
     this.corporationID = corporationID;
@@ -85,6 +86,7 @@ public class CorporationSheet extends CachedData {
     this.px64x64 = px64x64;
     this.px128x128 = px128x128;
     this.px256x256 = px256x256;
+    this.warEligible = warEligible;
   }
 
   /**
@@ -117,7 +119,8 @@ public class CorporationSheet extends CachedData {
         && factionID == other.factionID
         && nullSafeObjectCompare(px64x64, other.px64x64)
         && nullSafeObjectCompare(px128x128, other.px128x128)
-        && nullSafeObjectCompare(px256x256, other.px256x256);
+        && nullSafeObjectCompare(px256x256, other.px256x256)
+        && warEligible == other.warEligible;
   }
 
   /**
@@ -196,6 +199,10 @@ public class CorporationSheet extends CachedData {
     return px256x256;
   }
 
+  public boolean isWarEligible() {
+    return warEligible;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -212,6 +219,7 @@ public class CorporationSheet extends CachedData {
         dateFounded == that.dateFounded &&
         creatorID == that.creatorID &&
         factionID == that.factionID &&
+        warEligible == that.warEligible &&
         Objects.equals(corporationName, that.corporationName) &&
         Objects.equals(description, that.description) &&
         Objects.equals(ticker, that.ticker) &&
@@ -225,7 +233,7 @@ public class CorporationSheet extends CachedData {
   public int hashCode() {
     return Objects.hash(super.hashCode(), allianceID, ceoID, corporationID, corporationName, description, memberCount,
                         shares, stationID, taxRate, ticker, url, dateFounded, creatorID, factionID, px64x64, px128x128,
-                        px256x256);
+                        px256x256, warEligible);
   }
 
   @Override
@@ -248,6 +256,7 @@ public class CorporationSheet extends CachedData {
         ", px64x64='" + px64x64 + '\'' +
         ", px128x128='" + px128x128 + '\'' +
         ", px256x256='" + px256x256 + '\'' +
+        ", warEligible=" + warEligible +
         ", dateFoundedDate=" + dateFoundedDate +
         '}';
   }
@@ -300,7 +309,8 @@ public class CorporationSheet extends CachedData {
       final AttributeSelector factionID,
       final AttributeSelector px64x64,
       final AttributeSelector px128x128,
-      final AttributeSelector px256x256) throws IOException {
+      final AttributeSelector px256x256,
+      final AttributeSelector warEligible) throws IOException {
     try {
       return EveKitUserAccountProvider.getFactory()
                                       .runTransaction(() -> {
@@ -330,6 +340,7 @@ public class CorporationSheet extends CachedData {
                                         AttributeSelector.addStringSelector(qs, "c", "px64x64", px64x64, p);
                                         AttributeSelector.addStringSelector(qs, "c", "px128x128", px128x128, p);
                                         AttributeSelector.addStringSelector(qs, "c", "px256x256", px256x256, p);
+                                        AttributeSelector.addBooleanSelector(qs, "c", "warEligible", px256x256);
                                         // Set CID constraint and ordering
                                         setCIDOrdering(qs, contid, reverse);
                                         // Return result
