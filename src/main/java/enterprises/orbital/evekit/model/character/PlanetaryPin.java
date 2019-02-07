@@ -121,6 +121,54 @@ public class PlanetaryPin extends CachedData {
   }
 
   /**
+   * Compare to pin head sets.  Normal null safe object compare doesn't work properly here.
+   *
+   * @param a first set to compare.
+   * @param b second set to compare.
+   * @return true if the sets have identical contents, false otherwise.
+   */
+  private boolean comparePinHeadSet(Set<PlanetaryPinHead> a, Set<PlanetaryPinHead> b) {
+    if (a == b) return true;
+    if (a == null || b == null) return false;
+    if (a.size() != b.size()) return false;
+    for (PlanetaryPinHead next : a) {
+      boolean found = false;
+      for (PlanetaryPinHead cmp: b) {
+        if (next.equivalent(cmp)) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) return false;
+    }
+    return true;
+  }
+
+  /**
+   * Compare to pin content sets.  Normal null safe object compare doesn't work properly here.
+   *
+   * @param a first set to compare.
+   * @param b second set to compare.
+   * @return true if the sets have identical contents, false otherwise.
+   */
+  private boolean comparePinContentSet(Set<PlanetaryPinContent> a, Set<PlanetaryPinContent> b) {
+    if (a == b) return true;
+    if (a == null || b == null) return false;
+    if (a.size() != b.size()) return false;
+    for (PlanetaryPinContent next : a) {
+      boolean found = false;
+      for (PlanetaryPinContent cmp: b) {
+        if (next.equivalent(cmp)) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) return false;
+    }
+    return true;
+  }
+
+  /**
    * {@inheritDoc}
    */
   @Override
@@ -135,7 +183,7 @@ public class PlanetaryPin extends CachedData {
         && floatCompare(longitude, other.longitude,0.00001F)
         && floatCompare(latitude, other.latitude,0.00001F)
         && floatCompare(headRadius, other.headRadius,0.00001F)
-        && nullSafeObjectCompare(heads, other.heads) && nullSafeObjectCompare(contents, other.contents);
+        && comparePinHeadSet(heads, other.heads) && comparePinContentSet(contents, other.contents);
   }
 
   /**

@@ -53,6 +53,12 @@ public class PlanetaryPinHead {
         CachedData.floatCompare(that.longitude, longitude,0.00001F);
   }
 
+  public boolean equivalent(PlanetaryPinHead that) {
+    return headID == that.headID &&
+        CachedData.floatCompare(that.latitude, latitude,0.00001F) &&
+        CachedData.floatCompare(that.longitude, longitude,0.00001F);
+  }
+
   @Override
   public int hashCode() {
     return Objects.hash(headID, latitude, longitude);

@@ -40,6 +40,11 @@ public class PlanetaryPinContent {
         amount == that.amount;
   }
 
+  public boolean equivalent(PlanetaryPinContent that) {
+    return typeID == that.typeID &&
+        amount == that.amount;
+  }
+
   @Override
   public int hashCode() {
 
