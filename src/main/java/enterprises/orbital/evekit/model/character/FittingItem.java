@@ -3,6 +3,7 @@ package enterprises.orbital.evekit.model.character;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
+import enterprises.orbital.evekit.model.AttributeParameters;
 import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
 
@@ -32,13 +33,13 @@ public class FittingItem extends CachedData {
 
   private int fittingID;
   private int typeID;
-  private int flag;
+  private String flag;
   private int quantity;
 
   @SuppressWarnings("unused")
   protected FittingItem() {}
 
-  public FittingItem(int fittingID, int typeID, int flag, int quantity) {
+  public FittingItem(int fittingID, int typeID, String flag, int quantity) {
     this.fittingID = fittingID;
     this.typeID = typeID;
     this.flag = flag;
@@ -63,7 +64,7 @@ public class FittingItem extends CachedData {
     FittingItem other = (FittingItem) sup;
     return fittingID == other.fittingID &&
         typeID == other.typeID &&
-        flag == other.flag &&
+        flag.equals(other.flag) &&
         quantity == other.quantity;
   }
 
@@ -83,7 +84,7 @@ public class FittingItem extends CachedData {
     return typeID;
   }
 
-  public int getFlag() {
+  public String getFlag() {
     return flag;
   }
 
@@ -109,13 +110,12 @@ public class FittingItem extends CachedData {
     FittingItem that = (FittingItem) o;
     return fittingID == that.fittingID &&
         typeID == that.typeID &&
-        flag == that.flag &&
-        quantity == that.quantity;
+        quantity == that.quantity &&
+        flag.equals(that.flag);
   }
 
   @Override
   public int hashCode() {
-
     return Objects.hash(super.hashCode(), fittingID, typeID, flag, quantity);
   }
 
@@ -124,7 +124,7 @@ public class FittingItem extends CachedData {
       final long time,
       final int fittingID,
       final int typeID,
-      final int flag) throws IOException {
+      final String flag) throws IOException {
     try {
       return EveKitUserAccountProvider.getFactory()
                                       .runTransaction(() -> {
@@ -171,9 +171,10 @@ public class FittingItem extends CachedData {
                                         // Constrain lifeline
                                         AttributeSelector.addLifelineSelector(qs, "c", at);
                                         // Constrain attributes
+                                        AttributeParameters p = new AttributeParameters("att");
                                         AttributeSelector.addIntSelector(qs, "c", "fittingID", fittingID);
                                         AttributeSelector.addIntSelector(qs, "c", "typeID", typeID);
-                                        AttributeSelector.addIntSelector(qs, "c", "flag", flag);
+                                        AttributeSelector.addStringSelector(qs, "c", "flag", flag, p);
                                         AttributeSelector.addIntSelector(qs, "c", "quantity", quantity);
                                         // Set CID constraint and ordering
                                         setCIDOrdering(qs, contid, reverse);
@@ -184,6 +185,7 @@ public class FittingItem extends CachedData {
                                                                                                      qs.toString(),
                                                                                                      FittingItem.class);
                                         query.setParameter("owner", owner);
+                                        p.fillParams(query);
                                         query.setMaxResults(maxresults);
                                         return query.getResultList();
                                       });

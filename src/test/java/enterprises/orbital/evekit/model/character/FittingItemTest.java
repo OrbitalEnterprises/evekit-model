@@ -16,7 +16,7 @@ import java.util.Map;
 public class FittingItemTest extends AbstractModelTester<FittingItem> {
   private final int fittingID = TestBase.getRandomInt(100000000);
   private final int typeID = TestBase.getRandomInt(100000000);
-  private final int flag = TestBase.getRandomInt(100000000);
+  private final String flag = TestBase.getRandomText(50);
   private final int quantity = TestBase.getRandomInt(100000000);
 
   final ClassUnderTestConstructor<FittingItem> eol = () -> new FittingItem(
@@ -30,7 +30,7 @@ public class FittingItemTest extends AbstractModelTester<FittingItem> {
     runBasicTests(eol, () -> new FittingItem[]{
         new FittingItem(fittingID + 1, typeID, flag, quantity),
         new FittingItem(fittingID, typeID + 1, flag, quantity),
-        new FittingItem(fittingID, typeID, flag + 1, quantity),
+        new FittingItem(fittingID, typeID, flag + "1", quantity),
         new FittingItem(fittingID, typeID, flag, quantity + 1)
     }, AccountAccessMask.createMask(AccountAccessMask.ACCESS_FITTINGS));
   }
