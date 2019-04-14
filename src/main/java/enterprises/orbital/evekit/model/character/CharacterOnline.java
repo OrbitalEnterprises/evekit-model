@@ -206,4 +206,37 @@ public class CharacterOnline extends CachedData {
     }
   }
 
+  public static List<CharacterOnline> ekfQuery(
+      final SynchronizedEveAccount owner,
+      final long contid,
+      final int maxresults,
+      final long timestamp) throws IOException {
+    try {
+      return EveKitUserAccountProvider.getFactory()
+                                      .runTransaction(() -> {
+                                        StringBuilder qs = new StringBuilder();
+                                        qs.append("SELECT c FROM CharacterOnline c WHERE ");
+                                        // Constrain to specified owner
+                                        qs.append("c.owner = :owner");
+                                        // Constrain lifeline
+                                        AttributeSelector.addFirstLiveSelector(qs, "c", timestamp);
+                                        // Set CID constraint and ordering
+                                        setCIDOrdering(qs, contid, false);
+                                        // Return result
+                                        TypedQuery<CharacterOnline> query = EveKitUserAccountProvider.getFactory()
+                                                                                                     .getEntityManager()
+                                                                                                     .createQuery(
+                                                                                                         qs.toString(),
+                                                                                                         CharacterOnline.class);
+                                        query.setParameter("owner", owner);
+                                        query.setMaxResults(maxresults);
+                                        return query.getResultList();
+                                      });
+    } catch (Exception e) {
+      if (e.getCause() instanceof IOException) throw (IOException) e.getCause();
+      log.log(Level.SEVERE, "query error", e);
+      throw new IOException(e.getCause());
+    }
+  }
+
 }

@@ -32,16 +32,13 @@ import java.util.stream.StreamSupport;
     indexes = {
         @Index(
             name = "accountIndex",
-            columnList = "aid",
-            unique = false),
+            columnList = "aid"),
         @Index(
             name = "lifeStartIndex",
-            columnList = "lifeStart",
-            unique = false),
+            columnList = "lifeStart"),
         @Index(
             name = "lifeEndIndex",
-            columnList = "lifeEnd",
-            unique = false)
+            columnList = "lifeEnd")
     })
 @JsonIgnoreProperties({
     "owner", "accessMask", "metaData", "mask", "allMetaData"
