@@ -19,58 +19,62 @@ public class CharacterSheetTest extends AbstractModelTester<CharacterSheet> {
   private final int factionID = TestBase.getRandomInt(100000000);
   private final String description = TestBase.getRandomText(50);
   private final float securityStatus = TestBase.getRandomFloat(10);
+  private final String title = TestBase.getRandomText(50);
 
   final ClassUnderTestConstructor<CharacterSheet> eol = () -> new CharacterSheet(characterID, name, corporationID,
                                                                                  raceID, doB, bloodlineID,
                                                                                  ancestryID, gender, allianceID,
                                                                                  factionID, description,
-                                                                                 securityStatus);
+                                                                                 securityStatus, title);
 
   final ClassUnderTestConstructor<CharacterSheet> live = () -> new CharacterSheet(characterID, name, corporationID + 1,
                                                                                   raceID, doB, bloodlineID,
                                                                                   ancestryID, gender, allianceID,
                                                                                   factionID, description,
-                                                                                  securityStatus);
+                                                                                  securityStatus, title);
 
   @Test
   public void testBasic() throws Exception {
     runBasicTests(eol, () -> new CharacterSheet[]{
         new CharacterSheet(
             characterID + 1, name, corporationID, raceID, doB, bloodlineID, ancestryID, gender,
-            allianceID, factionID, description, securityStatus),
+            allianceID, factionID, description, securityStatus, title),
         new CharacterSheet(
             characterID, name + "1", corporationID, raceID, doB, bloodlineID, ancestryID, gender,
-            allianceID, factionID, description, securityStatus),
+            allianceID, factionID, description, securityStatus, title),
         new CharacterSheet(
             characterID, name, corporationID + 1, raceID, doB, bloodlineID, ancestryID, gender,
-            allianceID, factionID, description, securityStatus),
+            allianceID, factionID, description, securityStatus, title),
         new CharacterSheet(
             characterID, name, corporationID, raceID + 1, doB, bloodlineID, ancestryID, gender,
-            allianceID, factionID, description, securityStatus),
+            allianceID, factionID, description, securityStatus, title),
         new CharacterSheet(
             characterID, name, corporationID, raceID, doB + 1, bloodlineID, ancestryID, gender,
-            allianceID, factionID, description, securityStatus),
+            allianceID, factionID, description, securityStatus, title),
         new CharacterSheet(
             characterID, name, corporationID, raceID, doB, bloodlineID + 1, ancestryID, gender,
-            allianceID, factionID, description, securityStatus),
+            allianceID, factionID, description, securityStatus, title),
         new CharacterSheet(
             characterID, name, corporationID, raceID, doB, bloodlineID, ancestryID + 1, gender,
-            allianceID, factionID, description, securityStatus),
+            allianceID, factionID, description, securityStatus, title),
         new CharacterSheet(
             characterID, name, corporationID, raceID, doB, bloodlineID, ancestryID, gender + "1",
-            allianceID, factionID, description, securityStatus),
+            allianceID, factionID, description, securityStatus, title),
         new CharacterSheet(
             characterID, name, corporationID, raceID, doB, bloodlineID, ancestryID, gender,
-            allianceID + 1, factionID, description, securityStatus),
+            allianceID + 1, factionID, description, securityStatus, title),
         new CharacterSheet(
             characterID, name, corporationID, raceID, doB, bloodlineID, ancestryID, gender, allianceID,
-            factionID + 1, description, securityStatus),
+            factionID + 1, description, securityStatus, title),
         new CharacterSheet(
             characterID, name, corporationID, raceID, doB, bloodlineID, ancestryID, gender, allianceID,
-            factionID, description + "1", securityStatus),
+            factionID, description + "1", securityStatus, title),
         new CharacterSheet(
             characterID, name, corporationID, raceID, doB, bloodlineID, ancestryID, gender, allianceID,
-            factionID, description, securityStatus + 1.0F),
+            factionID, description, securityStatus + 1.0F, title),
+        new CharacterSheet(
+            characterID, name, corporationID, raceID, doB, bloodlineID, ancestryID, gender, allianceID,
+            factionID, description, securityStatus, title + "1"),
     }, AccountAccessMask.createMask(AccountAccessMask.ACCESS_CHARACTER_SHEET));
 
   }
@@ -86,10 +90,10 @@ public class CharacterSheetTest extends AbstractModelTester<CharacterSheet> {
     final float SEC_TWO = 5.010531F;
     CharacterSheet sheetOne = new CharacterSheet(
         characterID, name, corporationID, raceID, doB, bloodlineID, ancestryID, gender, allianceID,
-        factionID, description, SEC_ONE);
+        factionID, description, SEC_ONE, title);
     CharacterSheet sheetTwo = new CharacterSheet(
         characterID, name, corporationID, raceID, doB, bloodlineID, ancestryID, gender, allianceID,
-        factionID, description, SEC_TWO);
+        factionID, description, SEC_TWO, title);
     Assert.assertTrue(sheetOne.equivalent(sheetTwo));
   }
 

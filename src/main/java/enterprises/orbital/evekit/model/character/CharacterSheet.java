@@ -45,6 +45,10 @@ public class CharacterSheet extends CachedData {
       length = 102400)
   private String description;
   private float securityStatus;
+  @Lob
+  @Column(
+      length = 1000)
+  private String title;
 
   @Transient
   @ApiModelProperty(
@@ -60,7 +64,7 @@ public class CharacterSheet extends CachedData {
 
   public CharacterSheet(long characterID, String name, int corporationID, int raceID, long doB, int bloodlineID,
                         int ancestryID, String gender, int allianceID, int factionID, String description,
-                        float securityStatus) {
+                        float securityStatus, String title) {
     this.characterID = characterID;
     this.name = name;
     this.corporationID = corporationID;
@@ -73,6 +77,7 @@ public class CharacterSheet extends CachedData {
     this.factionID = factionID;
     this.description = description;
     this.securityStatus = securityStatus;
+    this.title = title;
   }
 
   /**
@@ -104,7 +109,8 @@ public class CharacterSheet extends CachedData {
         allianceID == other.allianceID &&
         factionID == other.factionID &&
         nullSafeObjectCompare(description, other.description) &&
-        floatCompare(securityStatus, other.securityStatus, 0.00001F);
+        floatCompare(securityStatus, other.securityStatus, 0.00001F) &&
+        nullSafeObjectCompare(title, other.title);
   }
 
   /**
@@ -163,6 +169,8 @@ public class CharacterSheet extends CachedData {
     return securityStatus;
   }
 
+  public String getTitle() { return title; }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -180,13 +188,14 @@ public class CharacterSheet extends CachedData {
         Float.compare(that.securityStatus, securityStatus) == 0 &&
         Objects.equals(name, that.name) &&
         Objects.equals(gender, that.gender) &&
-        Objects.equals(description, that.description);
+        Objects.equals(description, that.description) &&
+        Objects.equals(title, that.title);
   }
 
   @Override
   public int hashCode() {
     return Objects.hash(super.hashCode(), characterID, name, corporationID, raceID, doB, bloodlineID, ancestryID,
-                        gender, allianceID, factionID, description, securityStatus);
+                        gender, allianceID, factionID, description, securityStatus, title);
   }
 
   @Override
@@ -204,6 +213,7 @@ public class CharacterSheet extends CachedData {
         ", factionID=" + factionID +
         ", description='" + description + '\'' +
         ", securityStatus=" + securityStatus +
+        ", title='" + title + '\'' +
         ", doBDate=" + doBDate +
         '}';
   }
@@ -251,7 +261,8 @@ public class CharacterSheet extends CachedData {
       final AttributeSelector allianceID,
       final AttributeSelector factionID,
       final AttributeSelector description,
-      final AttributeSelector securityStatus) throws IOException {
+      final AttributeSelector securityStatus,
+      final AttributeSelector title) throws IOException {
     try {
       return EveKitUserAccountProvider.getFactory()
                                       .runTransaction(() -> {
@@ -275,6 +286,7 @@ public class CharacterSheet extends CachedData {
                                         AttributeSelector.addIntSelector(qs, "c", "factionID", factionID);
                                         AttributeSelector.addStringSelector(qs, "c", "description", description, p);
                                         AttributeSelector.addFloatSelector(qs, "c", "securityStatus", securityStatus);
+                                        AttributeSelector.addStringSelector(qs, "c", "title", title, p);
                                         // Set CID constraint and ordering
                                         setCIDOrdering(qs, contid, reverse);
                                         // Return result
