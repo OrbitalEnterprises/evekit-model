@@ -3,6 +3,7 @@ package enterprises.orbital.evekit.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import enterprises.orbital.base.Stamper;
 import enterprises.orbital.db.ConnectionFactory.RunInTransaction;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
@@ -261,6 +262,26 @@ public abstract class CachedData {
    */
   public abstract boolean equivalent(
                                      CachedData other);
+
+  public static String dataHashHelper(Object... args) {
+    StringBuilder builder = new StringBuilder();
+    builder.append(args != null ? args.length : 0).append("|");
+    for (Object next : args) {
+      builder.append(next).append("|");
+    }
+    return Stamper.fastDigest(builder.toString());
+  }
+
+  /**
+   * Compute a hash string for this object.  This method should be implemented by subclasses using only non-CachedData
+   * fields.
+   *
+   * @return if not overridden by a subclass, then we return a hash string over cached data fields which are typically
+   * always unique.
+   */
+  public String dataHash() {
+    return dataHashHelper(cid, owner != null ? owner.getAid() : 0, eveKitVersion, accessMask, lifeStart, lifeEnd);
+  }
 
   // Meta-data functions
 

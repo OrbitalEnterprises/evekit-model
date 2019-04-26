@@ -9,6 +9,7 @@ import enterprises.orbital.evekit.model.CachedData;
 
 import javax.persistence.*;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -66,6 +67,11 @@ public class ContactLabel extends CachedData {
     ContactLabel other = (ContactLabel) sup;
     return nullSafeObjectCompare(list, other.list) && labelID == other.labelID && nullSafeObjectCompare(name,
                                                                                                         other.name);
+  }
+
+  @Override
+  public String dataHash() {
+    return dataHashHelper(list, labelID, name);
   }
 
   /**

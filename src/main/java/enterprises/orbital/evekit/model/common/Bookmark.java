@@ -124,6 +124,12 @@ public class Bookmark extends CachedData {
         && nullSafeObjectCompare(note, other.note);
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(folderID, folderName, folderCreatorID, bookmarkID, bookmarkCreatorID, created, itemID,
+                          typeID, locationID, x, y, z, memo, note);
+  }
+
   /**
    * {@inheritDoc}
    */

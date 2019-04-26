@@ -83,6 +83,11 @@ public class Blueprint extends CachedData {
         && runs == other.runs;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(itemID, locationID, locationFlag, typeID, quantity, timeEfficiency, materialEfficiency, runs);
+  }
+
   /**
    * {@inheritDoc}
    */

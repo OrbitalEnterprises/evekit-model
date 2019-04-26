@@ -9,10 +9,7 @@ import enterprises.orbital.evekit.model.CachedData;
 
 import javax.persistence.*;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -87,6 +84,15 @@ public class Contact extends CachedData {
         nullSafeObjectCompare(labels, other.labels);
   }
 
+  @Override
+  public String dataHash() {
+    // Ensure label list is ordered so we can compare consistently.
+    Object[] ordered = labels.toArray();
+    Arrays.sort(ordered);
+    return dataHashHelper(list, contactID, standing, contactType, inWatchlist, isBlocked,
+                          Arrays.toString(ordered));
+  }
+
   /**
    * {@inheritDoc}
    */
@@ -140,7 +146,6 @@ public class Contact extends CachedData {
 
   @Override
   public int hashCode() {
-
     return Objects.hash(super.hashCode(), list, contactID, standing, contactType, inWatchlist, isBlocked, labels);
   }
 
