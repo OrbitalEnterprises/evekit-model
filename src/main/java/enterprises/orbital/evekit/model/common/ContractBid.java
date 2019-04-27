@@ -93,6 +93,11 @@ public class ContractBid extends CachedData {
         && nullSafeObjectCompare(amount, other.amount);
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(bidID, contractID, bidderID, dateBid, amount);
+  }
+
   /**
    * {@inheritDoc}
    */

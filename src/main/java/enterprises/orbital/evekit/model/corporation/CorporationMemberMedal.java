@@ -90,6 +90,11 @@ public class CorporationMemberMedal extends CachedData {
         && nullSafeObjectCompare(reason, other.reason) && nullSafeObjectCompare(status, other.status);
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(medalID, characterID, issued, issuerID, reason, status);
+  }
+
   /**
    * {@inheritDoc}
    */

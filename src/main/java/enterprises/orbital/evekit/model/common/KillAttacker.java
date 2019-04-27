@@ -87,6 +87,12 @@ public class KillAttacker extends CachedData {
         && weaponTypeID == other.weaponTypeID && finalBlow == other.finalBlow;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(killID, attackerCharacterID, allianceID, attackerCorporationID, damageDone, factionID,
+                          securityStatus, shipTypeID, weaponTypeID, finalBlow);
+  }
+
   /**
    * {@inheritDoc}
    */

@@ -60,6 +60,11 @@ public class MemberTitle extends CachedData {
     return characterID == other.characterID && titleID == other.titleID;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(characterID, titleID);
+  }
+
   /**
    * {@inheritDoc}
    */

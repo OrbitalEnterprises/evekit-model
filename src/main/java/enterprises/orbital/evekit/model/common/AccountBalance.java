@@ -1,6 +1,5 @@
 package enterprises.orbital.evekit.model.common;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
@@ -12,7 +11,6 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.persistence.*;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -81,6 +79,11 @@ public class AccountBalance extends CachedData {
     if (!(sup instanceof AccountBalance)) return false;
     AccountBalance other = (AccountBalance) sup;
     return division == other.division && nullSafeObjectCompare(balance, other.balance);
+  }
+
+  @Override
+  public String dataHash() {
+    return dataHashHelper(division, balance);
   }
 
   /**

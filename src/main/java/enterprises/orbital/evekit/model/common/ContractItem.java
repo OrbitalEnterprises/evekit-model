@@ -78,6 +78,11 @@ public class ContractItem extends CachedData {
         && rawQuantity == other.rawQuantity && singleton == other.singleton && included == other.included;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(contractID, recordID, typeID, quantity, rawQuantity, singleton, included);
+  }
+
   /**
    * {@inheritDoc}
    */

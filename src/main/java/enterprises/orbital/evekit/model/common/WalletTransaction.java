@@ -153,6 +153,12 @@ public class WalletTransaction extends CachedData {
         && journalTransactionID == other.journalTransactionID;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(division, transactionID, date, quantity, typeID, price, clientID, locationID, isBuy,
+                          isPersonal, journalTransactionID);
+  }
+
   /**
    * {@inheritDoc}
    */

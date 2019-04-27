@@ -102,6 +102,12 @@ public class ContainerLog extends CachedData {
                                  other.passwordType) && quantity == other.quantity && typeID == other.typeID;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(logTime, action, characterID, locationFlag, containerID, containerTypeID, locationID,
+                          newConfiguration, oldConfiguration, passwordType, quantity, typeID);
+  }
+
   /**
    * {@inheritDoc}
    */

@@ -102,6 +102,13 @@ public class CustomsOffice extends CachedData {
         && floatCompare(taxRateStandingTerrible, other.taxRateStandingTerrible,0.00001F);
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(officeID, solarSystemID, reinforceExitStart, reinforceExitEnd, allowAlliance, allowStandings,
+                          standingLevel, taxRateAlliance, taxRateCorp, taxRateStandingExcellent, taxRateStandingGood,
+                          taxRateStandingNeutral, taxRateStandingBad, taxRateStandingTerrible);
+  }
+
   /**
    * {@inheritDoc}
    */

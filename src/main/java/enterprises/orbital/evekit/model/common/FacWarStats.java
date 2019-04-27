@@ -95,6 +95,12 @@ public class FacWarStats extends CachedData {
         && victoryPointsYesterday == other.victoryPointsYesterday;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(currentRank, enlisted, factionID, highestRank, killsLastWeek, killsTotal,
+                          killsYesterday, pilots, victoryPointsLastWeek, victoryPointsTotal, victoryPointsYesterday);
+  }
+
   /**
    * {@inheritDoc}
    */

@@ -92,6 +92,11 @@ public class MemberRoleHistory extends CachedData {
         old == other.old;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(characterID, changedAt,issuerID, roleType, roleName, old);
+  }
+
   /**
    * {@inheritDoc}
    */

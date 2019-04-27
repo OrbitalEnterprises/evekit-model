@@ -181,6 +181,13 @@ public class Contract extends CachedData {
         && nullSafeObjectCompare(buyout, other.buyout) && doubleCompare(volume, other.volume, 0.00001D);
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(contractID, issuerID, issuerCorpID, assigneeID, acceptorID, startStationID, endStationID,
+                          type, status, title, forCorp, availability, dateIssued, dateExpired, dateAccepted, numDays,
+                          dateCompleted, price, reward, collateral, buyout, volume);
+  }
+
   /**
    * {@inheritDoc}
    */

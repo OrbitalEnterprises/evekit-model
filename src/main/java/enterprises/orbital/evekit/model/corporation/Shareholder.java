@@ -65,6 +65,11 @@ public class Shareholder extends CachedData {
         && shares == other.shares;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(shareholderID, shareholderType, shares);
+  }
+
   /**
    * {@inheritDoc}
    */

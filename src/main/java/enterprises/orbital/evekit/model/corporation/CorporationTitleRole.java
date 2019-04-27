@@ -75,6 +75,11 @@ public class CorporationTitleRole extends CachedData {
         atOther == other.atOther;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(titleID, roleName, grantable, atHQ, atBase, atOther);
+  }
+
   /**
    * {@inheritDoc}
    */

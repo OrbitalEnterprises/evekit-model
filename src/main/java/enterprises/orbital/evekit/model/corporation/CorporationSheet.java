@@ -123,6 +123,13 @@ public class CorporationSheet extends CachedData {
         && warEligible == other.warEligible;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(allianceID, ceoID, corporationID, corporationName, description, memberCount, shares,
+                          stationID, taxRate, ticker, url, dateFounded, creatorID, factionID, px64x64, px128x128,
+                          px256x256, warEligible);
+  }
+
   /**
    * {@inheritDoc}
    */

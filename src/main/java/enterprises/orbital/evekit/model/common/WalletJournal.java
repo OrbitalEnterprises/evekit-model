@@ -177,6 +177,12 @@ public class WalletJournal extends CachedData {
         nullSafeObjectCompare(description, other.description);
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(division, refID, date, refType, firstPartyID, secondPartyID, argName1, argID1, amount,
+                          balance, reason, taxReceiverID, taxAmount, contextID, contextType, description);
+  }
+
   /**
    * {@inheritDoc}
    */

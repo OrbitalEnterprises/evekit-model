@@ -106,6 +106,11 @@ public class MemberTracking extends CachedData {
         && startDateTime == other.startDateTime;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(characterID, baseID, locationID, logoffDateTime, logonDateTime, shipTypeID, startDateTime);
+  }
+
   /**
    * {@inheritDoc}
    */

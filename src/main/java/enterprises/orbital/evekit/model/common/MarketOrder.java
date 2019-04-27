@@ -158,6 +158,13 @@ public class MarketOrder extends CachedData {
         isCorp == other.isCorp;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(orderID, walletDivision, bid, charID, duration, escrow, issued, issuedBy, minVolume,
+                          orderState, price, orderRange, typeID, volEntered, volRemaining, regionID, locationID,
+                          isCorp);
+  }
+
   /**
    * {@inheritDoc}
    */

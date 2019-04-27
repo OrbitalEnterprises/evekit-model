@@ -58,6 +58,11 @@ public class Member extends CachedData {
     return characterID == other.characterID;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(characterID);
+  }
+
   /**
    * {@inheritDoc}
    */

@@ -87,6 +87,11 @@ public class CorporationMedal extends CachedData {
         && created == other.created && creatorID == other.creatorID;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(medalID, description, title, created, creatorID);
+  }
+
   /**
    * {@inheritDoc}
    */

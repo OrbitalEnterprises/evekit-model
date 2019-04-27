@@ -66,6 +66,11 @@ public class Fuel extends CachedData {
     return starbaseID == other.starbaseID && typeID == other.typeID && quantity == other.quantity;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(starbaseID, typeID, quantity);
+  }
+
   /**
    * {@inheritDoc}
    */

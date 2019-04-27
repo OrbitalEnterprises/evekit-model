@@ -158,6 +158,13 @@ public class Structure extends CachedData {
         unanchorsAt == other.unanchorsAt;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(structureID, corporationID, fuelExpires, nextReinforceApply, nextReinforceHour,
+                          nextReinforceWeekday, profileID, reinforceHour, reinforceWeekday, state, stateTimerEnd,
+                          stateTimerStart, systemID, typeID, unanchorsAt);
+  }
+
   /**
    * {@inheritDoc}
    */

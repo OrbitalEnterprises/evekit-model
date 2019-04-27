@@ -158,6 +158,14 @@ public class Starbase extends CachedData {
         attackIfAtWar == other.attackIfAtWar;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(starbaseID, typeID, systemID, moonID, state, unanchorAt, reinforcedUntil, onlinedSince,
+                          fuelBayView, fuelBayTake, anchor, unanchor, online, offline, allowCorporationMembers,
+                          allowAllianceMembers, useAllianceStandings, attackStandingThreshold,
+                          attackSecurityStatusThreshold, attackIfOtherSecurityStatusDropping, attackIfAtWar);
+  }
+
   /**
    * {@inheritDoc}
    */

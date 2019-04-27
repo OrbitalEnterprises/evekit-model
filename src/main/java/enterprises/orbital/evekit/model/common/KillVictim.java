@@ -82,6 +82,12 @@ public class KillVictim extends CachedData {
         && doubleCompare(z, other.z,0.00000001D);
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(killID, allianceID, killCharacterID, killCorporationID, damageTaken, factionID,
+                          shipTypeID, x, y, z);
+  }
+
   /**
    * {@inheritDoc}
    */

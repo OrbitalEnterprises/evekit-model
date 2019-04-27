@@ -54,6 +54,11 @@ public class MemberLimit extends CachedData {
     return memberLimit == other.memberLimit;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(memberLimit);
+  }
+
   /**
    * {@inheritDoc}
    */

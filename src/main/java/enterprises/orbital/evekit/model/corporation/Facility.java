@@ -62,6 +62,11 @@ public class Facility extends CachedData {
     return facilityID == other.facilityID && typeID == other.typeID && solarSystemID == other.solarSystemID;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(facilityID, typeID, solarSystemID);
+  }
+
   /**
    * {@inheritDoc}
    */

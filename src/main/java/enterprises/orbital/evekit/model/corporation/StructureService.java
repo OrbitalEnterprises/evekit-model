@@ -1,18 +1,14 @@
 package enterprises.orbital.evekit.model.corporation;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import enterprises.orbital.evekit.account.AccountAccessMask;
 import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 import enterprises.orbital.evekit.account.SynchronizedEveAccount;
 import enterprises.orbital.evekit.model.AttributeParameters;
 import enterprises.orbital.evekit.model.AttributeSelector;
 import enterprises.orbital.evekit.model.CachedData;
-import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.*;
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -67,6 +63,11 @@ public class StructureService extends CachedData {
     return structureID == other.structureID &&
         nullSafeObjectCompare(name, other.name) &&
         nullSafeObjectCompare(state, other.state);
+  }
+
+  @Override
+  public String dataHash() {
+    return dataHashHelper(structureID, name, state);
   }
 
   /**

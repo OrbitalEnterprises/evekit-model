@@ -89,6 +89,11 @@ public class Kill extends CachedData {
         warID == other.warID;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(killID, killTime, moonID, solarSystemID, warID);
+  }
+
   /**
    * {@inheritDoc}
    */

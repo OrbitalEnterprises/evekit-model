@@ -90,6 +90,11 @@ public class KillItem extends CachedData {
         && singleton == other.singleton && sequence == other.sequence && containerSequence == other.containerSequence;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(killID, typeID, flag, qtyDestroyed, qtyDropped, singleton, sequence, containerSequence);
+  }
+
   /**
    * {@inheritDoc}
    */

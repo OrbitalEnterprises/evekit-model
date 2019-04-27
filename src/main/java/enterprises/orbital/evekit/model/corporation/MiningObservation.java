@@ -89,6 +89,11 @@ public class MiningObservation extends CachedData {
         lastUpdated == other.lastUpdated;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(observerID, characterID, typeID, recordedCorporationID, quantity, lastUpdated);
+  }
+
   /**
    * {@inheritDoc}
    */

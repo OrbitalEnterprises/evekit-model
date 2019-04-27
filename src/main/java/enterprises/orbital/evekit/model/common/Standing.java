@@ -77,6 +77,11 @@ public class Standing extends CachedData {
         && floatCompare(standing, other.standing, 0.00001F);
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(standingEntity, fromID, standing);
+  }
+
   /**
    * {@inheritDoc}
    */

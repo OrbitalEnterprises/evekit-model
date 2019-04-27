@@ -75,6 +75,11 @@ public class MemberRole extends CachedData {
         atOther == other.atOther;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(characterID, roleName, grantable, atHQ, atBase, atOther);
+  }
+
   /**
    * {@inheritDoc}
    */

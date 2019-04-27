@@ -106,6 +106,11 @@ public class MiningExtraction extends CachedData {
         naturalDecayTime == other.naturalDecayTime;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(moonID, structureID, extractionStartTime, chunkArrivalTime, naturalDecayTime);
+  }
+
   /**
    * {@inheritDoc}
    */

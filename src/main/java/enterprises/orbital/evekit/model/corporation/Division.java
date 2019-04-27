@@ -66,6 +66,11 @@ public class Division extends CachedData {
     return wallet == other.wallet && division == other.division && nullSafeObjectCompare(name, other.name);
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(wallet, division, name);
+  }
+
   /**
    * {@inheritDoc}
    */

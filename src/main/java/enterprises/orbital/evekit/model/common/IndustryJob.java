@@ -173,6 +173,14 @@ public class IndustryJob extends CachedData {
         && completedCharacterID == other.completedCharacterID && successfulRuns == other.successfulRuns;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(jobID, installerID, facilityID, stationID, activityID, blueprintID, blueprintTypeID,
+                          blueprintLocationID, outputLocationID, runs, cost, licensedRuns, probability, productTypeID,
+                          status, timeInSeconds, startDate, endDate, pauseDate, completedDate, completedCharacterID,
+                          successfulRuns);
+  }
+
   /**
    * {@inheritDoc}
    */
@@ -269,6 +277,7 @@ public class IndustryJob extends CachedData {
     return successfulRuns;
   }
 
+  @SuppressWarnings("Duplicates")
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
