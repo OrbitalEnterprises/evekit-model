@@ -12,9 +12,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.*;
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -96,6 +94,11 @@ public class CharacterMedal extends CachedData {
         && corporationID == other.corporationID && issued == other.issued && issuerID == other.issuerID && nullSafeObjectCompare(
         reason, other.reason)
         && nullSafeObjectCompare(status, other.status);
+  }
+
+  @Override
+  public String dataHash() {
+    return dataHashHelper(description, medalID, title, corporationID, issued, issuerID, reason, status);
   }
 
   /**

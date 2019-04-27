@@ -88,6 +88,11 @@ public class CharacterSheetClone extends CachedData {
         lastStationChangeDate == other.lastStationChangeDate;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(cloneJumpDate, homeStationID, homeStationType, lastStationChangeDate);
+  }
+
   /**
    * {@inheritDoc}
    */

@@ -68,6 +68,11 @@ public class FittingItem extends CachedData {
         quantity == other.quantity;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(fittingID, typeID, flag, quantity);
+  }
+
   /**
    * {@inheritDoc}
    */

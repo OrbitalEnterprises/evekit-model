@@ -88,6 +88,11 @@ public class CharacterContactNotification extends CachedData {
         && nullSafeObjectCompare(messageData, other.messageData);
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(notificationID, senderID, sentDate, standingLevel, messageData);
+  }
+
   /**
    * {@inheritDoc}
    */

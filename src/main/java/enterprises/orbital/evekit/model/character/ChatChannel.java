@@ -77,6 +77,11 @@ public class ChatChannel extends CachedData {
         && hasPassword == other.hasPassword && nullSafeObjectCompare(motd, other.motd);
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(channelID, ownerID, displayName, comparisonKey, hasPassword, motd);
+  }
+
   /**
    * {@inheritDoc}
    */

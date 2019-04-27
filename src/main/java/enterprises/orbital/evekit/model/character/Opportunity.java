@@ -75,6 +75,11 @@ public class Opportunity extends CachedData {
         completedAt == other.completedAt;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(taskID, completedAt);
+  }
+
   /**
    * {@inheritDoc}
    */

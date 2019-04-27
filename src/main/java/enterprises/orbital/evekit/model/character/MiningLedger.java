@@ -82,6 +82,11 @@ public class MiningLedger extends CachedData {
         quantity == other.quantity;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(date, solarSystemID, typeID, quantity);
+  }
+
   /**
    * {@inheritDoc}
    */

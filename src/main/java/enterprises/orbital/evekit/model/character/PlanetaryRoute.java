@@ -10,6 +10,7 @@ import enterprises.orbital.evekit.model.CachedData;
 import javax.persistence.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -81,6 +82,15 @@ public class PlanetaryRoute extends CachedData {
         && contentTypeID == other.contentTypeID
         && floatCompare(quantity, other.quantity,0.00001F)
         && nullSafeListCompare(waypoints, other.waypoints);
+  }
+
+  @Override
+  public String dataHash() {
+    // Sort waypoints for consistent hashing
+    List<Long> sortWaypoints = new ArrayList<>(waypoints);
+    sortWaypoints.sort(Comparator.comparingLong(Long::longValue));
+    return dataHashHelper(planetID, routeID, sourcePinID, destinationPinID, contentTypeID, quantity,
+                          dataHashHelper(sortWaypoints.toArray()));
   }
 
   /**

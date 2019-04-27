@@ -72,6 +72,11 @@ public class CharacterRole extends CachedData {
     return nullSafeObjectCompare(roleCategory, other.roleCategory) && nullSafeObjectCompare(roleName, other.roleName);
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(roleCategory, roleName);
+  }
+
   /**
    * {@inheritDoc}
    */

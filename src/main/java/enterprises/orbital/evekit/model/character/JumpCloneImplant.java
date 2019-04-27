@@ -67,6 +67,11 @@ public class JumpCloneImplant extends CachedData {
     return jumpCloneID == other.jumpCloneID && typeID == other.typeID;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(jumpCloneID, typeID);
+  }
+
   /**
    * {@inheritDoc}
    */

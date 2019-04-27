@@ -62,6 +62,11 @@ public class LoyaltyPoints extends CachedData {
         loyaltyPoints == other.loyaltyPoints;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(corporationID, loyaltyPoints);
+  }
+
   /**
    * {@inheritDoc}
    */

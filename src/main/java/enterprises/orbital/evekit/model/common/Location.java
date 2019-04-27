@@ -76,6 +76,11 @@ public class Location extends CachedData {
         && doubleCompare(z, other.z, 0.000000001D);
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(itemID, itemName, x, y, z);
+  }
+
   /**
    * {@inheritDoc}
    */

@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(
@@ -104,6 +105,20 @@ public class CharacterMailMessage extends CachedData {
         && sentDate == other.sentDate && nullSafeObjectCompare(title, other.title)
         && nullSafeObjectCompare(recipients, other.recipients) && msgRead == other.msgRead
         && nullSafeObjectCompare(body, other.body);
+  }
+
+  @Override
+  public String dataHash() {
+    // sort labels and recipients for consistent hashing
+    List<Integer> sortLabels = new ArrayList<>(labels);
+    sortLabels.sort(Comparator.comparingInt(Integer::intValue));
+    List<MailMessageRecipient> sortRecipients = new ArrayList<>(recipients);
+    sortRecipients.sort(Comparator.comparingInt(MailMessageRecipient::getRecipientID));
+    return dataHashHelper(messageID, senderID, sentDate, title, msgRead, body,
+                          dataHashHelper(sortLabels.toArray()),
+                          dataHashHelper(sortRecipients.stream()
+                                                       .map(x -> x.getRecipientType() + x.getRecipientID())
+                                                       .toArray()));
   }
 
   /**

@@ -91,6 +91,11 @@ public class CharacterMedalGraphic extends CachedData {
         color == other.color;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(medalID, issued, part, layer, graphic, color);
+  }
+
   /**
    * {@inheritDoc}
    */

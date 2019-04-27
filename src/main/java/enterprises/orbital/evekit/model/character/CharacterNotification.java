@@ -98,6 +98,11 @@ public class CharacterNotification extends CachedData {
         && nullSafeObjectCompare(text, other.text);
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(notificationID, type, senderID, senderType, sentDate, msgRead, text);
+  }
+
   /**
    * {@inheritDoc}
    */

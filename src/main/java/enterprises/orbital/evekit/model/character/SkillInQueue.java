@@ -34,16 +34,16 @@ import java.util.logging.Logger;
         query = "SELECT c FROM SkillInQueue c where c.owner = :owner and c.queuePosition >= :qmax and c.lifeStart <= :point and c.lifeEnd > :point order by c.queuePosition asc"),
 })
 public class SkillInQueue extends CachedData {
-  private static final Logger log       = Logger.getLogger(SkillInQueue.class.getName());
-  private static final byte[] MASK      = AccountAccessMask.createMask(AccountAccessMask.ACCESS_SKILL_QUEUE);
+  private static final Logger log = Logger.getLogger(SkillInQueue.class.getName());
+  private static final byte[] MASK = AccountAccessMask.createMask(AccountAccessMask.ACCESS_SKILL_QUEUE);
 
-  private int                 endSP;
-  private long                endTime   = -1;
-  private int                 level;
-  private int                 queuePosition;
-  private int                 startSP;
-  private long                startTime = -1;
-  private int                 typeID;
+  private int endSP;
+  private long endTime = -1;
+  private int level;
+  private int queuePosition;
+  private int startSP;
+  private long startTime = -1;
+  private int typeID;
   private int trainingStartSP;
 
   @Transient
@@ -53,7 +53,7 @@ public class SkillInQueue extends CachedData {
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
       pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-  private Date                endTimeDate;
+  private Date endTimeDate;
   @Transient
   @ApiModelProperty(
       value = "startTime Date")
@@ -61,7 +61,7 @@ public class SkillInQueue extends CachedData {
   @JsonFormat(
       shape = JsonFormat.Shape.STRING,
       pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-  private Date                startTimeDate;
+  private Date startTimeDate;
 
   @SuppressWarnings("unused")
   protected SkillInQueue() {}
@@ -93,11 +93,16 @@ public class SkillInQueue extends CachedData {
    */
   @Override
   public boolean equivalent(
-                            CachedData sup) {
+      CachedData sup) {
     if (!(sup instanceof SkillInQueue)) return false;
     SkillInQueue other = (SkillInQueue) sup;
     return endSP == other.endSP && endTime == other.endTime && level == other.level && queuePosition == other.queuePosition && startSP == other.startSP
         && startTime == other.startTime && typeID == other.typeID && trainingStartSP == other.trainingStartSP;
+  }
+
+  @Override
+  public String dataHash() {
+    return dataHashHelper(endSP, endTime, level, queuePosition, startSP, startTime, typeID, trainingStartSP);
   }
 
   /**
@@ -179,22 +184,26 @@ public class SkillInQueue extends CachedData {
   }
 
   public static SkillInQueue get(
-                                 final SynchronizedEveAccount owner,
-                                 final long time,
-                                 final int queuePosition) throws IOException {
+      final SynchronizedEveAccount owner,
+      final long time,
+      final int queuePosition) throws IOException {
     try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(() -> {
-        TypedQuery<SkillInQueue> getter = EveKitUserAccountProvider.getFactory().getEntityManager().createNamedQuery("SkillInQueue.getByQueuePosition",
-                                                                                                                     SkillInQueue.class);
-        getter.setParameter("owner", owner);
-        getter.setParameter("qp", queuePosition);
-        getter.setParameter("point", time);
-        try {
-          return getter.getSingleResult();
-        } catch (NoResultException e) {
-          return null;
-        }
-      });
+      return EveKitUserAccountProvider.getFactory()
+                                      .runTransaction(() -> {
+                                        TypedQuery<SkillInQueue> getter = EveKitUserAccountProvider.getFactory()
+                                                                                                   .getEntityManager()
+                                                                                                   .createNamedQuery(
+                                                                                                       "SkillInQueue.getByQueuePosition",
+                                                                                                       SkillInQueue.class);
+                                        getter.setParameter("owner", owner);
+                                        getter.setParameter("qp", queuePosition);
+                                        getter.setParameter("point", time);
+                                        try {
+                                          return getter.getSingleResult();
+                                        } catch (NoResultException e) {
+                                          return null;
+                                        }
+                                      });
     } catch (Exception e) {
       if (e.getCause() instanceof IOException) throw (IOException) e.getCause();
       log.log(Level.SEVERE, "query error", e);
@@ -203,44 +212,49 @@ public class SkillInQueue extends CachedData {
   }
 
   public static List<SkillInQueue> accessQuery(
-                                               final SynchronizedEveAccount owner,
-                                               final long contid,
-                                               final int maxresults,
-                                               final boolean reverse,
-                                               final AttributeSelector at,
-                                               final AttributeSelector endSP,
-                                               final AttributeSelector endTime,
-                                               final AttributeSelector level,
-                                               final AttributeSelector queuePosition,
-                                               final AttributeSelector startSP,
-                                               final AttributeSelector startTime,
-                                               final AttributeSelector typeID,
-                                               final AttributeSelector trainingStartSP) throws IOException {
+      final SynchronizedEveAccount owner,
+      final long contid,
+      final int maxresults,
+      final boolean reverse,
+      final AttributeSelector at,
+      final AttributeSelector endSP,
+      final AttributeSelector endTime,
+      final AttributeSelector level,
+      final AttributeSelector queuePosition,
+      final AttributeSelector startSP,
+      final AttributeSelector startTime,
+      final AttributeSelector typeID,
+      final AttributeSelector trainingStartSP) throws IOException {
     try {
-      return EveKitUserAccountProvider.getFactory().runTransaction(() -> {
-        StringBuilder qs = new StringBuilder();
-        qs.append("SELECT c FROM SkillInQueue c WHERE ");
-        // Constrain to specified owner
-        qs.append("c.owner = :owner");
-        // Constrain lifeline
-        AttributeSelector.addLifelineSelector(qs, "c", at);
-        // Constrain attributes
-        AttributeSelector.addIntSelector(qs, "c", "endSP", endSP);
-        AttributeSelector.addLongSelector(qs, "c", "endTime", endTime);
-        AttributeSelector.addIntSelector(qs, "c", "level", level);
-        AttributeSelector.addIntSelector(qs, "c", "queuePosition", queuePosition);
-        AttributeSelector.addIntSelector(qs, "c", "startSP", startSP);
-        AttributeSelector.addLongSelector(qs, "c", "startTime", startTime);
-        AttributeSelector.addIntSelector(qs, "c", "typeID", typeID);
-        AttributeSelector.addIntSelector(qs, "c", "trainingStartSP", trainingStartSP);
-        // Set CID constraint and ordering
-        setCIDOrdering(qs, contid, reverse);
-        // Return result
-        TypedQuery<SkillInQueue> query = EveKitUserAccountProvider.getFactory().getEntityManager().createQuery(qs.toString(), SkillInQueue.class);
-        query.setParameter("owner", owner);
-        query.setMaxResults(maxresults);
-        return query.getResultList();
-      });
+      return EveKitUserAccountProvider.getFactory()
+                                      .runTransaction(() -> {
+                                        StringBuilder qs = new StringBuilder();
+                                        qs.append("SELECT c FROM SkillInQueue c WHERE ");
+                                        // Constrain to specified owner
+                                        qs.append("c.owner = :owner");
+                                        // Constrain lifeline
+                                        AttributeSelector.addLifelineSelector(qs, "c", at);
+                                        // Constrain attributes
+                                        AttributeSelector.addIntSelector(qs, "c", "endSP", endSP);
+                                        AttributeSelector.addLongSelector(qs, "c", "endTime", endTime);
+                                        AttributeSelector.addIntSelector(qs, "c", "level", level);
+                                        AttributeSelector.addIntSelector(qs, "c", "queuePosition", queuePosition);
+                                        AttributeSelector.addIntSelector(qs, "c", "startSP", startSP);
+                                        AttributeSelector.addLongSelector(qs, "c", "startTime", startTime);
+                                        AttributeSelector.addIntSelector(qs, "c", "typeID", typeID);
+                                        AttributeSelector.addIntSelector(qs, "c", "trainingStartSP", trainingStartSP);
+                                        // Set CID constraint and ordering
+                                        setCIDOrdering(qs, contid, reverse);
+                                        // Return result
+                                        TypedQuery<SkillInQueue> query = EveKitUserAccountProvider.getFactory()
+                                                                                                  .getEntityManager()
+                                                                                                  .createQuery(
+                                                                                                      qs.toString(),
+                                                                                                      SkillInQueue.class);
+                                        query.setParameter("owner", owner);
+                                        query.setMaxResults(maxresults);
+                                        return query.getResultList();
+                                      });
     } catch (Exception e) {
       if (e.getCause() instanceof IOException) throw (IOException) e.getCause();
       log.log(Level.SEVERE, "query error", e);

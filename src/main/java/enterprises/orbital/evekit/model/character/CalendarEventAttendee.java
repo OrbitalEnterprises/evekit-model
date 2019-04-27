@@ -67,6 +67,11 @@ public class CalendarEventAttendee extends CachedData {
                                                                                                  other.response);
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(eventID, characterID, response);
+  }
+
   /**
    * {@inheritDoc}
    */

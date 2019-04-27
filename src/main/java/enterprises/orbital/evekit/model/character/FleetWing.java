@@ -65,6 +65,11 @@ public class FleetWing extends CachedData {
         nullSafeObjectCompare(name, other.name);
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(fleetID, wingID, name);
+  }
+
   /**
    * {@inheritDoc}
    */

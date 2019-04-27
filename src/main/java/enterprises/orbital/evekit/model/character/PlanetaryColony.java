@@ -88,6 +88,11 @@ public class PlanetaryColony extends CachedData {
         && lastUpdate == other.lastUpdate && upgradeLevel == other.upgradeLevel && numberOfPins == other.numberOfPins;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(planetID, solarSystemID, planetType, ownerID, lastUpdate, upgradeLevel, numberOfPins);
+  }
+
   /**
    * {@inheritDoc}
    */

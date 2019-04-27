@@ -68,6 +68,11 @@ public class MailLabel extends CachedData {
         nullSafeObjectCompare(color, other.color);
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(labelID, unreadCount, name, color);
+  }
+
   /**
    * {@inheritDoc}
    */

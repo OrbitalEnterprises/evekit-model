@@ -84,6 +84,11 @@ public class CharacterOnline extends CachedData {
         && logins == other.logins;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(online, lastLogin, lastLogout, logins);
+  }
+
   /**
    * {@inheritDoc}
    */

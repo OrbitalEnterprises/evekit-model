@@ -1,5 +1,7 @@
 package enterprises.orbital.evekit.model.character;
 
+import enterprises.orbital.evekit.model.CachedData;
+
 import javax.persistence.Embeddable;
 import java.util.Objects;
 
@@ -43,6 +45,10 @@ public class PlanetaryPinContent {
   public boolean equivalent(PlanetaryPinContent that) {
     return typeID == that.typeID &&
         amount == that.amount;
+  }
+
+  public String dataHash() {
+    return CachedData.dataHashHelper(typeID, amount);
   }
 
   @Override

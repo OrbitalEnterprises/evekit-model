@@ -3,6 +3,9 @@ package enterprises.orbital.evekit.model.character;
 import enterprises.orbital.evekit.model.CachedData;
 
 import javax.persistence.Embeddable;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 
 @Embeddable
@@ -57,6 +60,10 @@ public class PlanetaryPinHead {
     return headID == that.headID &&
         CachedData.floatCompare(that.latitude, latitude,0.00001F) &&
         CachedData.floatCompare(that.longitude, longitude,0.00001F);
+  }
+
+  public String dataHash() {
+    return CachedData.dataHashHelper(headID, latitude, longitude);
   }
 
   @Override

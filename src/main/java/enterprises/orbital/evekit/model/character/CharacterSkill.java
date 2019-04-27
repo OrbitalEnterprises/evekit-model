@@ -70,6 +70,11 @@ public class CharacterSkill extends CachedData {
         activeSkillLevel == other.activeSkillLevel;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(typeID, trainedSkillLevel, skillpoints, activeSkillLevel);
+  }
+
   /**
    * {@inheritDoc}
    */

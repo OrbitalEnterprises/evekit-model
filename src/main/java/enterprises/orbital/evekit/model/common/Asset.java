@@ -92,6 +92,12 @@ public class Asset extends CachedData {
         blueprintCopy == other.blueprintCopy;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(itemID, locationID, locationType, locationFlag, typeID, quantity, singleton,
+                          blueprintType, blueprintCopy);
+  }
+
   /**
    * {@inheritDoc}
    */

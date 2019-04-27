@@ -104,6 +104,12 @@ public class FleetMember extends CachedData {
         wingID == other.wingID;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(fleetID, characterID, joinTime, role, roleName, shipTypeID, solarSystemID, squadID,
+                          stationID, takesFleetWarp, wingID);
+  }
+
   /**
    * {@inheritDoc}
    */

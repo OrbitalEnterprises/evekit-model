@@ -55,6 +55,11 @@ public class CharacterSheetSkillPoints extends CachedData {
     return totalSkillPoints == other.totalSkillPoints && unallocatedSkillPoints == other.unallocatedSkillPoints;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(totalSkillPoints, unallocatedSkillPoints);
+  }
+
   /**
    * {@inheritDoc}
    */

@@ -113,6 +113,12 @@ public class CharacterSheet extends CachedData {
         nullSafeObjectCompare(title, other.title);
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(characterID, name, corporationID, raceID, doB, bloodlineID, ancestryID, gender,
+                          allianceID, factionID, description, securityStatus, title);
+  }
+
   /**
    * {@inheritDoc}
    */

@@ -103,6 +103,11 @@ public class ChatChannelMember extends CachedData {
                                                                                                               other.reason);
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(channelID, category, accessorID, accessorType, untilWhen, reason);
+  }
+
   /**
    * {@inheritDoc}
    */

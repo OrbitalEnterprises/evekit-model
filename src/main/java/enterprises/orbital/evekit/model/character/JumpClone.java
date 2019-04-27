@@ -71,6 +71,11 @@ public class JumpClone extends CachedData {
         nullSafeObjectCompare(locationType, other.locationType);
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(jumpCloneID, locationID, cloneName, locationType);
+  }
+
   /**
    * {@inheritDoc}
    */

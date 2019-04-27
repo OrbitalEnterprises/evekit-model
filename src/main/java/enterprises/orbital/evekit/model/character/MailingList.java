@@ -62,6 +62,11 @@ public class MailingList extends CachedData {
     return nullSafeObjectCompare(displayName, other.displayName) && listID == other.listID;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(displayName, listID);
+  }
+
   /**
    * {@inheritDoc}
    */

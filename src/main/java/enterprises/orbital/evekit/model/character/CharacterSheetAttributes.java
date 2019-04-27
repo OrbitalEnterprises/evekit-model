@@ -100,6 +100,12 @@ public class CharacterSheetAttributes extends CachedData {
         accruedRemapCooldownDate == other.accruedRemapCooldownDate;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(intelligence, memory, charisma, perception, willpower, bonusRemaps, lastRemapDate,
+                          accruedRemapCooldownDate);
+  }
+
   /**
    * {@inheritDoc}
    */

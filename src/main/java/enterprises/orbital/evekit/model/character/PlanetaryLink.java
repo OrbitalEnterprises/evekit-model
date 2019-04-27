@@ -8,6 +8,8 @@ import enterprises.orbital.evekit.model.CachedData;
 
 import javax.persistence.*;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -69,6 +71,11 @@ public class PlanetaryLink extends CachedData {
     if (!(sup instanceof PlanetaryLink)) return false;
     PlanetaryLink other = (PlanetaryLink) sup;
     return planetID == other.planetID && sourcePinID == other.sourcePinID && destinationPinID == other.destinationPinID && linkLevel == other.linkLevel;
+  }
+
+  @Override
+  public String dataHash() {
+    return dataHashHelper(planetID, sourcePinID, destinationPinID, linkLevel);
   }
 
   /**

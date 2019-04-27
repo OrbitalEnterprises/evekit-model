@@ -186,6 +186,19 @@ public class PlanetaryPin extends CachedData {
         && comparePinHeadSet(heads, other.heads) && comparePinContentSet(contents, other.contents);
   }
 
+  @Override
+  public String dataHash() {
+    // sort pin heads and pin contents for consistent hashing
+    List<PlanetaryPinHead> sortHeads = new ArrayList<>(heads);
+    sortHeads.sort(Comparator.comparingInt(PlanetaryPinHead::getHeadID));
+    List<PlanetaryPinContent> sortContents = new ArrayList<>(contents);
+    sortContents.sort(Comparator.comparingInt(PlanetaryPinContent::getTypeID));
+    return dataHashHelper(planetID, pinID, typeID, schematicID, lastCycleStart, cycleTime, quantityPerCycle,
+                          installTime, expiryTime, productTypeID, longitude, latitude, headRadius,
+                          dataHashHelper(sortHeads.stream().map(PlanetaryPinHead::dataHash).toArray()),
+                          dataHashHelper(sortContents.stream().map(PlanetaryPinContent::dataHash).toArray()));
+  }
+
   /**
    * {@inheritDoc}
    */

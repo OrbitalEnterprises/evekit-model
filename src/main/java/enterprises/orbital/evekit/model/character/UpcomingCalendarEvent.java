@@ -100,6 +100,12 @@ public class UpcomingCalendarEvent extends CachedData {
         ownerType, other.ownerType);
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(duration, eventDate, eventID, eventText, eventTitle, ownerID, ownerName, response,
+                          importance, ownerType);
+  }
+
   /**
    * {@inheritDoc}
    */

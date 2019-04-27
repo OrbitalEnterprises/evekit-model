@@ -72,6 +72,11 @@ public class Fitting extends CachedData {
         shipTypeID == other.shipTypeID;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(fittingID, name, description, shipTypeID);
+  }
+
   /**
    * {@inheritDoc}
    */

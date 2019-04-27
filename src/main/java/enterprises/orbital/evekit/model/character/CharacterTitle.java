@@ -62,6 +62,11 @@ public class CharacterTitle extends CachedData {
     return titleID == other.titleID && nullSafeObjectCompare(titleName, other.titleName);
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(titleID, titleName);
+  }
+
   /**
    * {@inheritDoc}
    */

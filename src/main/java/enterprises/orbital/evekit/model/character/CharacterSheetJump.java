@@ -89,6 +89,11 @@ public class CharacterSheetJump extends CachedData {
     return jumpActivation == other.jumpActivation && jumpFatigue == other.jumpFatigue && jumpLastUpdate == other.jumpLastUpdate;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(jumpActivation, jumpFatigue, jumpLastUpdate);
+  }
+
   /**
    * {@inheritDoc}
    */

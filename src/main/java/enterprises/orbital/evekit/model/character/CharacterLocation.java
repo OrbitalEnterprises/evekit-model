@@ -58,6 +58,11 @@ public class CharacterLocation extends CachedData {
     return solarSystemID == other.solarSystemID && stationID == other.stationID && structureID == other.structureID;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(solarSystemID, stationID, structureID);
+  }
+
   /**
    * {@inheritDoc}
    */

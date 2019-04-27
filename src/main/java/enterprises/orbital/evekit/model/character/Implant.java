@@ -61,6 +61,11 @@ public class Implant extends CachedData {
     return typeID == other.typeID;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(typeID);
+  }
+
   /**
    * {@inheritDoc}
    */

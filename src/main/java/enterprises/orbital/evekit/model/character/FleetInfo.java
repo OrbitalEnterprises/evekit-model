@@ -74,6 +74,11 @@ public class FleetInfo extends CachedData {
         nullSafeObjectCompare(motd,other.motd);
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(fleetID, isFreeMove, isRegistered, isVoiceEnabled, motd);
+  }
+
   /**
    * {@inheritDoc}
    */

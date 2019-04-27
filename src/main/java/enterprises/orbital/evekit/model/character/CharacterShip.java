@@ -59,6 +59,11 @@ public class CharacterShip extends CachedData {
                                                                                                      other.shipName);
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(shipTypeID, shipItemID, shipName);
+  }
+
   /**
    * {@inheritDoc}
    */

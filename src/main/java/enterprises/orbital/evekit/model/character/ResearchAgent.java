@@ -86,6 +86,11 @@ public class ResearchAgent extends CachedData {
         && researchStartDate == other.researchStartDate && skillTypeID == other.skillTypeID;
   }
 
+  @Override
+  public String dataHash() {
+    return dataHashHelper(agentID, pointsPerDay, remainderPoints, researchStartDate, skillTypeID);
+  }
+
   /**
    * {@inheritDoc}
    */
