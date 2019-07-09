@@ -494,7 +494,7 @@ public class MarketOrder extends CachedData {
                                         // Constrain attributes
                                         AttributeParameters p = new AttributeParameters("att");
                                         AttributeSelector.addLongSelector(qs, "c", "orderID", orderID);
-                                        AttributeSelector.addIntSelector(qs, "c", "accountKey", walletDivision);
+                                        AttributeSelector.addIntSelector(qs, "c", "walletDivision", walletDivision);
                                         AttributeSelector.addBooleanSelector(qs, "c", "bid", bid);
                                         AttributeSelector.addLongSelector(qs, "c", "charID", charID);
                                         AttributeSelector.addIntSelector(qs, "c", "duration", duration);
