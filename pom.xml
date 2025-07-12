@@ -20,7 +20,7 @@
   <properties>
     <evekit.version>4.2.1</evekit.version>
     <hsqldb.version>2.3.3</hsqldb.version>
-    <apache.commons.version>3.4</apache.commons.version>
+    <apache.commons.version>3.18.0</apache.commons.version>
   </properties>
   
   <dependencies>
